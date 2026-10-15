@@ -16,6 +16,97 @@
   },
   "coreRoles": ["tobias-larke", "dagny-brask", "nettle-tumbletoe"],
   "gmNotes": "THE TRUTH: Corvin Pell faked his death six weeks ago to escape his creditors. Tonight is his exit. He is the auctioneer, 'Mr. Sprott', in a powdered wig and a Disguise Self (the real Sprott is gagged in the pantry). He invited the five people who could prove he is alive so he can pin the night's thefts and frauds on them; the Watch has been tipped. Lot Thirteen, the 'Magpie's Chest', is Biscuit, his pet mimic, whose gut holds his real hoard plus the item he took from each cast member. Biscuit is calmed by Corvin's whistled 'Magpie's Waltz' (Tobias knows the tune). ACT 1, MASKS ON (30-40 min): arrival, the mask table, mingling. Meet Lady Ysolde Marchbanks (rival bidder, Nettle's patron), Captain Maud Holloway (Watch, undercover as a wine bore), and the auctioneer. Run lots 1-12 as a bidding farce: most 'relics' are Odalys's forgeries, so let her squirm. Plant: the auctioneer whistles; the portraits whisper. ACT 2, LOT THIRTEEN (30 min): the chest rolls out, the whistle sounds, the lights die, the doors lock. The chest scuttles off into the house and two animated armor 'bailiffs' (MM) wake and demand everyone's masks stay on. Let each secret start to leak. ACT 3, THE HOUSE WAKES (60-75 min): chase Biscuit through the portrait gallery (talking portraits gossip; Odalys's forged saints heckle her), the kitchen (animated cookware, skill challenge), and the cellar to the crypt, where Pell's grave is a trapdoor to a river tunnel. Fight or tame the mimic (MM mimic; a few bars of the Waltz, Animal Handling, or a sausage calms it). Its gut holds each cast member's stolen item. ACT 4, THE UNMASKING (45-60 min): the boathouse. Corvin (use the Spy stat block with Misty Step and Invisibility once each; add two Thugs for a 5-player table) tries to leave with Biscuit in a trunk. The Watch arrives, expecting five thieves. The party must unmask him (Investigation or Insight against the disguise, Anselm's sworn word, Dagny's forged-letter proof, Odalys's illusion-craft, Tobias's tune). Endings: hand Corvin to Captain Holloway, trade his freedom for their stolen things, or let Biscuit eat the evidence. TABLE NOTES: secrets are levers, not obligations. Nobody has to betray anybody; the fun is the reveal and the divided loyalties. Nudge a reveal at the end of Act 2 and another during the Act 3 crypt. For 3 players drop one armor and use a single mimic; for 5 add the Thugs in Act 4. Lady Marchbanks wants Lot Thirteen destroyed and Odalys exposed; she can be a rival, an ally, or a pawn.",
+  "gazette": {
+    "name": "The Mallow Row Mercury",
+    "town": "Mallow Row",
+    "price": "Two pence, masks extra"
+  },
+  "sounds": {
+    "beds": [
+      {
+        "id": "the-salesroom",
+        "label": "The salesroom, masked and murmuring",
+        "preset": "crowd"
+      },
+      {
+        "id": "the-house-wakes",
+        "label": "The lights die and the house wakes",
+        "preset": "drone"
+      },
+      {
+        "id": "kitchen-fires",
+        "label": "The kitchen: pots, fires and rattling copper",
+        "preset": "fire"
+      },
+      {
+        "id": "rain-on-the-boathouse",
+        "label": "Rain on the boathouse roof",
+        "preset": "rain"
+      }
+    ],
+    "stingers": [
+      {
+        "id": "hammer-falls",
+        "label": "The hammer falls: sold",
+        "preset": "gong"
+      },
+      {
+        "id": "bidders-applaud",
+        "label": "The room applauds a winning bid",
+        "preset": "cheer"
+      },
+      {
+        "id": "the-doors-lock",
+        "label": "The doors lock",
+        "preset": "door"
+      },
+      {
+        "id": "a-forgery-shatters",
+        "label": "A forged relic shatters",
+        "preset": "glass"
+      },
+      {
+        "id": "lot-thirteen-stirs",
+        "label": "Something in Lot Thirteen stirs",
+        "preset": "heartbeat"
+      },
+      {
+        "id": "misty-step",
+        "label": "Corvin vanishes in a Misty Step",
+        "preset": "whoosh"
+      }
+    ]
+  },
+  "letters": [
+    {
+      "id": "the-waltz-and-the-wink",
+      "to": "tobias-larke",
+      "title": "A folded sheet of music from a masked hand",
+      "when": "End of Act 2: as the lights die and the doors lock",
+      "text": "Darling. You kept the lid shut, and I have not forgotten who sang loudest. Here is the Waltz, in case your fingers have gone stiff with grief; whistle it in the gallery and the beast will heel. One favour, and then Old Marigold is yours with a new string: when the doors open on the boathouse, do not say my name. Let them squint at me a little longer. I promise the ending will be worth it. I promise you a great many things; I know. Burn this, or don't. C."
+    },
+    {
+      "id": "the-magpie-retainer",
+      "to": "dagny-brask",
+      "title": "The retainer, on a silver tray",
+      "when": "Act 3: in the kitchen challenge, left on the pass beside a wax magpie seal",
+      "text": "Captain Brask. Twenty gold a month was never charity; it was a retainer, and tonight I am calling it in. Stand at the boathouse door when the Watch comes and let no one pass until I have finished my speech. Do this and your pension bond is yours, the letter that ruined you is ash, and whoever's hand it was need never be named. Refuse, and the Watch will find a disgraced guard-captain at the scene of a dead man's thefts. You were always the best door I owned. The magpie."
+    },
+    {
+      "id": "the-lid-and-the-roof",
+      "to": "anselm-pyke",
+      "title": "A note under the coffin stone",
+      "when": "Act 3: in the crypt, tucked beneath the stone of the coffin-trapdoor",
+      "text": "Brother Anselm. I know you lifted the lid at the vigil, because the oil keg was a hair off true when they carried it back. You closed it. You finished the rites. You kept the roof. I have rarely been so moved by a man's discretion. Saint Edda's reliquary is in the beast's belly, and you may have it, and my gratitude, for the price of one small testimony: that you saw a dead man in that coffin, to the Watch, with your hand on the book. A priest's word is worth more than gold. Spend it kindly. A grateful parishioner."
+    },
+    {
+      "id": "the-ladys-midnight",
+      "to": "nettle-tumbletoe",
+      "title": "Marchbanks's last offer",
+      "when": "Act 3: delivered by the Lady's maid in the portrait gallery, or found tucked in Nettle's glove",
+      "text": "Master Tumbletoe. My patience and my money both expire at midnight. There is a ledger bound in plum-red leather inside that creature's belly; fetch it, unread, and your burrow's note is forgotten. At the stroke of twelve I intend to ask the room who made Pell's relics, and I would prefer to name a name of my own choosing. You have been so kind to the girl. Be kind to yourself instead. If you cannot decide by then, I will decide for you, and the Tumbletoes will pay the difference. Y. Marchbanks."
+    }
+  ],
   "content": {
     "sources": ["PHB 2014", "Xanathar's Guide to Everything", "Monster Manual 2014"],
     "warnings": ["faked death and grief", "fraud and impersonation", "an NPC bound and gagged (offscreen)", "cartoonish violence"]

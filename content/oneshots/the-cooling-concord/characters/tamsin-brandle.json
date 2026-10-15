@@ -111,5 +111,40 @@
         { "id": "loaf", "label": "Heel of bread", "value": "The heel of a loaf, warm, wrapped in a Chancery maintenance order" }
       ]
     }
-  ]
+  ],
+  "flashback": "What is the first thing you say to the man in the fire each morning?",
+  "ifUnclaimed": {
+    "npc": "Tamsin is absent, up a chimney: Pip, her apprentice, guides the party through the hypocaust in Act 2 and mutters about Damper Seven. Tamsin appears sooty at the furnace in Act 4, just as Torvak begins to speak, and says only: 'He's clear. Let him talk.'",
+    "reassign": [
+      {
+        "beat": "Knows the short routes through the hypocaust",
+        "to": [
+          "sabra-kovane",
+          "corwen-tidewrack"
+        ],
+        "text": "You have walked the stokers' galleries a hundred times, or been dragged through the outflow sluice once. Either way you know the short route down to the Heart-furnace and which flues will scald you."
+      },
+      {
+        "beat": "Damper Seven propped open, and the spiced cinder-oil (letter: little-stoker)",
+        "to": [
+          "sabra-kovane",
+          "selenor-aetheis"
+        ],
+        "text": "You have known for years that someone props Damper Seven open and feeds the Surety spiced cinder-oil. You have never reported it, because the only effect you can see is that he sounds clearer."
+      },
+      {
+        "beat": "Talks to Torvak daily, so knows what he wants",
+        "to": [
+          "vessia-drun",
+          "sabra-kovane"
+        ],
+        "text": "You are the one person who has actually asked Torvak what he wants, and you have not told anyone the answer. He wants to be heard before anyone votes."
+      }
+    ],
+    "cuts": [
+      "The Tamsin and Vessia furnace-bench Jubilee tradition.",
+      "The stoker and Selenor ink-versus-soot banter.",
+      "The skill-challenge shortcut in Act 2; the route is longer and the clock is tighter."
+    ]
+  }
 }

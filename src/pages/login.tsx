@@ -7,6 +7,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const forGm = typeof router.query.next === "string" && /^\/[^/]+\/gm\/?$/.test(router.query.next.split("?")[0]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,7 +48,7 @@ export default function LoginPage() {
             Tear-Off
           </Typography>
           <Typography align="center" sx={{ fontFamily: "var(--font-print)", fontSize: 18 }}>
-            Speak the word at the door.
+            {forGm ? "Only the GM goes behind the screen. Speak the GM's word." : "Speak the word at the door."}
           </Typography>
           <TextField
             type="password"

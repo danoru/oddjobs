@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createToken, AUTH_COOKIE } from "@/lib/auth";
+import { createToken, roleForPassword, AUTH_COOKIE } from "@/lib/auth";
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,14 +13,15 @@ export default async function handler(
   if (!process.env.APP_PASSWORD) {
     return res.status(500).json({ error: "APP_PASSWORD not configured" });
   }
-  if (password !== process.env.APP_PASSWORD) {
+  const role = roleForPassword(password);
+  if (!role) {
     return res.status(401).json({ error: "Wrong password" });
   }
-  const token = await createToken();
+  const token = await createToken(role);
   const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
   res.setHeader(
     "Set-Cookie",
     `${AUTH_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60 * 60 * 24 * 30}${secure}`,
   );
-  return res.status(200).json({ ok: true });
+  return res.status(200).json({ ok: true, role });
 }

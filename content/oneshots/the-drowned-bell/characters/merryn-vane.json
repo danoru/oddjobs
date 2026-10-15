@@ -432,5 +432,39 @@
         }
       ]
     }
-  ]
+  ],
+  "flashback": "What does the bell sound like to you, and whose voice is in it?",
+  "ifUnclaimed": {
+    "npc": "Merryn is absent, but the Ghost stands dry at the waterline in Act 1 in the rain, saying 'It's calling me' before she walks the party toward the Tern's ribs. In Act 4 she waits at the foot of the rope and offers the Tidemother's bargain to whoever steps forward.",
+    "reassign": [
+      {
+        "beat": "The bell rings in her head and says her name",
+        "to": [
+          "odo-brambletoe",
+          "sister-vell"
+        ],
+        "text": "Since the bell was cut you have heard it ringing under the water, faint and sure, and sometimes it says your name. If you close your eyes, you can point to where it lies."
+      },
+      {
+        "beat": "The Tidemother's deal: take the rope, the drowned sleep, the debt is paid",
+        "to": [
+          "rook",
+          "marrow"
+        ],
+        "text": "Before the ringing, something under the water offers you a deal: take the rope, the drowned sleep, and your debt is paid, and you go down with them. It is a deal, not a command. You have not told anyone."
+      },
+      {
+        "beat": "She suspects the bell lies in the Tern's ribs",
+        "to": [
+          "marrow",
+          "sister-vell"
+        ],
+        "text": "You think the bell is tangled in the Tern's wreck. It lies off the Gull's Teeth where the current runs hardest, and you have not let yourself look at it in eleven years."
+      }
+    ],
+    "cuts": [
+      "The Merryn and Odo last-verse scene.",
+      "Her private audience with the Tidemother; run it as a vision for whoever takes the rope."
+    ]
+  }
 }

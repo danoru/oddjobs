@@ -310,5 +310,41 @@
         }
       ]
     }
-  ]
+  ],
+  "flashback": "What did Sister Vell say to you the night she hauled you out of the surf at nine, and what have you never said back?",
+  "ifUnclaimed": {
+    "npc": "Rook is absent from the table because the smugglers caught him. He is bound in the Act 2 cave, ashamed and talkative, and trades the buyer's description and the wreck's location for a promise to be taken along. The coin is still in his boot.",
+    "reassign": [
+      {
+        "beat": "The Tidemother's coin, and its letter (the-coin-keeps-the-count)",
+        "to": [
+          "merryn-vane",
+          "odo-brambletoe",
+          "marrow"
+        ],
+        "text": "In the cave you find a coin stamped with a drowned woman's face, warm as a living hand. It was the buyer's payment for the bell. It dreams at you, and it knows exactly how much the bell weighs."
+      },
+      {
+        "beat": "Knows the way into the smugglers' cave",
+        "to": [
+          "marrow",
+          "odo-brambletoe"
+        ],
+        "text": "You grew up running goods past the Watch. You know the sea-mouth behind the Gull's Teeth, the knock the smugglers use, and the name to give at the inner door."
+      },
+      {
+        "beat": "The stranger in the sea-green coat who hired the thief",
+        "to": [
+          "sister-vell",
+          "odo-brambletoe"
+        ],
+        "text": "Three weeks ago a stranger in a sea-green coat asked you about the tower stair and how heavy the yoke was. You told him, because he was polite and tipped well."
+      }
+    ],
+    "cuts": [
+      "Rook's private confession to Vell, and her 'I knew' reply.",
+      "The Act 2 break-in set piece; replace with a rescue of Rook.",
+      "The coin-on-the-rope choice in Act 4, unless the coin holder wants to make it."
+    ]
+  }
 }

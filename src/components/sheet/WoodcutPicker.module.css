@@ -1,0 +1,48 @@
+.pair {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.frame {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+}
+
+.frame figcaption {
+  margin-top: 4px;
+  font-size: 12px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.plate {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border: 3px double var(--ink);
+  background: var(--parchment);
+  box-sizing: border-box;
+}
+
+/* The woodcut is already two flat colours; keep the browser from smearing the hatching. */
+.woodcut {
+  image-rendering: auto;
+}
+
+.working {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+  border: 3px double var(--ink);
+  background: var(--parchment);
+  color: var(--ink-soft);
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.hidden {
+  display: none;
+}

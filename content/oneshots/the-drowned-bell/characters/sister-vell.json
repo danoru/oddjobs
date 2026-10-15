@@ -406,5 +406,40 @@
         }
       ]
     }
-  ]
+  ],
+  "flashback": "Three nights ago you woke in the tower to an empty yoke. What was the very first thing you told yourself?",
+  "ifUnclaimed": {
+    "npc": "Run Vell as a steady lantern on the beach in Act 1, healing the wounded and asking sharp, kind questions. She never accuses Rook and waits for him to speak first. In Act 4 she is the voice on the shore, holding the lanterns and the town together while the party rows out.",
+    "reassign": [
+      {
+        "beat": "She saw Rook take the bell and let him go",
+        "to": [
+          "odo-brambletoe",
+          "marrow"
+        ],
+        "text": "Three nights ago you were on the harbour wall and saw Rook climb the bell-tower with a saw and a sack. You thought about shouting. You didn't. You have told nobody you saw."
+      },
+      {
+        "beat": "Keeper's lore, and the old keeper's warning on the wreck (letter: the-keepers-warning)",
+        "to": [
+          "merryn-vane",
+          "odo-brambletoe"
+        ],
+        "text": "You have read the old keepers' logs in the tower. You know the bell is a collar, not a lullaby, and that the keeper does not choose who stays at the rope. If the old keeper left a note on the wreck, it is meant for you."
+      },
+      {
+        "beat": "She washed Merryn that night and felt her breathe",
+        "to": [
+          "marrow",
+          "odo-brambletoe"
+        ],
+        "text": "You saw Merryn Vane's chest rise after the whole beach had called her dead. You were told to say nothing and you have kept to it for eleven years."
+      }
+    ],
+    "cuts": [
+      "The grave-side scene where Vell lets Marrow's coins lie.",
+      "Vell's 'I knew' conversation with Rook; whoever inherited the first beat can deliver it, or let it go.",
+      "Healing is thinner: add two potions of healing in the Act 2 cave."
+    ]
+  }
 }

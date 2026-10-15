@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import type { GetStaticProps } from "next";
 import { Box, Container, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { loadAll } from "@/lib/content";
+import { FATE_LABEL, type Survivor } from "@/lib/legacy";
+import { loadSurvivors } from "@/lib/legacy.server";
 import type { OneShotWithCast } from "@/lib/schema";
 import { SiteHeader } from "@/components/SiteHeader";
 import { PosterIcon } from "@/components/PosterIcon";
@@ -15,8 +17,11 @@ type Summary = Pick<
   "slug" | "title" | "pitch" | "ruleset" | "level" | "players" | "durationHrs" | "tone" | "posting"
 > & { cast: { id: string; icon: OneShotWithCast["cast"][number]["poster"]["icon"] }[] };
 
-export const getStaticProps: GetStaticProps<{ jobs: Summary[] }> = async () => ({
+export const getStaticProps: GetStaticProps<{ jobs: Summary[]; survivors: Survivor[] }> = async () => ({
   props: {
+    survivors: loadSurvivors()
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, 8),
     jobs: loadAll().map((os) => ({
       slug: os.slug,
       title: os.title,
@@ -32,7 +37,7 @@ export const getStaticProps: GetStaticProps<{ jobs: Summary[] }> = async () => (
   },
 });
 
-export default function BoardPage({ jobs }: { jobs: Summary[] }) {
+export default function BoardPage({ jobs, survivors }: { jobs: Summary[]; survivors: Survivor[] }) {
   const [ruleset, setRuleset] = useState<"all" | "2014" | "2024">("all");
   const [party, setParty] = useState<number | "any">("any");
   const shown = useMemo(
@@ -133,6 +138,25 @@ export default function BoardPage({ jobs }: { jobs: Summary[] }) {
                   </div>
                 </Link>
               ))}
+            </div>
+          )}
+          {survivors.length > 0 && (
+            <div className={s.note} style={{ ["--tilt" as string]: "-0.8deg", marginTop: 32, maxWidth: 560 }}>
+              <span className={s.pin} aria-hidden="true" />
+              <p className={s.noteTitle}>Notable survivors</p>
+              <ul className={s.yarnList}>
+                {survivors.map((v) => (
+                  <li key={v.id}>
+                    <span className={s.yarn}>
+                      {v.name}
+                      {v.title ? `, the ${v.title}` : `, ${v.epithet}`}
+                    </span>{" "}
+                    {FATE_LABEL[v.fate].toLowerCase()} {v.oneshotTitle}
+                    {v.playedBy ? ` (played by ${v.playedBy})` : ""}.
+                    {v.line ? <i> &ldquo;{v.line}&rdquo;</i> : null}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>

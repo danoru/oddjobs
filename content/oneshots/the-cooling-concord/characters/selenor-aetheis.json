@@ -132,5 +132,32 @@
         { "id": "ribbon", "label": "Unsealed ribbon", "value": "A length of Chancery ribbon with no wax on it, saved for a document he has not dared write" }
       ]
     }
-  ]
+  ],
+  "flashback": "What did your grandfather Aetheion say about the Concord when you were small, and what did you take him to mean?",
+  "ifUnclaimed": {
+    "npc": "The Chancery sends Steward Naeris Oulane to cast its vote and carry the Chancery copy. She is friendly and visibly reluctant, and she can be talked around. She cites the Chancery's line and folds when the original text is read aloud.",
+    "reassign": [
+      {
+        "beat": "The missing page from the Chancery copy (letter: the-drafters-seal)",
+        "to": [
+          "corwen-tidewrack",
+          "tamsin-brandle"
+        ],
+        "text": "You have noticed that the Chancery's certified copy skips a page between the fourth and fifth articles. The register says nothing. You know exactly which clause would be on it."
+      },
+      {
+        "beat": "The Registrar's Writ of Assumed Consent",
+        "to": [
+          "sabra-kovane",
+          "tamsin-brandle"
+        ],
+        "text": "Steward Naeris pressed a sealed Writ into your hand: if the Surety will not consent to renewal, the bearer is to mark for him. You have not broken the seal. You have not decided anything."
+      }
+    ],
+    "cuts": [
+      "Selenor's legal back-and-forth in the parley; Naeris holds the Chancery's line.",
+      "The Selenor and Corwen letter-writers' banter.",
+      "The Selenor and Vessia 'my grandfather drafted yours' confrontation."
+    ]
+  }
 }

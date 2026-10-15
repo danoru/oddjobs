@@ -96,5 +96,41 @@
         { "id": "tankard", "label": "Hold tankard", "value": "A dented tankard from her mountain hold, still smelling of barley" }
       ]
     }
-  ]
+  ],
+  "flashback": "What was the nastiest thing you thought about Corvin Pell while you carried his coffin?",
+  "ifUnclaimed": {
+    "npc": "Dagny is absent. The two animated bailiffs wear the old Pell House guard livery with her name stitched in the collar, which the party can notice. In Act 4 she turns up at the boathouse beside the Watch, furious and unmasked, as a witness.",
+    "reassign": [
+      {
+        "beat": "The magpie-sealed envelopes: 20 gp every first of the month (letter: the-magpie-retainer)",
+        "to": [
+          "anselm-pyke",
+          "nettle-tumbletoe",
+          "odalys-quill"
+        ],
+        "text": "Since the funeral, 20 gp has arrived on the first of every month in an unmarked envelope sealed with a wax magpie. You have told no one. A dead man does not post letters."
+      },
+      {
+        "beat": "Knows the house's doors and guard rota",
+        "to": [
+          "nettle-tumbletoe",
+          "odalys-quill"
+        ],
+        "text": "You know Pell House's doors: which lock from the cellar side, where the boathouse key hangs, and that the pantry is the only room with a bolt on the outside."
+      },
+      {
+        "beat": "The forged letter that ruined her",
+        "to": [
+          "tobias-larke",
+          "anselm-pyke"
+        ],
+        "text": "Dagny Brask's old comrades told you the letter that ruined her was a forgery, and nobody has ever said whose. You want to help clear her name."
+      }
+    ],
+    "cuts": [
+      "The Dagny and Odalys reckoning over the forged letter.",
+      "The Act 4 door-guard test; Corvin can hire another guest instead, or skip it.",
+      "Dagny catching Nettle on the east wall."
+    ]
+  }
 }

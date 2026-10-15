@@ -134,5 +134,23 @@
         { "id": "shell", "label": "Whelk shell", "value": "A whelk shell that is faintly warm and, if you hold it up, whispers the weather" }
       ]
     }
-  ]
+  ],
+  "flashback": "What was the last thing the tide-court told you before they sealed the tube, and what did you want to say back?",
+  "ifUnclaimed": {
+    "npc": "Corwen is absent. Per the rite, the casting vote passes to Torvak himself. A queasy, tongue-tied Driftwood courier delivers the original Concord at midnight and refuses to speak until the gong.",
+    "reassign": [
+      {
+        "beat": "The original Concord in the waxed tube, with the Rider",
+        "to": [
+          "tamsin-brandle",
+          "sabra-kovane"
+        ],
+        "text": "This afternoon a green-faced man off the Driftwood barge pressed a waxed tube into your hands. 'Hold this until midnight, and tell no one.' You have not opened it. Inside is the original Concord, with a Rider the Chancery's copy does not have."
+      }
+    ],
+    "cuts": [
+      "Corwen's sea-order silence and the Witness's casting-vote tension (Torvak takes the casting vote).",
+      "The Corwen and Selenor letter-writers' scene."
+    ]
+  }
 }

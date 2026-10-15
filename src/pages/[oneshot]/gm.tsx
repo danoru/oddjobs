@@ -1,0 +1,192 @@
+import Head from "next/head";
+import Link from "next/link";
+import { useState } from "react";
+import type { GetServerSideProps } from "next";
+import { Alert, Box, Button, Container, Typography } from "@mui/material";
+import { requestRole } from "@/lib/auth";
+import { loadOneShot } from "@/lib/content";
+import type { OneShotWithCast } from "@/lib/schema";
+import { useClaims } from "@/lib/storage";
+import { SiteHeader } from "@/components/SiteHeader";
+import { GmTablePanels } from "@/components/gm/GmTablePanels";
+import s from "@/components/board/Board.module.css";
+
+type Props = { os: OneShotWithCast };
+
+/**
+ * The GM's view: notes, every secret, the full ties and the live table.
+ * Rendered per request after checking the GM role, so `gmNotes` only ever
+ * leaves the server in a response that already passed that check — there's
+ * no static page or data file for it.
+ */
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, params, resolvedUrl }) => {
+  if ((await requestRole(req)) !== "gm") {
+    return { redirect: { destination: `/login?next=${encodeURIComponent(resolvedUrl)}`, permanent: false } };
+  }
+  const slug = String(params?.oneshot ?? "");
+  if (!/^[a-z0-9-]+$/.test(slug)) return { notFound: true };
+  let os: OneShotWithCast;
+  try {
+    os = loadOneShot(slug);
+  } catch {
+    return { notFound: true };
+  }
+  res.setHeader("Cache-Control", "private, no-store");
+  return { props: { os: JSON.parse(JSON.stringify(os)) as OneShotWithCast } };
+};
+
+const mono = { fontFamily: "var(--font-print)", fontSize: 16 } as const;
+
+export default function GmPage({ os }: Props) {
+  const claims = useClaims(os.slug);
+  const { table, claimedBy, loading, error, openTable, leave, release } = claims;
+  const [problem, setProblem] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const nameOf = (id: string) => os.cast.find((c) => c.id === id)?.name ?? id;
+
+  async function open() {
+    setBusy(true);
+    setProblem(await openTable());
+    setBusy(false);
+  }
+
+  return (
+    <>
+      <Head>
+        <title>{`GM · ${os.title} · Tear-Off`}</title>
+        <meta name="robots" content="noindex" />
+      </Head>
+      <Container maxWidth="lg" sx={{ pb: 8 }}>
+        <SiteHeader back={{ href: `/${os.slug}`, label: os.title }} />
+
+        <div className={s.frame}>
+          <div className={s.grid} style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))" }}>
+            <div className={s.note} style={{ ["--tilt" as string]: "-0.6deg" }}>
+              <span className={s.brassPin} aria-hidden="true" />
+              <div className={s.postingHeader}>Behind the screen</div>
+              <h1 className={s.postingTitle} style={{ fontSize: "clamp(26px, 4vw, 38px)" }}>
+                {os.title}
+              </h1>
+              {table ? (
+                <>
+                  <Typography sx={{ ...mono, mt: 1 }}>Read this out — players join with it on the job page:</Typography>
+                  <Typography
+                    aria-label={`Table code ${table.split("").join(" ")}`}
+                    sx={{ fontFamily: "var(--font-poster)", fontSize: 52, letterSpacing: "0.18em", color: "var(--wax)" }}
+                  >
+                    {table}
+                  </Typography>
+                  <Typography sx={{ ...mono, fontSize: 14, color: "var(--ink-soft)" }}>
+                    Or share <Link href={`/${os.slug}?table=${table}`}>{`/${os.slug}?table=${table}`}</Link>
+                  </Typography>
+                  <Box sx={{ display: "flex", gap: 1, mt: 1.5, flexWrap: "wrap" }}>
+                    <Button size="small" variant="outlined" onClick={open} disabled={busy} sx={{ color: "var(--ink)", borderColor: "var(--ink-soft)" }}>
+                      Open a new table
+                    </Button>
+                    <Button size="small" onClick={leave} sx={{ color: "var(--ink-soft)" }}>
+                      Forget this table
+                    </Button>
+                  </Box>
+                </>
+              ) : (
+                <>
+                  <Typography sx={{ ...mono, my: 1.5 }}>
+                    Open a table to get a code. Everyone who joins with it shares one board: a torn poster is gone for
+                    the whole table.
+                  </Typography>
+                  <Button variant="contained" color="secondary" onClick={open} disabled={busy}>
+                    Open a table
+                  </Button>
+                </>
+              )}
+              {(problem || error) && (
+                <Alert severity="warning" sx={{ mt: 1.5 }}>
+                  {problem ?? error}
+                </Alert>
+              )}
+            </div>
+
+            <div className={s.note} style={{ ["--tilt" as string]: "0.8deg" }}>
+              <span className={s.pin} aria-hidden="true" />
+              <p className={s.noteTitle}>Who&apos;s playing whom</p>
+              {!table && <Typography sx={mono}>No table open — claims will show here live.</Typography>}
+              {table && loading && <Typography sx={mono}>Asking the table…</Typography>}
+              {table && !loading && (
+                <ul className={s.yarnList} aria-live="polite">
+                  {os.cast.map((c) => {
+                    const claim = claimedBy[c.id];
+                    return (
+                      <li key={c.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ flex: 1 }}>
+                          <span className={s.yarn}>{c.name}</span>{" "}
+                          {claim ? `— ${claim.name ?? "someone"}` : <i>still on the board (NPC tonight?)</i>}
+                          {os.coreRoles.includes(c.id) && !claim && <b> · needed</b>}
+                        </span>
+                        {claim && (
+                          <Button size="small" onClick={() => release(c.id)} sx={{ color: "var(--ink-soft)" }}>
+                            pin back up
+                          </Button>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          </div>
+
+          <GmTablePanels os={os} table={table} present={Object.keys(claimedBy)} />
+
+          {os.gmNotes && (
+            <div className={s.note} style={{ ["--tilt" as string]: "-0.3deg", marginTop: 32 }}>
+              <span className={s.pin} aria-hidden="true" />
+              <p className={s.noteTitle}>GM notes</p>
+              <Typography sx={{ ...mono, whiteSpace: "pre-wrap" }}>{os.gmNotes}</Typography>
+            </div>
+          )}
+
+          <div
+            className={s.grid}
+            style={{ marginTop: 32, gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))" }}
+          >
+            {os.cast.map((c, i) => (
+              <div key={c.id} className={s.note} style={{ ["--tilt" as string]: `${i % 2 ? 0.7 : -0.7}deg` }}>
+                <span className={s.pin} aria-hidden="true" />
+                <p className={s.noteTitle} style={{ marginBottom: 0 }}>
+                  {c.name}
+                  {c.poster.alias && <span style={{ fontSize: 15 }}> (board: {c.poster.alias})</span>}
+                </p>
+                <div className={s.meta} style={{ marginBottom: 8 }}>
+                  <span>{c.poster.epithet}</span>
+                  <span>{c.mech.classes.map((k) => `${k.name} ${k.level}`).join(" / ")}</span>
+                  {claimedBy[c.id]?.name && <span>played by {claimedBy[c.id].name}</span>}
+                </div>
+                <Typography sx={mono}>
+                  <b>Tonight:</b> {c.story.stake}
+                </Typography>
+                <Typography sx={{ ...mono, mt: 1, color: "var(--wax)" }}>
+                  <b>Secret:</b> {c.story.secret}
+                </Typography>
+                <ul className={s.yarnList} style={{ marginTop: 8 }}>
+                  {c.story.ties.map((t) => (
+                    <li key={t.to}>
+                      <span className={s.yarn}>→ {nameOf(t.to)}</span> {t.text}
+                      {t.public && (
+                        <span style={{ display: "block", fontSize: 13, color: "var(--ink-soft)" }}>
+                          board says: {t.public}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                <Button component={Link} href={`/${os.slug}/${c.id}`} size="small" sx={{ color: "var(--ink-soft)", mt: 1 }}>
+                  Open sheet
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Container>
+    </>
+  );
+}

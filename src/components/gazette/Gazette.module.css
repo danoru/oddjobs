@@ -1,0 +1,136 @@
+/* The morning-after broadsheet. Screen preview and one printed page. */
+
+.paper {
+  max-width: 8.5in;
+  margin: 0 auto;
+  padding: 0.45in;
+  background: #f6eedb;
+  background-image: radial-gradient(ellipse at 80% 0%, rgba(255, 255, 255, 0.5), transparent 60%);
+  color: #1b1209;
+  font-family: var(--font-sheet);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+}
+
+.ears {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-label);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 4px;
+}
+
+.masthead {
+  font-family: "UnifrakturMaguntia", var(--font-poster);
+  font-size: clamp(40px, 8vw, 68px);
+  line-height: 1.05;
+  text-align: center;
+  margin: 8px 0 4px;
+}
+
+.dateline {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 3px double currentColor;
+  border-bottom: 1px solid currentColor;
+  padding: 3px 0;
+  font-family: var(--font-label);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+
+.headline {
+  font-family: var(--font-poster);
+  font-size: clamp(26px, 4.6vw, 40px);
+  line-height: 1.05;
+  text-align: center;
+  margin: 14px 0 4px;
+  text-transform: uppercase;
+}
+
+.subhead {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 18px;
+  text-align: center;
+  margin: 0 0 10px;
+}
+
+.woodcut {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  padding: 6px 0 10px;
+  border-bottom: 1px solid currentColor;
+  color: #2b1d0e;
+}
+
+.cols {
+  columns: 3 170px;
+  column-gap: 20px;
+  column-rule: 1px solid rgba(27, 18, 9, 0.35);
+  margin-top: 10px;
+  font-size: 13.5px;
+  line-height: 1.42;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.lead::first-letter {
+  float: left;
+  font-family: var(--font-poster);
+  font-size: 46px;
+  line-height: 0.85;
+  padding: 4px 6px 0 0;
+}
+
+.item {
+  break-inside: avoid;
+  margin: 0 0 10px;
+}
+
+.itemHead {
+  text-align: left;
+  font-family: var(--font-label);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid rgba(27, 18, 9, 0.4);
+  margin-bottom: 3px;
+}
+
+.quote {
+  font-family: var(--font-print);
+  font-style: italic;
+}
+
+.section {
+  font-family: "UnifrakturMaguntia", var(--font-poster);
+  font-size: 20px;
+  text-align: center;
+  margin: 6px 0;
+  break-after: avoid;
+}
+
+.foot {
+  margin-top: 12px;
+  border-top: 1px solid currentColor;
+  padding-top: 4px;
+  font-family: var(--font-label);
+  font-size: 11px;
+  text-align: center;
+  letter-spacing: 0.06em;
+}
+
+@media print {
+  .cols {
+    font-size: 15px;
+  }
+  .paper {
+    box-shadow: none;
+    background: #fff;
+    padding: 0;
+    max-width: none;
+  }
+}

@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import type { Character } from "@/lib/schema";
+import { WoodcutPicker } from "./WoodcutPicker";
 import { defaultChoiceId, emptyTweaks, encodeTweaks, hasTweaks, tweaksSchema, type Tweaks } from "@/lib/customize";
 
 export function CustomizeDrawer({
@@ -83,13 +84,19 @@ export function CustomizeDrawer({
             minRows={3}
             fullWidth
           />
+          <WoodcutPicker value={tweaks.portraitData} onChange={(portraitData) => set({ portraitData })} />
           <TextField
             label="Portrait image link"
             placeholder="https://…"
             defaultValue={tweaks.portrait ?? ""}
             onBlur={(e) => setPortrait(e.target.value.trim())}
             error={Boolean(portraitError)}
-            helperText={portraitError ?? "Shown on the poster as a woodcut."}
+            helperText={
+              portraitError ??
+              (tweaks.portraitData
+                ? "Your woodcut portrait is in use. Remove it to show this link instead."
+                : "Or link a picture. It is included in share links; uploaded portraits are not.")
+            }
             fullWidth
           />
           {stock.options.map((opt) => (

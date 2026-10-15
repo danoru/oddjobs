@@ -240,6 +240,55 @@ export const optionSchema = z.discriminatedUnion("kind", [
   }),
 ]);
 
+// ---- Table-play extras -------------------------------------------------------
+
+/** Synthesised sound presets (src/lib/sound/synth.ts), so no audio files need licensing. */
+export const SOUND_BEDS = ["storm", "rain", "sea", "wind", "fire", "tavern", "drone", "crowd"] as const;
+export const SOUND_STINGERS = [
+  "bell",
+  "thunder",
+  "tide",
+  "drowned",
+  "door",
+  "heartbeat",
+  "gong",
+  "glass",
+  "cheer",
+  "whoosh",
+] as const;
+
+export const soundsSchema = z.object({
+  /** Looping ambience; one plays at a time and they crossfade. */
+  beds: z.array(z.object({ id, label: z.string(), preset: z.enum(SOUND_BEDS) })).default([]),
+  /** One-shot cues played over the bed. */
+  stingers: z.array(z.object({ id, label: z.string(), preset: z.enum(SOUND_STINGERS) })).default([]),
+});
+
+/** A sealed handout the GM delivers to one player mid-session. GM-only until delivered. */
+export const letterSchema = z.object({
+  id,
+  /** Character id who receives it. */
+  to: id,
+  /** Short GM-facing label, e.g. "Who bought the bell". */
+  title: z.string(),
+  /** When to send it, e.g. "Act 3: the wreck". */
+  when: z.string(),
+  /** What the player reads after breaking the seal. */
+  text: z.string(),
+});
+
+/** What the GM does with a character nobody claims tonight. GM-only. */
+export const ifUnclaimedSchema = z.object({
+  /** How the GM plays them as an NPC (or "absent"). */
+  npc: z.string(),
+  /** Story beats handed to someone else if they're at the table, first match wins per beat. */
+  reassign: z
+    .array(z.object({ beat: z.string(), to: z.array(id).min(1), text: z.string() }))
+    .default([]),
+  /** Scenes or threads that drop out without them. */
+  cuts: z.array(z.string()).default([]),
+});
+
 // ---- Top-level documents ----------------------------------------------------
 
 export const characterSchema = z.object({
@@ -262,6 +311,9 @@ export const characterSchema = z.object({
   story: storySchema,
   mech: mechSchema,
   options: z.array(optionSchema).default([]),
+  /** Session-zero question the player answers in a sentence before play. */
+  flashback: z.string().optional(),
+  ifUnclaimed: ifUnclaimedSchema.optional(),
 });
 
 export const oneShotSchema = z.object({
@@ -285,6 +337,10 @@ export const oneShotSchema = z.object({
   /** Character ids needed at minimum headcount. */
   coreRoles: z.array(id),
   gmNotes: z.string().optional(),
+  /** Masthead for the morning-after broadsheet. */
+  gazette: z.object({ name: z.string(), town: z.string(), price: z.string().default("One penny") }).optional(),
+  sounds: soundsSchema.optional(),
+  letters: z.array(letterSchema).default([]),
   content: z
     .object({ sources: z.array(z.string()).default([]), warnings: z.array(z.string()).default([]) })
     .default({ sources: [], warnings: [] }),
@@ -299,6 +355,9 @@ export type Story = z.infer<typeof storySchema>;
 export type CustomOption = z.infer<typeof optionSchema>;
 export type Character = z.infer<typeof characterSchema>;
 export type OneShot = z.infer<typeof oneShotSchema>;
+export type Letter = z.infer<typeof letterSchema>;
+export type IfUnclaimed = z.infer<typeof ifUnclaimedSchema>;
+export type Sounds = z.infer<typeof soundsSchema>;
 export type Ruleset = OneShot["ruleset"];
 
 /** A one-shot with its cast loaded and cross-checked. */

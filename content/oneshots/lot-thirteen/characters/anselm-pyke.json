@@ -124,5 +124,31 @@
         { "id": "rosemary", "label": "Grave rosemary", "value": "A sachet of grave rosemary, for remembrance and moths" }
       ]
     }
-  ]
+  ],
+  "flashback": "What do you tell the parish when they ask what Corvin Pell looked like at rest?",
+  "ifUnclaimed": {
+    "npc": "Anselm is absent; the Quiet Hour sends a curt note of regret. Saint Edda's reliquary still lies in Biscuit's gut and can be returned or kept by whoever finds it. Treat the funeral as a rumour of a curiously light coffin.",
+    "reassign": [
+      {
+        "beat": "The coffin held sandbags and a keg of lamp oil",
+        "to": [
+          "dagny-brask",
+          "tobias-larke"
+        ],
+        "text": "At the vigil you lifted a corner of the coffin lid and saw sandbags and a keg of lamp oil. Corvin Pell was not in it. You closed it and told no one."
+      },
+      {
+        "beat": "A sworn word the Watch will believe (letter: the-lid-and-the-roof)",
+        "to": [
+          "dagny-brask",
+          "tobias-larke"
+        ],
+        "text": "You are willing to swear before Captain Holloway, on your honour, that the coffin was wrong. If the Watch needs a witness with a spotless name, you will give them one."
+      }
+    ],
+    "cuts": [
+      "The Saint Edda's reliquary thread; it becomes simple loot.",
+      "Anselm's handkerchief moment with Odalys."
+    ]
+  }
 }

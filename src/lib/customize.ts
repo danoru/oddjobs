@@ -1,12 +1,21 @@
 import { z } from "zod";
 import type { Character, CustomOption } from "./schema";
 
+/** A woodcut portrait kept on this device: a small raster data URL. Never goes in share links. */
+export const PORTRAIT_DATA_MAX = 250_000;
+export const PORTRAIT_DATA_RE = /^data:image\/(png|webp|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/;
+
 /** A player's tweaks to a stock character. Lives in localStorage and share links. */
 export const tweaksSchema = z.object({
   name: z.string().max(80).optional(),
   pronouns: z.string().max(40).optional(),
   appearance: z.string().max(600).optional(),
   portrait: z.string().url().max(500).regex(/^https?:\/\//, "http(s) only").optional(),
+  portraitData: z
+    .string()
+    .max(PORTRAIT_DATA_MAX)
+    .regex(PORTRAIT_DATA_RE, "png, webp or jpeg data URL only")
+    .optional(),
   choices: z.record(z.string(), z.string()).default({}),
 });
 export type Tweaks = z.infer<typeof tweaksSchema>;
@@ -14,7 +23,7 @@ export type Tweaks = z.infer<typeof tweaksSchema>;
 export const emptyTweaks = (): Tweaks => ({ choices: {} });
 
 export const hasTweaks = (t: Tweaks) =>
-  Boolean(t.name || t.pronouns || t.appearance || t.portrait || Object.keys(t.choices).length);
+  Boolean(t.name || t.pronouns || t.appearance || t.portrait || t.portraitData || Object.keys(t.choices).length);
 
 /** The choice id that the stock character already uses for an option. */
 export function defaultChoiceId(c: Character, opt: CustomOption): string {
@@ -47,7 +56,9 @@ export function applyTweaks(stock: Character, t: Tweaks): Character {
   if (t.name) c.name = t.name;
   if (t.pronouns) c.story.pronouns = t.pronouns;
   if (t.appearance) c.story.appearance = t.appearance;
-  if (t.portrait) c.portrait = t.portrait;
+  // An uploaded woodcut wins over a linked image.
+  if (t.portraitData) c.portrait = t.portraitData;
+  else if (t.portrait) c.portrait = t.portrait;
 
   for (const opt of c.options) {
     const choiceId = t.choices[opt.id];
@@ -93,8 +104,11 @@ const pick = <V>(choices: { id: string; value: V }[], choiceId: string): V | und
 
 // ---- Share links: tweaks <-> URL hash ----------------------------------------
 
+/** portraitData is left out: it is far too big for a URL, so shared links carry the https portrait only. */
 export function encodeTweaks(t: Tweaks): string {
-  const json = JSON.stringify(t);
+  const shareable: Tweaks = { ...t };
+  delete shareable.portraitData;
+  const json = JSON.stringify(shareable);
   const bytes = new TextEncoder().encode(json);
   let bin = "";
   bytes.forEach((b) => (bin += String.fromCharCode(b)));

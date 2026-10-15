@@ -101,5 +101,32 @@
         { "id": "tin", "label": "Ration tin", "value": "A legion ration tin with 'T. DRUN' scratched inside the lid" }
       ]
     }
-  ]
+  ],
+  "flashback": "Which of your grandfather's letters did you learn by heart as a child, and which line in it did you never believe?",
+  "ifUnclaimed": {
+    "npc": "Vessia arrives late as a grim, bad-kneed NPC and reaches the furnace at the start of Act 4. She votes as the party leans, and after the vote she is the one who confesses that she gave the Black Ash the hour and the route.",
+    "reassign": [
+      {
+        "beat": "The Surety's blood vote",
+        "to": [
+          "sabra-kovane",
+          "tamsin-brandle"
+        ],
+        "text": "With his granddaughter absent, the Registrar names you Torvak's proxy by oath-kinship, the Surety's blood in all but birth. You hold his vote tonight, and you owe him the truth about what he wants."
+      },
+      {
+        "beat": "The ash-black coin and the leaked hour",
+        "to": [
+          "selenor-aetheis",
+          "sabra-kovane"
+        ],
+        "text": "A Pyrosi envoy promised you Torvak would be freed, not used, if you gave them the hour the wards would fall and the pilgrims' route. You gave both. The ash-black coin in your pocket calls them in, and you truly believe they mean him no harm."
+      }
+    ],
+    "cuts": [
+      "Vessia's defection choice in Act 3 (the Black Ash letter goes to whoever inherited the coin).",
+      "The Sabra and Vessia forgiveness subplot.",
+      "The 'thank you or a punch' conversation with Selenor."
+    ]
+  }
 }

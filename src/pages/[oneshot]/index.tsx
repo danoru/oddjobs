@@ -1,38 +1,23 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import { Box, Button, Container, Typography } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import ContentCutIcon from "@mui/icons-material/ContentCut";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import TvIcon from "@mui/icons-material/Tv";
+import HistoryEduIcon from "@mui/icons-material/HistoryEdu";
 import { loadOneShot, publishedSlugs } from "@/lib/content";
 import { toPublic, type PublicOneShot } from "@/lib/public";
 import { useClaims } from "@/lib/storage";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Poster } from "@/components/board/Poster";
+import { TableNote } from "@/components/board/TableNote";
+import { YarnBoard } from "@/components/board/YarnBoard";
+import { cameoHook, cameosFor, type Survivor } from "@/lib/legacy";
+import { loadSurvivors } from "@/lib/legacy.server";
 import s from "@/components/board/Board.module.css";
-
-/**
- * Ties as undirected pairs for the public board. Only each tie's `public` line
- * is shown — the full text can hold secrets and stays on the player's sheet.
- */
-function tiePairs(os: PublicOneShot) {
-  const label = (id: string) => {
-    const c = os.cast.find((x) => x.id === id);
-    return c ? (c.poster.alias ?? c.name) : id;
-  };
-  const byKey = new Map<string, { key: string; a: string; b: string; public: string[] }>();
-  for (const c of os.cast) {
-    for (const t of c.story.ties) {
-      const [x, y] = [c.id, t.to].sort();
-      const key = `${x}|${y}`;
-      const pair = byKey.get(key) ?? { key, a: label(x), b: label(y), public: [] };
-      // A mystery character's ties stay mysterious.
-      if (t.public && !c.poster.alias) pair.public.push(t.public);
-      byKey.set(key, pair);
-    }
-  }
-  return [...byKey.values()];
-}
 
 const ROLE_ORDER = ["tank", "striker", "healer", "support", "control", "face", "scout", "utility"] as const;
 
@@ -41,16 +26,19 @@ export const getStaticPaths: GetStaticPaths = async () => ({
   fallback: false,
 });
 
-export const getStaticProps: GetStaticProps<{ os: PublicOneShot }> = async ({ params }) => ({
-  props: { os: toPublic(loadOneShot(String(params!.oneshot))) },
-});
+export const getStaticProps: GetStaticProps<{ os: PublicOneShot; cameos: Survivor[] }> = async ({ params }) => {
+  const slug = String(params!.oneshot);
+  return { props: { os: toPublic(loadOneShot(slug)), cameos: cameosFor(slug, loadSurvivors()) } };
+};
 
-export default function JobPage({ os }: { os: PublicOneShot }) {
-  const { claims, toggle } = useClaims(os.slug);
+export default function JobPage({ os, cameos }: { os: PublicOneShot; cameos: Survivor[] }) {
+  const router = useRouter();
+  const table = useClaims(os.slug);
+  const { claims, claimedBy, toggle } = table;
+  const linkCode = typeof router.query.table === "string" ? router.query.table : undefined;
   const claimedCast = os.cast.filter((c) => claims.includes(c.id));
   const covered = new Set(claimedCast.flatMap((c) => c.roles));
   const missingCore = os.coreRoles.filter((id) => !claims.includes(id));
-  const pairs = tiePairs(os);
   const nameOf = (id: string) => {
     const c = os.cast.find((x) => x.id === id);
     return c ? (c.poster.alias ?? c.name) : id;
@@ -110,8 +98,39 @@ export default function JobPage({ os }: { os: PublicOneShot }) {
               >
                 Print the tear-off flyer
               </Button>
+              <Button
+                component={Link}
+                href={`/${os.slug}/tv`}
+                variant="outlined"
+                size="small"
+                startIcon={<TvIcon />}
+                sx={{ color: "var(--ink)", borderColor: "var(--ink-soft)" }}
+              >
+                Board on the TV
+              </Button>
+              <Button
+                component={Link}
+                href={`/${os.slug}/epilogue`}
+                variant="outlined"
+                size="small"
+                startIcon={<HistoryEduIcon />}
+                sx={{ color: "var(--ink)", borderColor: "var(--ink-soft)" }}
+              >
+                The morning after
+              </Button>
+              <Button
+                component={Link}
+                href={`/${os.slug}/gm`}
+                size="small"
+                startIcon={<VisibilityIcon />}
+                sx={{ color: "var(--ink-soft)" }}
+              >
+                GM&apos;s view
+              </Button>
             </Box>
           </div>
+
+          <TableNote claims={table} initialCode={linkCode} />
 
           <div className={s.grid}>
             {os.cast.map((c) => (
@@ -120,7 +139,7 @@ export default function JobPage({ os }: { os: PublicOneShot }) {
                 slug={os.slug}
                 character={c}
                 core={os.coreRoles.includes(c.id)}
-                claimed={claims.includes(c.id)}
+                claim={claimedBy[c.id]}
                 onToggleClaim={() => toggle(c.id)}
               />
             ))}
@@ -130,16 +149,7 @@ export default function JobPage({ os }: { os: PublicOneShot }) {
             <div className={s.note} style={{ ["--tilt" as string]: "1deg", gridColumn: "1 / -1" }}>
               <span className={s.pin} aria-hidden="true" />
               <p className={s.noteTitle}>Who knows whom</p>
-              <ul className={s.yarnList}>
-                {pairs.map((pair) => (
-                  <li key={pair.key}>
-                    <span className={s.yarn}>
-                      {pair.a} — {pair.b}
-                    </span>{" "}
-                    {pair.public.join(" · ")}
-                  </li>
-                ))}
-              </ul>
+              <YarnBoard cast={os.cast} claimedBy={claimedBy} />
             </div>
             <div className={s.note} style={{ ["--tilt" as string]: "-1.4deg" }}>
               <span className={s.pin} aria-hidden="true" />
@@ -147,7 +157,9 @@ export default function JobPage({ os }: { os: PublicOneShot }) {
               <Typography sx={{ fontFamily: "var(--font-print)", fontSize: 16 }}>
                 {claimedCast.length === 0
                   ? "No posters torn down yet."
-                  : `${claimedCast.length} of ${os.players.max} posters torn down: ${claimedCast.map((c) => c.name).join(", ")}.`}
+                  : `${claimedCast.length} of ${os.players.max} posters torn down: ${claimedCast
+                      .map((c) => (claimedBy[c.id]?.name ? `${c.name} (${claimedBy[c.id].name})` : c.name))
+                      .join(", ")}.`}
               </Typography>
               <div className={s.roleChips} aria-label="Party roles covered">
                 {ROLE_ORDER.map((r) => (
@@ -162,10 +174,30 @@ export default function JobPage({ os }: { os: PublicOneShot }) {
                 </Typography>
               )}
               <Typography sx={{ fontFamily: "var(--font-label)", fontSize: 12, color: "var(--ink-soft)", mt: 1.5 }}>
-                Claims are remembered on this device only.
+                {table.table
+                  ? `Shared with everyone at table ${table.table}.`
+                  : "Claims are remembered on this device only."}
               </Typography>
             </div>
           </div>
+
+          {cameos.length > 0 && (
+            <div className={s.grid} style={{ marginTop: 36 }}>
+              {cameos.map((v, i) => (
+                <div key={v.id} className={s.note} style={{ ["--tilt" as string]: `${i % 2 ? 1.6 : -1.2}deg` }}>
+                  <span className={s.brassPin} aria-hidden="true" />
+                  <div className={s.postingHeader}>ALSO SEEN IN TOWN</div>
+                  <p className={s.postingPitch} style={{ marginTop: 10, marginBottom: 6 }}>
+                    {cameoHook(v)}
+                  </p>
+                  {v.scar && <div className={s.meta}>Known by: {v.scar}</div>}
+                  <div className={s.meta} style={{ marginTop: 6 }}>
+                    GM: a survivor from another night. Drop them in as an NPC.
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </Container>
     </>

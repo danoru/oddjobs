@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useState } from "react";
 import ContentCutIcon from "@mui/icons-material/ContentCut";
 import type { Character } from "@/lib/schema";
+import type { ClaimInfo } from "@/lib/storage";
 import { PosterIcon } from "@/components/PosterIcon";
 import { playRip } from "@/lib/rip";
 import s from "./Board.module.css";
@@ -17,15 +18,17 @@ export function Poster({
   slug,
   character: c,
   core,
-  claimed,
+  claim,
   onToggleClaim,
 }: {
   slug: string;
   character: Character;
   core: boolean;
-  claimed: boolean;
+  /** Who tore it, if anyone. */
+  claim?: ClaimInfo;
   onToggleClaim: () => void;
 }) {
+  const claimed = Boolean(claim);
   const [justTorn, setJustTorn] = useState(false);
   const cls = c.mech.classes.map((k) => `${k.name} ${k.level}`).join(" / ");
   const shownName = c.poster.alias ?? c.name;
@@ -61,16 +64,23 @@ export function Poster({
           {c.poster.reward && <div className={s.posterReward}>REWARD · {c.poster.reward}</div>}
           <div className={s.posterTag}>{cls}</div>
         </Link>
-        {claimed ? (
+        {claim?.mine ? (
           <button type="button" className={s.unclaim} onClick={onToggleClaim}>
             pin it back up
           </button>
+        ) : claim ? (
+          <span className={s.heldBy}>torn down by {claim.name ?? "someone"}</span>
         ) : (
           <button type="button" className={s.strip} onClick={tear}>
             <ContentCutIcon sx={{ fontSize: 16 }} aria-hidden="true" /> TEAR TO CLAIM
           </button>
         )}
-        {claimed && <span className={s.claimedStamp}>CLAIMED</span>}
+        {claim && (
+          <span className={s.claimedStamp}>
+            CLAIMED
+            {claim.name && <span className={s.stampName}>{claim.mine ? "by you" : claim.name}</span>}
+          </span>
+        )}
       </article>
       {justTorn && <span className={s.falling} aria-hidden="true" />}
     </div>

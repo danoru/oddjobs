@@ -375,5 +375,39 @@
         }
       ]
     }
-  ]
+  ],
+  "flashback": "What do you say to the coin before you set it on a crewman's grave on a storm night?",
+  "ifUnclaimed": {
+    "npc": "Run Marrow as a silent figure walking down the beach toward the drowned in Act 1, nets still on his shoulder, refusing help. In Act 4 he turns up at the rope uninvited, and no one can talk him off it until the party gives him a better reason.",
+    "reassign": [
+      {
+        "beat": "The seven drowned crew, by name (and Hob's note at the end of Act 1)",
+        "to": [
+          "sister-vell",
+          "rook",
+          "odo-brambletoe"
+        ],
+        "text": "You know the Tern's crew by name: Hob Tarrant, Edda Kell, Wick Sorrel, Joss Marl, Nan Rudd, Dunstan Greer, Little Ferris. If one of them speaks to you tonight, answer them by name."
+      },
+      {
+        "beat": "Volunteers to stay at the rope in Act 4",
+        "to": [
+          "rook",
+          "odo-brambletoe"
+        ],
+        "text": "You have already decided that someone must stay at the rope, and that it ought to be you. You have told nobody. You think it would make things even."
+      },
+      {
+        "beat": "The hatchet: the lashing never snapped",
+        "to": [
+          "merryn-vane"
+        ],
+        "text": "You were the child on the Tern. You saw the lashing cut, and you saw who cut it. If the drowned ask who parted the line, you are the only living witness."
+      }
+    ],
+    "cuts": [
+      "The lifeboat-shed scene and the coin-on-the-grave ritual.",
+      "Marrow facing his old crew by name on the beach in Act 1; they simply shamble toward the town instead."
+    ]
+  }
 }

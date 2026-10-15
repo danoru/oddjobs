@@ -136,5 +136,33 @@
         { "id": "wick", "label": "Shrine wick", "value": "A wick from the first shrine-lamp, wrapped in oilcloth" }
       ]
     }
-  ]
+  ],
+  "flashback": "What was the first thing the shrine lamp ever said to you, and whose handwriting did you recognise in it?",
+  "ifUnclaimed": {
+    "npc": "Sabra is absent: the Ash Shrine's lamp burns unattended and speaks to whoever sits by it in Act 2, in Torvak's voice. Naeris Oulane holds the shrine key. A young Pyrosi acolyte, Ennik, can stand ready to perform the burning-rite if the vote is Release.",
+    "reassign": [
+      {
+        "beat": "Torvak asked to be let go, and she swore on the flame (letter: the-line-you-cut)",
+        "to": [
+          "tamsin-brandle",
+          "vessia-drun",
+          "corwen-tidewrack"
+        ],
+        "text": "Torvak has told you himself that he is tired, and asked you to let him go when the time comes. You swore on the flame. You have not told his granddaughter, and you do not know if keeping your word betrays your friends."
+      },
+      {
+        "beat": "The Pyrosi rite for ending a burning",
+        "to": [
+          "vessia-drun",
+          "corwen-tidewrack"
+        ],
+        "text": "You know the Pyrosi burning-rite, every word of it, and if the vote is Release you will be the one to light the pyre. Nobody else here can, and you have never wanted to."
+      }
+    ],
+    "cuts": [
+      "The Sabra and Vessia forgiveness subplot and the cut last line.",
+      "The shared furnace-room kettle argument with Tamsin.",
+      "The Ash Shrine rest in Act 2 (the lamp speaks in the hypocaust instead)."
+    ]
+  }
 }

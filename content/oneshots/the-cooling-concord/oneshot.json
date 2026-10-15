@@ -16,6 +16,97 @@
   },
   "coreRoles": ["vessia-drun", "sabra-kovane", "tamsin-brandle"],
   "gmNotes": "THE SITUATION. The Concord is a mutual hostage. The Pyrosi gave Tribune Torvak Drun as surety that the legions would not march on the Ouran successor states; the Ouran gave the city's water and its engineers' word that he would be kept as a hearth, not a weapon. His fire is the Thermae's furnace. At the fiftieth midnight the binding lapses unless the five Hands act. The rite is a vote at the Heart-furnace: RENEW (another fifty years, baths stay warm, he stays bound), RELEASE (he is freed to a true death on a Pyrosi pyre; the baths go cold; the city's economy and the Chancery's pride take a hit), or REKINDLE (the third path: he chooses to remain as the city's hearth by free covenant, which needs every Hand to give up something real, namely their secret). Corwen's original text says the Witness holds the casting vote and that renewal needs the bound one's own consent. The Chancery copy, certified in Amberhall, has lost that page.\n\nACT 1: THE DOOR OF THE QUIET HAND (about 45 min). The Thermae is packed for the free Jubilee soak. The water boils, the bronze bath-checks glow, and steam mephits (4 steam mephits, use stock stat blocks) erupt from the vents. Skirmish while rescuing panicked bathers (Dex or Athletics to haul people clear, hazard: scalding steam, 2d6 fire on a failed Dex save). Steward Naeris Oulane (friendly Ouran noble, commoner stats) explains the Concord and sets the clock: five hands must reach the Heart-furnace before midnight.\n\nACT 2: THE HYPOCAUST (about 75 min). A descent through brick flues, stokers' galleries and the Ash Shrine. Run it as a three-success challenge with a combat bookend: Tamsin knows the short routes, Sabra's shrine lamp lights the way, Selenor can command the Ouran bronze lamplighters (2 animated armors with lamps for heads) or Vessia can fight them. Magma mephits (3) in the old coal-hold. This is where each Hand's private truth should start to leak.\n\nACT 3: THE BLACK ASH (about 60 min). Centurion Kadrax Vorn (veteran) and four legionaries (guards), one of them a cinder-priest (acolyte), come through the old Pyrosi pilgrims' gate, led by the ash-black coin Vessia gave them. They intend to cut the Surety's chains and carry him home as a living weapon, not to free him. The fight can end by surrender, flight, or Vessia's defection; the cohort's retreat should not feel like a complete victory.\n\nACT 4: THE HEART-FURNACE (about 60 min). Torvak Drun, the Last Ember, speaks. He is lucid because Tamsin has been propping Damper Seven open for six years; the wards fray because of that. Play the parley first: each Hand states a position, texts are compared (Selenor's copy against Corwen's original), the Rider and the casting vote come out, and Torvak is asked what he wants. Then the vote, and consequences. If the vote goes badly or the parley fails, the binding breaks and he becomes a fire elemental (use stock fire elemental stats at 60 HP, no Fire Form engulf until round 3), grieving and enraged, and the party must calm or contain him. REKINDLE ends with a quiet, hot, warm scene; RELEASE with a pyre and a cold city; RENEW with a bitter, stable peace.\n\nFEWER THAN FIVE PLAYERS. Unplayed Hands are answered by NPC stand-ins who can be talked around, or by the Ember himself. If Corwen is unplayed, the casting vote passes to Torvak. Everything needed for the vote can be spoken aloud by the GM.\n\nCANON AND INVENTION. Drawn from the gazetteer: the Pyrosi (fire-aligned, militaristic) and Ouran (dissolved about 50 years ago, civic and arcane, bathhouse culture) cultures, New Ouransgard, Nova Pyra, Amberhall, Aldwick, Driftwood, Igwe and Akanai as named places, the Pyrosi Calendar date 1114-10-8, and the naming styles for each culture. Invented here and easy to change: the Concord itself, Torvak Drun, the Thermae, and the exact date of the Dissolution. If your canon says Pyrosi and Ouran history went differently, keep the structure (two powers, one hostage, five hands) and rename.",
+  "gazette": {
+    "name": "The Ouransgard Hearth-Courier",
+    "town": "New Ouransgard",
+    "price": "One copper, paid at the bath door"
+  },
+  "sounds": {
+    "beds": [
+      {
+        "id": "jubilee-baths",
+        "label": "The Thermae on Jubilee night, packed and steaming",
+        "preset": "crowd"
+      },
+      {
+        "id": "the-hypocaust",
+        "label": "The hypocaust: brick, pipe and distant hammering",
+        "preset": "drone"
+      },
+      {
+        "id": "black-ash-gate",
+        "label": "Ash wind at the pilgrims' gate",
+        "preset": "wind"
+      },
+      {
+        "id": "the-heart-furnace",
+        "label": "The Heart-furnace breathing",
+        "preset": "fire"
+      }
+    ],
+    "stingers": [
+      {
+        "id": "steam-vent-bursts",
+        "label": "A steam vent bursts",
+        "preset": "whoosh"
+      },
+      {
+        "id": "bath-check-cracks",
+        "label": "A bronze bath-check cracks",
+        "preset": "glass"
+      },
+      {
+        "id": "pilgrims-gate-opens",
+        "label": "The pilgrims' gate groans open",
+        "preset": "door"
+      },
+      {
+        "id": "torvaks-heart",
+        "label": "Torvak's furnace-heart beats",
+        "preset": "heartbeat"
+      },
+      {
+        "id": "the-concord-gong",
+        "label": "The Concord's gong strikes the hour",
+        "preset": "gong"
+      },
+      {
+        "id": "the-binding-breaks",
+        "label": "The binding breaks",
+        "preset": "thunder"
+      }
+    ]
+  },
+  "letters": [
+    {
+      "id": "the-line-you-cut",
+      "to": "sabra-kovane",
+      "title": "The line in the lamp-script",
+      "when": "Act 2: at the Ash Shrine, when the party rests by the lamp",
+      "text": "Warden. Three Jubilees you have read my words to my granddaughter and stopped one line short. Read it now, to yourself, and then decide. 'Tell Vessia I know what she has bargained, and I forgive it. I will not be carried out of this fire by anyone's army. I will walk, or I will burn. The choice was always mine; I was only waiting for someone to ask.' You swore on the flame to let me go. I am not asking you to break it. I am asking you to wait until I have spoken. T."
+    },
+    {
+      "id": "the-drafters-seal",
+      "to": "selenor-aetheis",
+      "title": "Aetheion's sealed note",
+      "when": "Late Act 2: behind the Chancery archive grating in the hypocaust, after the lamplighters",
+      "text": "Grandson. If this has found you, the Chancery has handed you a pen and a lie. Fifty years ago they asked me to remove the Rider, and I did, because I was young and the peace was fragile. I told myself the Surety would never know. He knew. Every night I heard the furnace through my study floor. Do not forge his mark. Ask him. If he says no, let the baths go cold; a city survives a cold bath, not a stolen consent. The missing page is not lost. The Witness has carried it from the start. A."
+    },
+    {
+      "id": "ash-on-the-tongue",
+      "to": "vessia-drun",
+      "title": "The ash-paper from the coin",
+      "when": "Act 3: as the Black Ash cohort comes through the pilgrims' gate and the coin heats",
+      "text": "Optio. The gate is open and the hour was true, and you have done well. Understand what follows. The Tribune is not to be freed. He is to be carried home, chained or unchained, because a banner that speaks is worth a legion. If he refuses, we burn the Thermae and every Hand in it. Hold the gate until we reach the furnace and you will be remembered as the one who brought him home. Break it, and we will tell the legions you sold him for a pension. Centurion Kadrax Vorn."
+    },
+    {
+      "id": "little-stoker",
+      "to": "tamsin-brandle",
+      "title": "Soot-writing on the furnace slate",
+      "when": "Act 4: at the Heart-furnace door, before the parley begins",
+      "text": "Tam. I know about Damper Seven. I have known for six years and I let you think it was only your kindness. I have been pulling at the wards from inside while your oil kept me clear. I wanted to be able to think when the time came. Do not carry this on your back; I asked it of you without asking. One thing more: do not let them vote for me before they have heard me. Let me say it with my own mouth. Then do whatever I ask, and know that I asked it clear. T."
+    }
+  ],
   "content": {
     "sources": [
       "world-gazetteer: README.md (Aedrassil & Ouros; Pyrosi and Ouran cultures)",

@@ -1,0 +1,197 @@
+/* The board on the TV: big, legible from across a table, no chrome. */
+
+.screen {
+  min-height: 100vh;
+  padding: clamp(16px, 2.5vw, 40px);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: clamp(14px, 2vw, 28px);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-family: var(--font-poster);
+  font-size: clamp(30px, 4.4vw, 64px);
+  color: var(--brass);
+  line-height: 1;
+  margin: 0;
+  text-shadow: 0 3px 0 #120b06;
+}
+
+.join {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--parchment);
+  color: var(--ink);
+  padding: 10px 16px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+  transform: rotate(1deg);
+}
+
+.code {
+  font-family: var(--font-poster);
+  font-size: clamp(36px, 4.6vw, 72px);
+  letter-spacing: 0.16em;
+  color: var(--wax);
+  line-height: 1;
+}
+
+.joinHint {
+  font-family: var(--font-print);
+  font-size: clamp(14px, 1.3vw, 20px);
+  max-width: 16ch;
+  line-height: 1.2;
+}
+
+.qr {
+  width: clamp(90px, 9vw, 150px);
+  height: clamp(90px, 9vw, 150px);
+}
+
+.qr svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.posters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: clamp(18px, 2.4vw, 40px);
+  align-content: center;
+}
+
+.poster {
+  position: relative;
+  background: var(--parchment);
+  color: var(--ink);
+  text-align: center;
+  padding: 26px 14px 16px;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
+  transform: rotate(var(--tilt, 0deg));
+  transition:
+    transform 0.6s ease,
+    opacity 0.6s ease;
+}
+
+.header {
+  font-family: var(--font-poster);
+  font-size: clamp(28px, 2.8vw, 46px);
+  letter-spacing: 0.05em;
+  border-bottom: 3px double var(--ink);
+  line-height: 1;
+  padding-bottom: 6px;
+}
+
+.icon {
+  margin: 12px auto 8px;
+  width: clamp(80px, 7vw, 120px);
+  height: clamp(80px, 7vw, 120px);
+  display: grid;
+  place-items: center;
+  border: 3px double var(--ink);
+  overflow: hidden;
+}
+
+.icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.name {
+  font-family: var(--font-print);
+  font-size: clamp(22px, 2vw, 32px);
+  line-height: 1.05;
+}
+
+.epithet {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: clamp(16px, 1.4vw, 22px);
+  color: var(--ink-soft);
+}
+
+.hook {
+  font-family: var(--font-print);
+  font-size: clamp(15px, 1.25vw, 20px);
+  line-height: 1.25;
+  margin: 8px 0 0;
+}
+
+.claimed {
+  opacity: 0.55;
+  transform: rotate(var(--tilt, 0deg)) translateY(10px);
+  clip-path: polygon(
+    0 0, 100% 0, 100% calc(100% - 8px), 90% 100%, 80% calc(100% - 9px), 70% calc(100% - 1px), 60% calc(100% - 9px),
+    50% 100%, 40% calc(100% - 8px), 30% calc(100% - 1px), 20% calc(100% - 9px), 10% 100%, 0 calc(100% - 8px)
+  );
+}
+
+.stamp {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  border: 4px solid var(--wax);
+  color: var(--wax);
+  background: rgba(243, 231, 203, 0.7);
+  font-family: var(--font-poster);
+  font-size: clamp(22px, 2.2vw, 36px);
+  padding: 2px 14px;
+  text-align: center;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.stampName {
+  display: block;
+  font-family: var(--font-print);
+  font-size: 0.6em;
+  letter-spacing: 0;
+}
+
+.justTorn {
+  animation: rip 0.9s ease;
+}
+
+@keyframes rip {
+  0% {
+    transform: rotate(var(--tilt, 0deg));
+    opacity: 1;
+  }
+  25% {
+    transform: rotate(calc(var(--tilt, 0deg) - 5deg)) translateY(-6px) scale(1.04);
+  }
+  100% {
+    transform: rotate(var(--tilt, 0deg)) translateY(10px);
+    opacity: 0.55;
+  }
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-family: var(--font-label);
+  color: var(--parchment-dark);
+  font-size: clamp(14px, 1.2vw, 20px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster,
+  .justTorn {
+    transition: none;
+    animation: none;
+  }
+}

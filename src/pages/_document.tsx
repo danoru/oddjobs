@@ -11,7 +11,7 @@ export default function Document() {
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans+SC:wght@500;700&family=Alegreya:ital,wght@0,400;0,600;1,400&family=IM+Fell+English:ital@0;1&family=Rye&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans+SC:wght@500;700&family=Alegreya:ital,wght@0,400;0,600;1,400&family=IM+Fell+English:ital@0;1&family=Rye&family=UnifrakturMaguntia&display=swap"
           rel="stylesheet"
         />
       </Head>

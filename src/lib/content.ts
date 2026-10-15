@@ -33,7 +33,7 @@ function parse<S extends z.ZodTypeAny>(schema: S, file: string): z.infer<S> {
 }
 
 /** Character ids that would collide with pages under /<oneshot>/. */
-const RESERVED_IDS = ["print", "flyer"];
+const RESERVED_IDS = ["print", "flyer", "gm", "tv", "epilogue", "sounds"];
 
 /** Problems that Zod alone can't see. Returns human-readable messages. */
 export function crossCheck(os: OneShot, cast: Character[]): string[] {
@@ -89,7 +89,20 @@ export function crossCheck(os: OneShot, cast: Character[]): string[] {
       const names = opt.choices.map((ch) => (typeof ch.value === "string" ? ch.value : ch.value.name));
       if (!names.includes(tagged[0])) errs.push(`${at} option "${opt.id}" has no choice matching stock "${tagged[0]}"`);
     }
+
+    for (const r of c.ifUnclaimed?.reassign ?? [])
+      for (const to of r.to)
+        if (to === c.id || !ids.has(to)) errs.push(`${at} ifUnclaimed beat "${r.beat}" reassigns to bad id "${to}"`);
   }
+
+  const letterIds = new Set<string>();
+  for (const l of os.letters) {
+    if (!ids.has(l.to)) errs.push(`letter "${l.id}" is addressed to unknown character "${l.to}"`);
+    if (letterIds.has(l.id)) errs.push(`duplicate letter id "${l.id}"`);
+    letterIds.add(l.id);
+  }
+  const sounds = [...(os.sounds?.beds ?? []), ...(os.sounds?.stingers ?? [])];
+  if (new Set(sounds.map((x) => x.id)).size !== sounds.length) errs.push("duplicate sound ids");
   return errs;
 }
 

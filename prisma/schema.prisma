@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// One game night of one one-shot. The GM opens it and reads out `code`;
+/// players join with the code and tear posters at this table.
+model Table {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  oneshot   String
+  claims     Claim[]
+  deliveries Delivery[]
+  flashbacks Flashback[]
+  createdAt  DateTime   @default(now())
+}
+
+/// A torn-down poster. The unique (tableId, characterId) pair is the lock:
+/// once someone holds a character, nobody else at the table can tear it.
+model Claim {
+  id          String   @id @default(cuid())
+  tableId     String
+  table       Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  characterId String
+  /// Random id the player's browser made up; never sent to other players.
+  playerId    String
+  playerName  String
+  claimedAt   DateTime @default(now())
+
+  @@unique([tableId, characterId])
+}
+
+/// A sealed letter the GM has handed to one character at this table. The
+/// text stays in content; this records that it was sent and when it was opened.
+/// `letterId` is a content letter id, or `beat:<from>:<n>` for a story beat
+/// inherited from a character nobody is playing tonight.
+model Delivery {
+  id          String    @id @default(cuid())
+  tableId     String
+  table       Table     @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  letterId    String
+  characterId String
+  deliveredAt DateTime  @default(now())
+  openedAt    DateTime?
+
+  @@unique([tableId, letterId])
+}
+
+/// A player's one-sentence answer to their character's session-zero question.
+model Flashback {
+  id          String   @id @default(cuid())
+  tableId     String
+  table       Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  characterId String
+  playerId    String
+  answer      String
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tableId, characterId])
+}

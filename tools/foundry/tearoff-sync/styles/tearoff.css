@@ -1,0 +1,97 @@
+.tearoff-board .window-content {
+  padding: 0.5rem 0.75rem;
+  overflow-y: auto;
+}
+.tearoff-board .tearoff-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.tearoff-board .tearoff-toolbar button {
+  width: auto;
+  flex: none;
+}
+.tearoff-board h2 {
+  margin: 0;
+  border: none;
+}
+.tearoff-board .tearoff-meta {
+  margin: 0 0 0.5rem;
+  opacity: 0.7;
+  font-size: var(--font-size-12, 12px);
+}
+.tearoff-board .tearoff-error {
+  margin: 0.25rem 0 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-left: 3px solid #b3402b;
+  background: rgba(179, 64, 43, 0.12);
+}
+.tearoff-board .tearoff-empty {
+  opacity: 0.7;
+}
+.tearoff-board .tearoff-posters {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.tearoff-board .tearoff-poster {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-border-light-tertiary, #888);
+  border-left-width: 4px;
+  border-radius: 3px;
+}
+.tearoff-board .tearoff-icon {
+  width: 1.6rem;
+  text-align: center;
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+.tearoff-board .tearoff-text {
+  flex: 1;
+  min-width: 0;
+}
+.tearoff-board .tearoff-header {
+  display: block;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  opacity: 0.6;
+}
+.tearoff-board .tearoff-epithet,
+.tearoff-board .tearoff-status {
+  font-size: var(--font-size-12, 12px);
+  opacity: 0.8;
+}
+.tearoff-board .tearoff-claimer {
+  font-weight: bold;
+}
+.tearoff-board .tearoff-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+.tearoff-board .tearoff-actions button {
+  width: auto;
+  padding: 0 0.5rem;
+}
+.tearoff-board .tearoff-unclaimed {
+  border-left-color: #888;
+}
+.tearoff-board .tearoff-assigned {
+  border-left-color: #3a7d44;
+}
+.tearoff-board .tearoff-pending {
+  border-left-color: #c28a1d;
+}
+.tearoff-board .tearoff-no-user,
+.tearoff-board .tearoff-no-actor {
+  border-left-color: #b3402b;
+}
+.tearoff-board .tearoff-gm {
+  border-left-color: #4a6fa5;
+}

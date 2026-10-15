@@ -13,5 +13,96 @@
   "posting": { "header": "HANDS WANTED FOR A NIGHT'S WORK", "reward": "The town's gratitude, and 300 gp from the harbourmaster" },
   "coreRoles": ["sister-vell", "rook"],
   "gmNotes": "Act 1: the beach as the drowned rise (skirmish, rescue villagers). Act 2: the smugglers' cave where Rook delivered the bell — the buyer was a cultist of the Tidemother. Act 3: row out in the storm; the bell is tangled in a wreck 30 ft down, guarded by a drowned knight. Act 4: ring it before the tide turns — someone has to stay at the rope while the drowned climb the hull.",
+  "gazette": {
+    "name": "The Saltmere Gazette",
+    "town": "Saltmere",
+    "price": "One penny, if it's dry"
+  },
+  "sounds": {
+    "beds": [
+      {
+        "id": "storm-on-the-breakwater",
+        "label": "Storm on the breakwater",
+        "preset": "storm"
+      },
+      {
+        "id": "smugglers-cave",
+        "label": "The smugglers' cave, dripping dark",
+        "preset": "drone"
+      },
+      {
+        "id": "rowing-over-the-wreck",
+        "label": "Rowing out over the wreck",
+        "preset": "sea"
+      },
+      {
+        "id": "gale-on-the-hull",
+        "label": "Gale on the hull, rain on the rope",
+        "preset": "rain"
+      }
+    ],
+    "stingers": [
+      {
+        "id": "the-bell-tolls",
+        "label": "The bell tolls",
+        "preset": "bell"
+      },
+      {
+        "id": "the-drowned-rise",
+        "label": "The drowned rise from the surf",
+        "preset": "drowned"
+      },
+      {
+        "id": "the-tide-turns",
+        "label": "The tide turns",
+        "preset": "tide"
+      },
+      {
+        "id": "thunder-over-the-bay",
+        "label": "Thunder over the bay",
+        "preset": "thunder"
+      },
+      {
+        "id": "hatch-slams-shut",
+        "label": "A wreck hatch slams shut",
+        "preset": "door"
+      },
+      {
+        "id": "it-says-your-name",
+        "label": "The bell says your name",
+        "preset": "heartbeat"
+      }
+    ]
+  },
+  "letters": [
+    {
+      "id": "hobs-last-word",
+      "to": "marrow",
+      "title": "A wet note from the Tern's bosun",
+      "when": "End of Act 1: once the beach is cleared, a drowned hand presses it into Marrow's palm",
+      "text": "Cap'n. Don't say it, you never could. We felt the hatchet go and we knew your arm by the weight of it. The Tern was already lost; the sea only wanted a count, and you gave her fewer than she meant to take. We have walked up this beach every storm for eleven years waiting for you to say our names. Say them tonight. But mind: when the bell rings true we wake for good, and the one who holds the rope goes down to keep us company. I'd sooner it were nobody. I'd sooner it were not you. Hob Tarrant, bosun."
+    },
+    {
+      "id": "the-coin-keeps-the-count",
+      "to": "rook",
+      "title": "The buyer's receipt",
+      "when": "Act 2: in the smugglers' cave, when Rook opens the buyer's strongbox or shows the coin to anyone",
+      "text": "Thief. You were paid forty gold for the cutting and one coin for the rowing. The coin is the receipt. It remembers who carried the bell down, and tonight it will ask for payment. But a receipt can be passed on. Hold it to the rope when the bell rings and the sea will count you among her own, and the one who was owed will go free. Give it to the one who has been reaching for it, and she will be spared the walk down. You will not be asked twice. Be gentle with yourself in the choosing; the sea never is. The one in the sea-green coat."
+    },
+    {
+      "id": "the-keepers-warning",
+      "to": "sister-vell",
+      "title": "The old keeper's oilskin",
+      "when": "Act 3: found tied inside the drowned knight's gauntlet on the wreck",
+      "text": "To whoever keeps the bell after me. Three things I never put in the log. One: the bell is not hung to keep the dead asleep, but to keep a single debt unpaid. Two: if the bay ever gives you a drowned child who breathes on your slab, wash her, wrap her, and tell no one, for she belongs to the sea, and the sea will come for her when the bell goes under. Three: the keeper does not choose who stays at the rope. The rope chooses. I let a thief go once, too. Forgive yourself first. Keeper Aldous Thorne."
+    },
+    {
+      "id": "the-last-verse",
+      "to": "odo-brambletoe",
+      "title": "The scrap from the black night",
+      "when": "Act 4: just before the ringing, when it slides out of Biddy's case on the hull",
+      "text": "You have carried this scrap since the black night in the boat and never read it by lamplight. Read it now. It is not a hymn. It is a lullaby, sung to a sleeper by the one who owns her, and the last verse is the only one that answers back. 'Sleep, you who counted the keel, let the rope go slack and kneel. One shall stay and one shall sing; neither is the sea's to bring.' It works in whoever's voice sings it, and it costs them the same. Choose the voice well."
+    }
+  ],
   "content": { "sources": ["PHB 2024"], "warnings": ["undead", "drowning"] }
 }

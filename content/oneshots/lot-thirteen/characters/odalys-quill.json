@@ -132,5 +132,32 @@
         { "id": "paint", "label": "Thimble of paint", "value": "A thimble of paint that shifts colour with her mood" }
       ]
     }
-  ]
+  ],
+  "flashback": "What is the first thing you ever forged for Corvin, and what did you tell yourself it was for?",
+  "ifUnclaimed": {
+    "npc": "Odalys is absent. Her forgeries still litter the salesroom: let relics visibly flake, and a tiny glyph shimmer under each wax seal when anyone looks closely. Her mother's grimoire sits in Lot 9 as a plain book of recipes anyone can win. Marchbanks's midnight exposure falls on an empty chair.",
+    "reassign": [
+      {
+        "beat": "Knows which relics are forgeries (the tell is a glyph under the seal)",
+        "to": [
+          "nettle-tumbletoe",
+          "anselm-pyke"
+        ],
+        "text": "You spot at a glance that half the catalogue is fake. Each forgery carries the same tiny glyph under the wax seal, the signature of one very good hand. You do not yet know whose."
+      },
+      {
+        "beat": "Saw the apprentice copying Dagny's handwriting",
+        "to": [
+          "tobias-larke",
+          "nettle-tumbletoe"
+        ],
+        "text": "Late one night, before the wedding that never happened, you saw Corvin's apprentice copying Dagny Brask's handwriting by candle, giggling nervously. She said it was a practical joke. You believed her."
+      }
+    ],
+    "cuts": [
+      "Odalys's squirm during the forgery farce in lots 1-12; Marchbanks heckles the relics instead.",
+      "The forged saints heckling the forger in the gallery; they heckle the whole party.",
+      "The soup scene between Dagny and Odalys."
+    ]
+  }
 }

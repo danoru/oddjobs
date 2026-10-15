@@ -379,5 +379,31 @@
         }
       ]
     }
-  ]
+  ],
+  "flashback": "What story do you tell in the Gull & Anchor about where the storm-hymn came from, and which part of it is a lie?",
+  "ifUnclaimed": {
+    "npc": "Odo is absent: he is on the harbour wall, leading the town in the storm-hymn through the gale. The party hears him faintly in Act 1 and again from the water in Act 4, and that chorus is what keeps the town from running.",
+    "reassign": [
+      {
+        "beat": "The storm-hymn, and leading the town in it",
+        "to": [
+          "sister-vell",
+          "merryn-vane"
+        ],
+        "text": "You know all three verses of the storm-hymn by heart, and the town will follow you if you start it. You have never sung it without being sure of the last note."
+      },
+      {
+        "beat": "The last verse that nobody can finish (letter: the-last-verse)",
+        "to": [
+          "merryn-vane",
+          "sister-vell"
+        ],
+        "text": "There is a tune you hum in your sleep that you never learned. Lately, when the bell rings in your head, words come with it. They are the last verse of the hymn, and they sound like an order."
+      }
+    ],
+    "cuts": [
+      "The Gull & Anchor opener about three unpaid pints.",
+      "The town singing under the bell in Act 4; the ringing is bare without the chorus."
+    ]
+  }
 }

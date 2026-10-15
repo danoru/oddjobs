@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
@@ -15,6 +16,7 @@ import { playRip } from "@/lib/rip";
 import { SiteHeader } from "@/components/SiteHeader";
 import { PosterIcon } from "@/components/PosterIcon";
 import { SheetBack, SheetFront } from "@/components/sheet/Sheet";
+import { PlayerExtras } from "@/components/table/PlayerExtras";
 import { CustomizeDrawer } from "@/components/sheet/CustomizeDrawer";
 import { FoundryDialog, RecipeDialog } from "@/components/sheet/ExportDialogs";
 import b from "@/components/board/Board.module.css";
@@ -36,9 +38,12 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => ({
 export default function CharacterPage({ os, id }: Props) {
   const stock = os.cast.find((c) => c.id === id)!;
   const { tweaks, setTweaks } = useTweaks(os.slug, id);
-  const { claims, toggle } = useClaims(os.slug);
+  const { claimedBy, toggle, table, player, error } = useClaims(os.slug);
   const c = useMemo(() => applyTweaks(stock, tweaks), [stock, tweaks]);
-  const claimed = claims.includes(id);
+  const claim = claimedBy[id];
+  const claimed = Boolean(claim);
+  // At a table you need a name before tearing; that's asked on the job page.
+  const needsName = Boolean(table && !player);
   const names = Object.fromEntries(os.cast.map((x) => [x.id, x.id === id ? c.name : x.name]));
   const [panel, setPanel] = useState<null | "customize" | "recipe" | "foundry">(null);
 
@@ -72,11 +77,36 @@ export default function CharacterPage({ os, id }: Props) {
               <div className={b.posterName}>{c.name}</div>
               <div className={b.posterEpithet}>{c.poster.epithet}</div>
               <p className={b.posterHook}>{c.poster.hook}</p>
-              {claimed && <span className={b.claimedStamp}>CLAIMED</span>}
+              {claim && (
+                <span className={b.claimedStamp}>
+                  CLAIMED
+                  {claim.name && <span className={b.stampName}>{claim.mine ? "by you" : claim.name}</span>}
+                </span>
+              )}
             </div>
 
+            {(table || claim?.name) && (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                {claim?.name
+                  ? claim.mine
+                    ? `You tore this one down at table ${table}.`
+                    : `${claim.name} tore this one down at table ${table}.`
+                  : `Still on the board at table ${table}.`}
+              </Typography>
+            )}
+            {error && (
+              <Typography variant="body2" color="warning.main" sx={{ mt: 1 }}>
+                {error}
+              </Typography>
+            )}
+
             <Stack spacing={1} sx={{ mt: 3 }}>
-              {!claimed && (
+              {!claimed && needsName && (
+                <Button component={Link} href={`/${os.slug}`} variant="contained" color="secondary">
+                  Join table {table} to claim
+                </Button>
+              )}
+              {!claimed && !needsName && (
                 <Button
                   variant="contained"
                   color="secondary"
@@ -101,7 +131,7 @@ export default function CharacterPage({ os, id }: Props) {
               <Button variant="outlined" startIcon={<FileDownloadIcon />} onClick={() => setPanel("foundry")}>
                 Foundry actor (beta)
               </Button>
-              {claimed && (
+              {claim?.mine && (
                 <Button size="small" sx={{ color: "text.secondary" }} onClick={() => toggle(id)}>
                   Pin the poster back up
                 </Button>
@@ -113,6 +143,11 @@ export default function CharacterPage({ os, id }: Props) {
           </Box>
 
           <main className={sheet.sheet}>
+            {table && player && claim?.mine && (
+              <div style={{ marginBottom: 24 }}>
+                <PlayerExtras code={table} playerId={player.id} characterId={id} flashback={stock.flashback} />
+              </div>
+            )}
             <SheetFront c={c} ruleset={os.ruleset} oneshotTitle={os.title} />
             <SheetBack c={c} oneshotTitle={os.title} names={names} sealedSecret />
           </main>

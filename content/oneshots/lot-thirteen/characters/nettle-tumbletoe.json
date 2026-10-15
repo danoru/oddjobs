@@ -100,5 +100,34 @@
         { "id": "pick", "label": "Heron lockpick", "value": "A silver lockpick shaped like a heron, stolen with permission" }
       ]
     }
-  ]
+  ],
+  "flashback": "What does the receipt you leave in place of every stolen thing actually say?",
+  "ifUnclaimed": {
+    "npc": "Nettle is absent. Lady Marchbanks has hired a jittery halfling named Fennick instead, who is found snagged on the gallery chandelier in Act 3. Marchbanks herself is the active rival bidder and pressures the party directly.",
+    "reassign": [
+      {
+        "beat": "Marchbanks's job: take Lot Thirteen before the hammer (200 gp up front, 1,000 on delivery)",
+        "to": [
+          "dagny-brask",
+          "tobias-larke",
+          "anselm-pyke"
+        ],
+        "text": "Lady Marchbanks cornered you at the cloakroom: 200 gp now and 1,000 more if Lot Thirteen never goes under the hammer. She took you for her thief. You have not said no."
+      },
+      {
+        "beat": "The dossier naming Odalys the forger, and the midnight exposure (letter: the-ladys-midnight)",
+        "to": [
+          "tobias-larke",
+          "dagny-brask",
+          "anselm-pyke"
+        ],
+        "text": "Marchbanks showed you her dossier. It names Corvin's apprentice as the forger of his relics, and she means to say so aloud at midnight. She does not know about the rest."
+      }
+    ],
+    "cuts": [
+      "Nettle's lock-and-roof heist set pieces; hand the locks to Odalys's illusions or Dagny's keys.",
+      "The Tumbletoe burrow-hold mortgage stakes.",
+      "Nettle's gentle kindness toward Odalys."
+    ]
+  }
 }

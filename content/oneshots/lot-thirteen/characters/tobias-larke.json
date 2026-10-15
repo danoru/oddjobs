@@ -123,5 +123,32 @@
         { "id": "letter", "label": "Corvin's last letter", "value": "Corvin's last letter, folded small and worn soft" }
       ]
     }
-  ]
+  ],
+  "flashback": "What were the last words Corvin said to you on the morning of the wedding that never happened?",
+  "ifUnclaimed": {
+    "npc": "Run Tobias as the mournful minstrel in the ballroom band, loyal to Corvin's memory. He plays the first act, and Biscuit seems to know him. If the party needs the Waltz, someone else must carry the tune.",
+    "reassign": [
+      {
+        "beat": "The Magpie's Waltz, which calms Biscuit",
+        "to": [
+          "odalys-quill",
+          "nettle-tumbletoe"
+        ],
+        "text": "You know the tune Corvin whistles when he is happy: five years of hearing it through a workshop wall, or three of hearing it round a troupe's fire. A few bars will calm the mimic."
+      },
+      {
+        "beat": "Corvin's note before the funeral: 'I need to die for a while'",
+        "to": [
+          "anselm-pyke",
+          "odalys-quill"
+        ],
+        "text": "A note reached you before the funeral in Corvin's own hand: 'I need to die for a while. Please make sure the lid stays shut.' You thought it a cruel joke. You are no longer sure."
+      }
+    ],
+    "cuts": [
+      "The Tobias and Corvin heartbreak scene in the boathouse; Corvin addresses the room instead.",
+      "Old Marigold's recovery thread; the lute simply sits in Biscuit's gut as treasure.",
+      "The Merry Perils bail-and-cheese gags with Nettle."
+    ]
+  }
 }
