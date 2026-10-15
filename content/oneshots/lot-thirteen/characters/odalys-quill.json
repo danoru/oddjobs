@@ -1,0 +1,136 @@
+{
+  "id": "odalys-quill",
+  "name": "Odalys Quill",
+  "order": 1,
+  "poster": {
+    "header": "LOST",
+    "epithet": "the Apprentice",
+    "hook": "One spellbook, last seen in Pell House. The owner is considerably less lost.",
+    "reward": "Her mother's book back",
+    "icon": "book"
+  },
+  "roles": ["control", "utility", "striker"],
+  "story": {
+    "pronouns": "she/her",
+    "age": "27",
+    "appearance": "Narrow, ink-stained and elegant, with cropped silver-white hair and eyes of two different colours: one green, one grey. Her borrowed gown has been cut to hide the stains on her cuffs, and she carries herself like someone who has rehearsed being calm.",
+    "concept": "Odalys spent five years as Corvin Pell's apprentice, which meant five years of copying, cataloguing and being told her talent was 'adequate'. She can make a painting weep or a candle sing, and she is very good at making things look like exactly what they are not. When he 'died' she walked out of Pell House with the clothes on her back. He had kept her mother's spellbook as 'tuition security'.",
+    "stake": "Her mother's spellbook is Lot 9 in the catalogue ('a modest grimoire, mostly recipes'), and her invitation says the real thing is in Lot Thirteen. Worse, most of the other lots are her own handiwork.",
+    "goal": "Recover her mother's book before the hammer falls, without letting anyone work out which lots she made.",
+    "secret": "She forged the 'rare relics' for Corvin for three years, aged by illusion and sealed with a little cantrip. If an expert looks closely tonight she hangs for fraud. She also copied Dagny's handwriting for the 'confession' that got Dagny dismissed; Corvin told her it was a practical joke.",
+    "voice": "Precise, dry, apologises at the wrong moments and never at the right ones. Corrects other people's grammar when frightened.",
+    "mannerisms": [
+      "Smooths her cuffs to hide the ink stains",
+      "Candle flames near her turn faintly violet when she is anxious, and she does not notice",
+      "Reflexively appraises the age of everything she touches, then looks guilty"
+    ],
+    "trinket": "Her mother's recipe card, the only page she managed to copy out",
+    "ties": [
+      { "to": "dagny-brask", "text": "She forged the letter that got Dagny dismissed. Dagny still brings her soup and calls it a misunderstanding.", "public": "Dagny is the one person at Pell House who was kind to her" },
+      { "to": "nettle-tumbletoe", "text": "She spotted Nettle loitering opposite Pell House for a week. Nettle keeps looking at her as if they know something.", "public": "Has seen them loitering near Pell House" },
+      { "to": "tobias-larke", "text": "Corvin's fiance. She made half the jewelry Corvin ever gave him and has never been able to look him in the eye.", "public": "Knew him by sight as Corvin's fiance" },
+      { "to": "anselm-pyke", "text": "At the funeral Anselm was the only one who offered her a handkerchief and did not ask why she wasn't crying.", "public": "He was kind to her at the funeral" }
+    ],
+    "intro": "\"Odalys Quill. I was his apprentice, and I would like my mother's book back. Please admire the tapestry; it is not mine.\""
+  },
+  "mech": {
+    "species": "Elf",
+    "lineage": "High Elf",
+    "size": "Medium",
+    "background": "Charlatan",
+    "classes": [{ "name": "Wizard", "subclass": "School of Illusion", "level": 3 }],
+    "abilities": { "str": 8, "dex": 15, "con": 14, "int": 16, "wis": 12, "cha": 10 },
+    "saves": ["int", "wis"],
+    "skills": ["arcana", "investigation", "deception", "sleightOfHand", "perception"],
+    "hp": 20,
+    "ac": { "value": 12, "note": "Unarmored (10 + Dex); 15 with Mage Armor" },
+    "speed": 30,
+    "senses": ["Darkvision 60 ft"],
+    "languages": ["Common", "Elvish", "Draconic"],
+    "tools": ["Disguise Kit", "Forgery Kit"],
+    "weaponTraining": ["Daggers", "Darts", "Slings", "Quarterstaffs", "Light crossbows", "Longswords", "Shortswords", "Shortbows", "Longbows"],
+    "features": [
+      { "name": "Keen Senses", "source": "species", "text": "You are proficient in Perception." },
+      { "name": "Fey Ancestry", "source": "species", "text": "Advantage on saves against being charmed, and magic cannot put you to sleep." },
+      { "name": "Trance", "source": "species", "text": "Four hours of meditation gives you the benefit of a night's sleep." },
+      { "name": "Arcane Recovery", "source": "class", "text": "After a short rest, recover spent spell slots totalling up to 2 levels (none above 5th).", "uses": { "max": 1, "per": "day" } },
+      { "name": "Ritual Casting", "source": "class", "text": "You can cast a wizard spell with the ritual tag from your spellbook without preparing it." },
+      { "name": "Illusion Savant", "source": "subclass", "text": "Copying illusion spells into your spellbook costs half the gold and time." },
+      { "name": "Improved Minor Illusion", "source": "subclass", "text": "You know Minor Illusion (free), and one casting can create both a sound and an image." },
+      { "name": "False Identity", "source": "background", "text": "You have a second identity with documents, acquaintances and disguises, and you can forge handwriting and official papers you have seen." }
+    ],
+    "attacks": [
+      { "name": "Fire Bolt", "kind": "spell", "ability": "int", "dice": "1d10", "damageType": "fire", "addMod": false, "range": "120 ft", "note": "Ignites loose flammable objects", "option": "signature" },
+      { "name": "Dagger", "kind": "weapon", "ability": "dex", "dice": "1d4", "damageType": "piercing", "range": "20/60 ft", "properties": ["Finesse", "Light", "Thrown"] }
+    ],
+    "spellcasting": {
+      "ability": "int",
+      "slots": [4, 2],
+      "spells": [
+        { "name": "Mage Hand", "level": 0 },
+        { "name": "Prestidigitation", "level": 0 },
+        { "name": "Fire Bolt", "level": 0, "option": "signature" },
+        { "name": "Message", "level": 0, "note": "High Elf cantrip" },
+        { "name": "Minor Illusion", "level": 0, "note": "Illusion Savant; doesn't count against cantrips known" },
+        { "name": "Mage Armor", "level": 1 },
+        { "name": "Shield", "level": 1 },
+        { "name": "Disguise Self", "level": 1 },
+        { "name": "Silent Image", "level": 1 },
+        { "name": "Color Spray", "level": 1 },
+        { "name": "Sleep", "level": 1 },
+        { "name": "Identify", "level": 1, "note": "Ritual" },
+        { "name": "Invisibility", "level": 2 },
+        { "name": "Mirror Image", "level": 2 },
+        { "name": "Misty Step", "level": 2 }
+      ],
+      "note": "Spellbook holds 10 leveled spells; prepares 6 each Long Rest (Int mod 3 + level 3). Suggested: Mage Armor, Shield, Disguise Self, Sleep, Invisibility, Misty Step."
+    },
+    "equipment": [
+      { "name": "Spellbook", "note": "A shabby travelling copy; her mother's is Lot 9" },
+      { "name": "Dagger", "equipped": true },
+      { "name": "Component Pouch" },
+      { "name": "Masquerade Gown", "note": "Borrowed, with deep hidden pockets" },
+      { "name": "Disguise Kit" },
+      { "name": "Forgery Kit", "note": "Ten stoppered bottles of coloured liquid, mostly ink" },
+      { "name": "Scholar's Pack" }
+    ],
+    "gold": 15
+  },
+  "options": [
+    {
+      "kind": "spell",
+      "id": "signature",
+      "label": "Signature cantrip",
+      "choices": [
+        {
+          "id": "fire-bolt",
+          "label": "Fire Bolt",
+          "value": { "name": "Fire Bolt", "level": 0 },
+          "attack": { "name": "Fire Bolt", "kind": "spell", "ability": "int", "dice": "1d10", "damageType": "fire", "addMod": false, "range": "120 ft", "note": "Ignites loose flammable objects" }
+        },
+        {
+          "id": "ray-of-frost",
+          "label": "Ray of Frost",
+          "value": { "name": "Ray of Frost", "level": 0 },
+          "attack": { "name": "Ray of Frost", "kind": "spell", "ability": "int", "dice": "1d8", "damageType": "cold", "addMod": false, "range": "60 ft", "note": "Target's speed is reduced by 10 ft until your next turn" }
+        },
+        {
+          "id": "shocking-grasp",
+          "label": "Shocking Grasp",
+          "value": { "name": "Shocking Grasp", "level": 0 },
+          "attack": { "name": "Shocking Grasp", "kind": "spell", "ability": "int", "dice": "1d8", "damageType": "lightning", "addMod": false, "range": "Touch", "note": "Advantage against targets in metal armor; target can't take reactions this turn" }
+        }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Keepsake",
+      "choices": [
+        { "id": "recipe", "label": "Recipe card", "value": "Her mother's recipe card, the only page she managed to copy out" },
+        { "id": "stamp", "label": "Hallmark stamp", "value": "A brass hallmark stamp she was never supposed to keep" },
+        { "id": "paint", "label": "Thimble of paint", "value": "A thimble of paint that shifts colour with her mood" }
+      ]
+    }
+  ]
+}

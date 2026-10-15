@@ -1,0 +1,140 @@
+{
+  "id": "sabra-kovane",
+  "name": "Sabra Kovane",
+  "order": 3,
+  "poster": {
+    "header": "SEEKING",
+    "epithet": "Warden of the Ash Shrine",
+    "hook": "Shrine-warden seeks steady hands for one holy, regrettable night.",
+    "reward": "A blessing, and tea",
+    "icon": "flame"
+  },
+  "roles": ["healer", "support", "tank"],
+  "story": {
+    "pronouns": "she/her",
+    "age": "83",
+    "appearance": "Compact, broad dwarf with a soot-grey braid pinned in a flame-knot and heavy forearms scarred by candle wax. Wears Pyrosi priest's chain under a bath-attendant's apron she refuses to remove.",
+    "concept": "Sabra is the warden of the Ash Shrine, a small Pyrosi altar that Pyrosi pilgrims were allowed to build inside the Ouran bathhouse as part of the Concord. She has tended it for thirty years, and in that time the shrine's lamp has taken to answering her, in a voice she recognises from letters. She has been a cleric of the Flame long enough to know that mercy and obedience are not always the same thing.",
+    "stake": "Whatever the vote is, she is the person who will have to carry it out. The Pyrosi rite for ending a burning is hers to perform.",
+    "goal": "Keep her promise to Torvak, and get Vessia to forgive her before the end of the night.",
+    "secret": "Three Jubilees ago the lamp told her that Torvak was tired. He asked her to let him go when the time came and she swore on the flame. She has never told Vessia. She does not know whether keeping her word means betraying her friends.",
+    "voice": "Dry, warm, unhurried; talks to everyone like a patient aunt and to the shrine lamp like an old colleague. Swears in Dwarvish.",
+    "mannerisms": [
+      "Touches the shrine-flame pin on her collar before saying anything difficult",
+      "Pours tea for people in emergencies",
+      "Talks to fires, then pretends she did not"
+    ],
+    "trinket": "A tin pilgrim's token worn smooth by thirty years of thumbs",
+    "ties": [
+      { "to": "vessia-drun", "text": "Torvak's granddaughter. Sabra reads her his words every Jubilee and has been editing out the last line for three years.", "public": "Tends the shrine of Vessia's grandfather" },
+      { "to": "tamsin-brandle", "text": "The stoker and the priest share the furnace-room, a kettle and a running argument about whose schedule comes first. Sabra would trust her with the shrine key, and has.", "public": "Share the furnace-room, a kettle and an argument" },
+      { "to": "corwen-tidewrack", "text": "The tide-reader arrived this afternoon off the Driftwood barge and asked where he could pray to something that wasn't on fire. She gave him her own seat and a cup of tea.", "public": "Gave him a seat and tea when he arrived today" }
+    ],
+    "intro": "\"Sabra Kovane, warden of the Ash Shrine. Sit. Drink. We have until midnight and I would rather you were warm.\""
+  },
+  "mech": {
+    "species": "Dwarf",
+    "lineage": "Pyrosi forge-born",
+    "size": "Medium",
+    "background": "Acolyte",
+    "classes": [{ "name": "Cleric", "subclass": "Light Domain", "level": 4 }],
+    "abilities": { "str": 13, "dex": 10, "con": 15, "int": 8, "wis": 18, "cha": 13 },
+    "saves": ["wis", "cha"],
+    "skills": ["insight", "religion", "medicine", "persuasion"],
+    "hp": 35,
+    "ac": { "value": 18, "note": "Chain mail + shield" },
+    "speed": 30,
+    "senses": ["Darkvision 120 ft"],
+    "languages": ["Common", "Dwarvish", "Giant"],
+    "tools": ["Calligrapher's Supplies"],
+    "armorTraining": ["Light", "Medium", "Heavy", "Shields"],
+    "weaponTraining": ["Simple", "Martial"],
+    "originFeat": "Magic Initiate (Cleric)",
+    "feats": ["Ability Score Improvement (Wis +1, Con +1)"],
+    "features": [
+      { "name": "Darkvision (120 ft)", "source": "species", "text": "See in dim light and darkness out to 120 ft." },
+      { "name": "Dwarven Resilience", "source": "species", "text": "Resist poison damage; advantage on saves against being Poisoned." },
+      { "name": "Dwarven Toughness", "source": "species", "text": "Your HP maximum rises by 1 per level." },
+      { "name": "Stonecunning", "source": "species", "text": "Bonus Action: tremorsense 60 ft for 10 minutes while standing on stone.", "uses": { "max": 2, "per": "long" } },
+      { "name": "Magic Initiate", "source": "feat", "text": "Light and Thaumaturgy cantrips; cast Bless once per Long Rest without a slot. Spell ability is Wisdom.", "uses": { "max": 1, "per": "long" } },
+      { "name": "Divine Order: Protector", "source": "class", "text": "Trained for battle: Martial weapons and Heavy armor." },
+      { "name": "Channel Divinity", "source": "class", "text": "Two uses; regain one on a Short Rest and all on a Long Rest. Options: Divine Spark, Turn Undead, Radiance of the Dawn.", "uses": { "max": 2, "per": "long" } },
+      { "name": "Divine Spark", "source": "class", "text": "Magic action: 30 ft, roll 1d8 + 4 and either heal that much or deal that much Necrotic or Radiant damage (Con save for half)." },
+      { "name": "Turn Undead", "source": "class", "text": "Magic action: undead of your choice within 30 ft make a Wis save or are Frightened and Incapacitated for 1 minute." },
+      { "name": "Radiance of the Dawn", "source": "subclass", "text": "Channel Divinity, Magic action: dispel magical darkness within 30 ft; creatures of your choice there make a Con save or take 2d10 + 4 Radiant damage (half on a success).", "uses": { "max": 2, "per": "long" } },
+      { "name": "Warding Flare", "source": "subclass", "text": "Reaction: when a creature you can see within 30 ft attacks you, impose Disadvantage on that attack roll.", "uses": { "max": 4, "per": "long" } }
+    ],
+    "attacks": [
+      { "name": "Warhammer", "kind": "weapon", "ability": "str", "dice": "1d8", "damageType": "bludgeoning", "properties": ["Versatile (1d10)"] },
+      { "name": "Sacred Flame", "kind": "spell", "ability": "wis", "save": "dex", "dice": "1d8", "damageType": "radiant", "addMod": false, "range": "60 ft", "note": "No benefit from cover", "option": "flame-cantrip" },
+      { "name": "Scorching Ray", "kind": "spell", "ability": "wis", "dice": "2d6", "damageType": "fire", "addMod": false, "range": "120 ft", "note": "3 rays with a 2nd-level slot; one more per slot level above 2nd" }
+    ],
+    "spellcasting": {
+      "ability": "wis",
+      "slots": [4, 3],
+      "spells": [
+        { "name": "Guidance", "level": 0 },
+        { "name": "Mending", "level": 0 },
+        { "name": "Spare the Dying", "level": 0 },
+        { "name": "Sacred Flame", "level": 0, "option": "flame-cantrip" },
+        { "name": "Light", "level": 0, "note": "Magic Initiate" },
+        { "name": "Thaumaturgy", "level": 0, "note": "Magic Initiate" },
+        { "name": "Burning Hands", "level": 1, "always": true, "note": "Light Domain" },
+        { "name": "Faerie Fire", "level": 1, "always": true, "note": "Light Domain" },
+        { "name": "Bless", "level": 1, "always": true, "note": "Magic Initiate; 1/long rest free" },
+        { "name": "Healing Word", "level": 1 },
+        { "name": "Cure Wounds", "level": 1 },
+        { "name": "Guiding Bolt", "level": 1 },
+        { "name": "Shield of Faith", "level": 1 },
+        { "name": "Scorching Ray", "level": 2, "always": true, "note": "Light Domain" },
+        { "name": "See Invisibility", "level": 2, "always": true, "note": "Light Domain" },
+        { "name": "Spiritual Weapon", "level": 2 },
+        { "name": "Lesser Restoration", "level": 2 },
+        { "name": "Aid", "level": 2 }
+      ],
+      "note": "Prepares 7 cleric spells after a Long Rest; domain spells are always prepared. Spell save DC 14, spell attack +6."
+    },
+    "equipment": [
+      { "name": "Chain Mail", "equipped": true, "note": "Under a bath-attendant's apron" },
+      { "name": "Shield", "equipped": true, "note": "Painted with a small flame" },
+      { "name": "Warhammer", "equipped": true },
+      { "name": "Holy Symbol", "note": "Flame-knot pin" },
+      { "name": "Healer's Kit" },
+      { "name": "Priest's Pack" },
+      { "name": "Shrine-lamp key" },
+      { "name": "Travelling tea set" }
+    ],
+    "gold": 14
+  },
+  "options": [
+    {
+      "kind": "spell",
+      "id": "flame-cantrip",
+      "label": "Signature cantrip",
+      "choices": [
+        {
+          "id": "sacred-flame",
+          "label": "Sacred Flame",
+          "value": { "name": "Sacred Flame", "level": 0 },
+          "attack": { "name": "Sacred Flame", "kind": "spell", "ability": "wis", "save": "dex", "dice": "1d8", "damageType": "radiant", "addMod": false, "range": "60 ft", "note": "No benefit from cover" }
+        },
+        {
+          "id": "word",
+          "label": "Word of Radiance",
+          "value": { "name": "Word of Radiance", "level": 0 },
+          "attack": { "name": "Word of Radiance", "kind": "spell", "ability": "wis", "save": "con", "dice": "1d6", "damageType": "radiant", "addMod": false, "range": "5-ft emanation", "note": "Each creature of your choice within 5 ft" }
+        }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Keepsake",
+      "choices": [
+        { "id": "token", "label": "Pilgrim's token", "value": "A tin pilgrim's token worn smooth by thirty years of thumbs" },
+        { "id": "kettle", "label": "Dented kettle", "value": "A palm-sized brass kettle, dented on one side, that she claims is blessed" },
+        { "id": "wick", "label": "Shrine wick", "value": "A wick from the first shrine-lamp, wrapped in oilcloth" }
+      ]
+    }
+  ]
+}

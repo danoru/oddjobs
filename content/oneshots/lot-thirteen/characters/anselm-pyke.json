@@ -1,0 +1,128 @@
+{
+  "id": "anselm-pyke",
+  "name": "Brother Anselm Pyke",
+  "order": 4,
+  "poster": {
+    "header": "REWARD",
+    "epithet": "the Undertaker",
+    "hook": "Paid for the truth about what weighed so little in Corvin Pell's coffin. Cannot pay much.",
+    "reward": "A clear conscience",
+    "icon": "skull"
+  },
+  "roles": ["healer", "support", "tank"],
+  "story": {
+    "pronouns": "he/him",
+    "age": "46",
+    "appearance": "Round and soft, with a gravedigger's shoulders and a priest's careful hands. His black vestments have a purple hem, and scale armor hidden underneath makes him walk slightly stiffly. His face was designed for sympathy.",
+    "concept": "Anselm has buried half his parish with the right words in the right order and has never once lost his temper. Six weeks ago he led the rites for Magister Pell. A solicitor brought him a death certificate already filled in, plus a purse of 500 gp 'for the roof', and Anselm signed without ever seeing the body.",
+    "stake": "He signed for a man he never examined. If Corvin lives, Anselm is complicit in fraud and the Quiet Hour loses its charter. His invitation says that Lot Thirteen holds the reliquary of Saint Edda, the order's only real treasure, which Corvin 'borrowed' two years ago.",
+    "goal": "Find out what really lay in that coffin, recover Saint Edda's reliquary, and quietly make right what he signed.",
+    "secret": "At the vigil he lifted a corner of the coffin lid and found sandbags and a keg of lamp oil. He closed it, finished the rites and kept the money. The roof is fixed and the gold cannot be returned. He has told nobody, not even his bishop.",
+    "voice": "Slow, kind and unhurried. Speaks in soft euphemisms ('passed', 'at rest', 'misplaced'), and his dark humor only leaks out when he is terrified.",
+    "mannerisms": [
+      "Straightens other people's collars",
+      "Murmurs condolences when anyone mentions anything unfortunate",
+      "Knocks twice on wood, then on stone, then on anything that sounds hollow"
+    ],
+    "trinket": "A coffin nail from Corvin's coffin, wrapped in a handkerchief",
+    "ties": [
+      { "to": "dagny-brask", "text": "She carried the coffin and told him it felt too light. He told her to sing the hymn. He has avoided her eyes ever since.", "public": "Buried a man together; neither has mentioned it since" },
+      { "to": "tobias-larke", "text": "Tobias sang at the funeral and insisted on guarding the lid. Anselm has quietly suspected him since, though it is not yet an accusation.", "public": "Sang at the same funeral; Anselm remembers the song" },
+      { "to": "odalys-quill", "text": "He gave her his handkerchief at the funeral. She was the only mourner who looked more frightened than sad, and he never asked why.", "public": "Lent her a handkerchief once" }
+    ],
+    "intro": "\"Brother Anselm, of the Quiet Hour. Do take a mask, friends. Everyone looks better with something to hide.\""
+  },
+  "mech": {
+    "species": "Human",
+    "lineage": "Variant Human",
+    "size": "Medium",
+    "background": "Acolyte",
+    "classes": [{ "name": "Cleric", "subclass": "Grave Domain", "level": 3 }],
+    "abilities": { "str": 10, "dex": 13, "con": 15, "int": 8, "wis": 16, "cha": 12 },
+    "saves": ["wis", "cha"],
+    "skills": ["insight", "religion", "medicine", "persuasion", "perception"],
+    "hp": 24,
+    "ac": { "value": 17, "note": "Scale mail 14 + Dex 1 + shield 2" },
+    "speed": 30,
+    "languages": ["Common", "Celestial", "Dwarvish", "Elvish"],
+    "armorTraining": ["Light", "Medium", "Shields"],
+    "weaponTraining": ["Simple"],
+    "feats": ["Healer"],
+    "features": [
+      { "name": "Healer", "source": "feat", "text": "Stabilizing someone with a healer's kit also restores 1 HP. Or spend one kit use as an action to heal 1d6 + 4 plus the target's maximum Hit Dice, once per target per rest." },
+      { "name": "Shelter of the Faithful", "source": "background", "text": "You and companions can receive free care and lodging at temples of your faith, and you have supporters among its clergy." },
+      { "name": "Circle of Mortality", "source": "subclass", "text": "When a spell would roll healing dice, you use the highest possible result instead. Spare the Dying is a bonus action with a 30 ft range for you." },
+      { "name": "Eyes of the Grave", "source": "subclass", "text": "Action: sense the location of undead within 60 ft until the end of your next turn (not behind total cover).", "uses": { "max": 3, "per": "long" } },
+      { "name": "Channel Divinity", "source": "class", "text": "One use per short or long rest. Options: Turn Undead, or Path to the Grave.", "uses": { "max": 1, "per": "short" } },
+      { "name": "Turn Undead", "source": "class", "text": "Action: undead within 30 ft that can see or hear you make a Wis save or flee for 1 minute (ends on damage)." },
+      { "name": "Path to the Grave", "source": "subclass", "text": "Action: curse a creature within 30 ft until the end of your next turn. The next attack that hits it, by you or an ally, treats it as vulnerable to all that attack's damage." }
+    ],
+    "attacks": [
+      { "name": "Mace", "kind": "weapon", "ability": "str", "dice": "1d6", "damageType": "bludgeoning" },
+      { "name": "Sacred Flame", "kind": "spell", "ability": "wis", "save": "dex", "dice": "1d8", "damageType": "radiant", "addMod": false, "range": "60 ft", "note": "No benefit from cover", "option": "signature" }
+    ],
+    "spellcasting": {
+      "ability": "wis",
+      "slots": [4, 2],
+      "spells": [
+        { "name": "Spare the Dying", "level": 0, "always": true, "note": "Grave Domain; bonus action, 30 ft" },
+        { "name": "Guidance", "level": 0 },
+        { "name": "Thaumaturgy", "level": 0 },
+        { "name": "Sacred Flame", "level": 0, "option": "signature" },
+        { "name": "Bane", "level": 1, "always": true },
+        { "name": "False Life", "level": 1, "always": true },
+        { "name": "Gentle Repose", "level": 2, "always": true },
+        { "name": "Ray of Enfeeblement", "level": 2, "always": true },
+        { "name": "Bless", "level": 1 },
+        { "name": "Cure Wounds", "level": 1 },
+        { "name": "Healing Word", "level": 1 },
+        { "name": "Sanctuary", "level": 1 },
+        { "name": "Lesser Restoration", "level": 2 },
+        { "name": "Spiritual Weapon", "level": 2 }
+      ],
+      "note": "Prepares 6 spells each Long Rest (Wis mod 3 + level 3); Grave Domain spells are always prepared and don't count."
+    },
+    "equipment": [
+      { "name": "Scale Mail", "equipped": true, "note": "Under the vestments" },
+      { "name": "Shield", "equipped": true, "note": "Carries the order's quiet-hour sigil" },
+      { "name": "Mace", "equipped": true },
+      { "name": "Holy Symbol", "note": "A black-enamel hourglass" },
+      { "name": "Healer's Kit", "note": "10 uses" },
+      { "name": "Prayer Book" },
+      { "name": "Vestments" },
+      { "name": "Priest's Pack" }
+    ],
+    "gold": 15
+  },
+  "options": [
+    {
+      "kind": "spell",
+      "id": "signature",
+      "label": "Signature cantrip",
+      "choices": [
+        {
+          "id": "sacred-flame",
+          "label": "Sacred Flame",
+          "value": { "name": "Sacred Flame", "level": 0 },
+          "attack": { "name": "Sacred Flame", "kind": "spell", "ability": "wis", "save": "dex", "dice": "1d8", "damageType": "radiant", "addMod": false, "range": "60 ft", "note": "No benefit from cover" }
+        },
+        {
+          "id": "toll-the-dead",
+          "label": "Toll the Dead",
+          "value": { "name": "Toll the Dead", "level": 0 },
+          "attack": { "name": "Toll the Dead", "kind": "spell", "ability": "wis", "save": "wis", "dice": "1d8", "damageType": "necrotic", "addMod": false, "range": "60 ft", "note": "1d12 if the target is missing any HP" }
+        }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Keepsake",
+      "choices": [
+        { "id": "nail", "label": "Coffin nail", "value": "A coffin nail from Corvin's coffin, wrapped in a handkerchief" },
+        { "id": "key", "label": "Bell-key", "value": "The order's tarnished bell-key, worn on a cord" },
+        { "id": "rosemary", "label": "Grave rosemary", "value": "A sachet of grave rosemary, for remembrance and moths" }
+      ]
+    }
+  ]
+}

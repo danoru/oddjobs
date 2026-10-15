@@ -1,0 +1,383 @@
+/* The character sheet: one CSS for screen and print. US Letter by default;
+   A4 is selected with the .a4 class on .sheet (page size set in the page). */
+
+.sheet {
+  color: var(--ink);
+  font-family: var(--font-sheet);
+  font-size: 13.5px;
+  line-height: 1.35;
+}
+
+.page {
+  position: relative;
+  background: #fbf5e6;
+  background-image:
+    radial-gradient(ellipse at 10% 0%, rgba(255, 255, 255, 0.7), transparent 55%),
+    radial-gradient(ellipse at 90% 100%, rgba(160, 110, 50, 0.12), transparent 50%);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  padding: 28px 32px 30px;
+  margin: 0 auto 28px;
+  max-width: 8.5in;
+}
+
+.head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 20px;
+  align-items: end;
+  border-bottom: 3px double var(--ink);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.name {
+  font-family: var(--font-print);
+  font-size: 34px;
+  line-height: 1;
+  margin: 0;
+}
+
+.epithet {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+
+.headMeta {
+  text-align: right;
+  font-family: var(--font-label);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.label {
+  font-family: var(--font-label);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.sectionTitle {
+  composes: label;
+  font-size: 12.5px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--ink);
+  margin: 12px 0 6px;
+  padding-bottom: 1px;
+}
+
+/* Abilities row */
+.abilities {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.ability {
+  border: 1.5px solid var(--ink);
+  border-radius: 10px 10px 18px 18px;
+  text-align: center;
+  padding: 4px 2px 6px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.abilityMod {
+  font-family: var(--font-print);
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.abilityScore {
+  display: inline-block;
+  font-family: var(--font-label);
+  font-size: 12px;
+  border: 1px solid var(--ink);
+  border-radius: 10px;
+  padding: 0 7px;
+}
+
+/* Vital boxes */
+.vitals {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.vital {
+  border: 1.5px solid var(--ink);
+  text-align: center;
+  padding: 4px 2px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.vitalValue {
+  font-family: var(--font-print);
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+.vitalNote {
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  line-height: 1.15;
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 18px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.list li {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 1px 0;
+}
+
+.dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border: 1.2px solid var(--ink);
+  border-radius: 50%;
+  transform: translateY(1px);
+}
+
+.dotOn {
+  composes: dot;
+  background: var(--ink);
+}
+
+.dotX {
+  composes: dot;
+  background: radial-gradient(circle, var(--parchment) 0 2px, var(--ink) 2.5px);
+}
+
+.bonus {
+  flex: none;
+  min-width: 26px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--ink-soft);
+  font-size: 11.5px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  font-family: var(--font-label);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-align: left;
+  font-weight: normal;
+  border-bottom: 1px solid var(--ink);
+  padding: 2px 6px 2px 0;
+}
+
+.table td {
+  border-bottom: 1px dotted rgba(43, 29, 14, 0.35);
+  padding: 3px 6px 3px 0;
+  vertical-align: top;
+}
+
+.features {
+  columns: 2;
+  column-gap: 18px;
+}
+
+.feature {
+  break-inside: avoid;
+  margin: 0 0 6px;
+}
+
+.featureName {
+  font-weight: 600;
+}
+
+.uses {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.box {
+  width: 9px;
+  height: 9px;
+  border: 1.2px solid var(--ink);
+}
+
+.spellLevel {
+  break-inside: avoid;
+  margin-bottom: 6px;
+}
+
+.spellHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-label);
+  font-size: 12.5px;
+}
+
+.spellNames {
+  margin: 1px 0 0;
+}
+
+.story p {
+  margin: 0 0 6px;
+}
+
+.storyGrid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 18px;
+}
+
+.quote {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 17px;
+  margin: 4px 0 10px;
+}
+
+.secret {
+  position: relative;
+  border: 1.5px dashed var(--wax);
+  padding: 8px 10px;
+  margin-top: 8px;
+}
+
+.sealed {
+  filter: blur(5px);
+  user-select: none;
+}
+
+.seal {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.sealDisc {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d66a59, var(--wax) 55%, #5a160d);
+  color: #f9d9cf;
+  font-family: var(--font-poster);
+  font-size: 13px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.footer {
+  margin-top: 12px;
+  font-family: var(--font-label);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  display: flex;
+  justify-content: space-between;
+}
+
+@media screen and (max-width: 760px) {
+  .page {
+    padding: 18px 16px;
+  }
+  .head {
+    grid-template-columns: 1fr;
+  }
+  .headMeta {
+    text-align: left;
+  }
+  .abilities {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .vitals {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .cols,
+  .storyGrid {
+    grid-template-columns: 1fr;
+  }
+  .features {
+    columns: 1;
+  }
+}
+
+@media print {
+  .sheet {
+    font-size: 8.9pt;
+    line-height: 1.24;
+  }
+  .head {
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+  }
+  .name {
+    font-size: 28px;
+  }
+  .sectionTitle {
+    margin: 8px 0 4px;
+  }
+  .abilityMod {
+    font-size: 21px;
+  }
+  .vitals {
+    margin-top: 6px;
+  }
+  .vitalValue {
+    font-size: 18px;
+  }
+  .list li {
+    padding: 0;
+  }
+  .feature {
+    margin-bottom: 4px;
+  }
+  .page {
+    box-shadow: none;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+    break-after: page;
+  }
+  .page:last-child {
+    break-after: auto;
+  }
+  .sealed {
+    filter: none;
+  }
+  .seal {
+    display: none;
+  }
+  .ability,
+  .vital {
+    background: none;
+  }
+}

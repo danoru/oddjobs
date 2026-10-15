@@ -1,0 +1,136 @@
+{
+  "id": "selenor-aetheis",
+  "name": "Selenor Aetheis",
+  "order": 2,
+  "poster": {
+    "header": "NOTICE",
+    "epithet": "Advocate of the Quiet Hand",
+    "hook": "By Chancery order: the Cooling Concord lapses at midnight. Attendance compulsory.",
+    "reward": "25 gp a day, and the Registrar's good opinion",
+    "icon": "book"
+  },
+  "roles": ["face", "support", "control"],
+  "story": {
+    "pronouns": "he/him",
+    "age": "114",
+    "appearance": "Slender, silver-haired high elf in a Chancery advocate's pale grey coat with ink-stained cuffs. A thin bronze seal-ring on every second finger, and a lute strapped across his back that he claims is for work.",
+    "concept": "Selenor is a junior advocate of the New Ouransgard Chancery, the grandson of Aetheion the Drafter, who wrote the Cooling Concord. He negotiates the city's contracts, softens its tax disputes, and has a talent for saying the unsayable beautifully. He is good at his job and has just started to dislike what that means.",
+    "stake": "The Chancery's budget, the city's baths and his own career all depend on renewal. His grandfather's name is on the clause that keeps Torvak in the fire.",
+    "goal": "Renew the Concord legally, with no one hurt, and then go home and sleep for a week.",
+    "secret": "He carries the Registrar's sealed Writ of Assumed Consent: if Torvak will not agree to renewal, Selenor is to forge the Surety's mark. He has also noticed that one page of the Chancery's copy, certified in the notaries' hall at Amberhall, is missing from the register. He told no one. He has decided nothing yet.",
+    "voice": "Warm, measured, a touch elegiac, as if every sentence were being engraved. Never interrupts. Goes very quiet when he is angry and begins to quote statute.",
+    "mannerisms": [
+      "Turns his seal-rings with his thumb while he thinks",
+      "Describes every room as if drafting its inventory",
+      "Hums a Ouran lament under his breath when nervous"
+    ],
+    "trinket": "Aetheion's pen, with a nib worn to a slant by eighty years of the wrong hand",
+    "ties": [
+      { "to": "corwen-tidewrack", "text": "A decade of formal letters between the Chancery and the Driftwood tide-court. They have never met, and Selenor suspects the man writes better than he speaks.", "public": "Ten years of formal letters; they have never met" },
+      { "to": "vessia-drun", "text": "His grandfather drafted the clause that bound hers. He has read every word of her family's file and has not yet said so.", "public": "His grandfather drafted the clause that bound hers" },
+      { "to": "tamsin-brandle", "text": "The stoker signs the Chancery's maintenance orders in soot-black thumbprints. He has been trying to get her to use a pen for three years.", "public": "She signs Chancery maintenance orders with a thumbprint" }
+    ],
+    "intro": "\"Selenor Aetheis, Chancery advocate. I'm here to see that nothing irreversible happens before breakfast.\""
+  },
+  "mech": {
+    "species": "Elf",
+    "lineage": "Ouran high elf",
+    "size": "Medium",
+    "background": "Charlatan",
+    "classes": [{ "name": "Bard", "subclass": "College of Lore", "level": 4 }],
+    "abilities": { "str": 8, "dex": 15, "con": 14, "int": 12, "wis": 10, "cha": 18 },
+    "saves": ["dex", "cha"],
+    "skills": ["deception", "sleightOfHand", "insight", "persuasion", "history", "performance", "investigation", "arcana", "religion", "perception", "stealth"],
+    "expertise": ["persuasion", "deception"],
+    "jackOfAllTrades": true,
+    "initiativeBonus": 1,
+    "hp": 31,
+    "ac": { "value": 14, "note": "Studded leather" },
+    "speed": 30,
+    "senses": ["Darkvision 60 ft"],
+    "languages": ["Common", "Elvish", "Dwarvish"],
+    "tools": ["Forgery Kit", "Calligrapher's Supplies", "Lute", "Flute", "Viol"],
+    "armorTraining": ["Light"],
+    "weaponTraining": ["Simple"],
+    "originFeat": "Skilled",
+    "feats": ["Ability Score Improvement (Cha +1, Con +1)"],
+    "weaponMasteries": [],
+    "features": [
+      { "name": "Fey Ancestry", "source": "species", "text": "Advantage on saves to avoid or end the Charmed condition." },
+      { "name": "Keen Senses", "source": "species", "text": "Proficiency in Insight." },
+      { "name": "Trance", "source": "species", "text": "A Long Rest takes 4 hours of meditation, not sleep." },
+      { "name": "Elven Lineage (High Elf)", "source": "species", "text": "Know Prestidigitation. Cast Detect Magic once per Long Rest without a slot. Spell ability is Charisma.", "uses": { "max": 1, "per": "long" } },
+      { "name": "Skilled", "source": "feat", "text": "Proficiency in three extra skills or tools; Perception, Stealth and Calligrapher's Supplies." },
+      { "name": "Bardic Inspiration (d6)", "source": "class", "text": "Bonus Action: give a creature within 60 ft a d6. Within the next hour, after it fails a D20 Test, it can add the die.", "uses": { "max": 4, "per": "long" } },
+      { "name": "Jack of All Trades", "source": "class", "text": "Add half your proficiency bonus to checks you are not proficient in." },
+      { "name": "Expertise", "source": "class", "text": "Double proficiency in Persuasion and Deception." },
+      { "name": "Bonus Proficiencies (Lore)", "source": "subclass", "text": "Three more skill proficiencies: Investigation, Arcana, Religion." },
+      { "name": "Cutting Words", "source": "subclass", "text": "Reaction: spend a Bardic Inspiration die to subtract it from a creature's attack roll, damage roll or ability check within 60 ft." }
+    ],
+    "attacks": [
+      { "name": "Dagger", "kind": "weapon", "ability": "dex", "dice": "1d4", "damageType": "piercing", "range": "20/60 ft", "properties": ["Finesse", "Light", "Thrown"] },
+      { "name": "Vicious Mockery", "kind": "spell", "ability": "cha", "save": "wis", "dice": "1d6", "damageType": "psychic", "addMod": false, "range": "60 ft", "note": "Target has disadvantage on its next attack roll before the end of your next turn if it fails", "option": "bard-cantrip" }
+    ],
+    "spellcasting": {
+      "ability": "cha",
+      "slots": [4, 3],
+      "spells": [
+        { "name": "Vicious Mockery", "level": 0, "option": "bard-cantrip" },
+        { "name": "Minor Illusion", "level": 0 },
+        { "name": "Message", "level": 0 },
+        { "name": "Prestidigitation", "level": 0, "always": true, "note": "High Elf lineage" },
+        { "name": "Detect Magic", "level": 1, "always": true, "note": "High Elf lineage; 1/long rest free" },
+        { "name": "Healing Word", "level": 1 },
+        { "name": "Dissonant Whispers", "level": 1 },
+        { "name": "Tasha's Hideous Laughter", "level": 1 },
+        { "name": "Faerie Fire", "level": 1 },
+        { "name": "Zone of Truth", "level": 2 },
+        { "name": "Calm Emotions", "level": 2 },
+        { "name": "Suggestion", "level": 2 }
+      ],
+      "note": "Prepares 7 bard spells after a Long Rest. Spell save DC 14, spell attack +6."
+    },
+    "equipment": [
+      { "name": "Studded Leather Armor", "equipped": true },
+      { "name": "Dagger", "equipped": true, "qty": 2 },
+      { "name": "Lute", "note": "Ouran, inlaid with a faded tide-pattern" },
+      { "name": "Forgery Kit" },
+      { "name": "Calligrapher's Supplies" },
+      { "name": "Chancery seal-rings", "note": "Three bronze rings; open doors in the Thermae" },
+      { "name": "Writ of Assumed Consent", "note": "Sealed; the Registrar's order" },
+      { "name": "Entertainer's Pack" }
+    ],
+    "gold": 22
+  },
+  "options": [
+    {
+      "kind": "spell",
+      "id": "bard-cantrip",
+      "label": "Signature cantrip",
+      "choices": [
+        {
+          "id": "mockery",
+          "label": "Vicious Mockery",
+          "value": { "name": "Vicious Mockery", "level": 0 },
+          "attack": { "name": "Vicious Mockery", "kind": "spell", "ability": "cha", "save": "wis", "dice": "1d6", "damageType": "psychic", "addMod": false, "range": "60 ft", "note": "Target has disadvantage on its next attack roll before the end of your next turn if it fails" }
+        },
+        {
+          "id": "thunderclap",
+          "label": "Thunderclap",
+          "value": { "name": "Thunderclap", "level": 0 },
+          "attack": { "name": "Thunderclap", "kind": "spell", "ability": "cha", "save": "con", "dice": "1d6", "damageType": "thunder", "addMod": false, "range": "5-ft emanation", "note": "Each creature within 5 ft of you; audible out to 100 ft" }
+        }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Keepsake",
+      "choices": [
+        { "id": "pen", "label": "Aetheion's pen", "value": "Aetheion's pen, with a nib worn to a slant by eighty years of the wrong hand" },
+        { "id": "letters", "label": "Driftwood letters", "value": "A tied bundle of ten years of tide-court correspondence, answered in the margin" },
+        { "id": "ribbon", "label": "Unsealed ribbon", "value": "A length of Chancery ribbon with no wax on it, saved for a document he has not dared write" }
+      ]
+    }
+  ]
+}

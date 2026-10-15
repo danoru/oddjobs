@@ -1,0 +1,127 @@
+{
+  "id": "tobias-larke",
+  "name": "Tobias Larke",
+  "order": 2,
+  "poster": {
+    "header": "MISSING",
+    "epithet": "the Jilted",
+    "hook": "One fiance, left at the altar, then reported dead. The groom would like a word.",
+    "reward": "A word. Possibly two.",
+    "icon": "music"
+  },
+  "roles": ["face", "support", "healer"],
+  "story": {
+    "pronouns": "he/him",
+    "age": "31",
+    "appearance": "Tall and curly-haired, with a mouth built for smiling and a face that is bad at hiding things. His peacock-blue waistcoat is patched at one elbow, and he wears a lute case on his back like a second, better-behaved personality.",
+    "concept": "Tobias is a jobbing minstrel who can charm a stone out of its mortgage. Two years ago he fell for Corvin Pell, who was charming, wealthy and always about to be wealthier. Corvin vanished on the morning of the wedding, taking Tobias's grandmother's lute 'to be restrung'. Six weeks ago the news arrived that Corvin had died, and Tobias sang at the funeral.",
+    "stake": "His grandmother's lute, Old Marigold, is somewhere in this house, and his invitation says it is in Lot Thirteen. He has also never been able to decide whether he wants to hug Corvin or hit him.",
+    "goal": "Get Old Marigold back, and finally ask Corvin's ghost, or his heirs, or anyone, why he ran.",
+    "secret": "Corvin wrote to him before the funeral: 'I need to die for a while, darling. Please sing at it, and make sure the lid stays shut.' Tobias did exactly that, because he loved him and was promised the lute back. He has told no one, and he knows the tune Corvin whistles when he is happy.",
+    "voice": "Warm, quick and generous with endearments for strangers. Slips into rhyme when upset. Never answers a hard question without a flourish.",
+    "mannerisms": [
+      "Hums fragments of 'The Magpie's Waltz' without noticing",
+      "Retunes his lute whenever he is lying",
+      "Calls everybody 'darling', including people he is about to rob"
+    ],
+    "trinket": "A cracked wedding band on a leather cord, never worn",
+    "ties": [
+      { "to": "anselm-pyke", "text": "He sang at the funeral and insisted on guarding the lid. Anselm watched him a little too long, and Tobias is sure Anselm suspects.", "public": "Sang at the funeral; Anselm watched him throughout" },
+      { "to": "nettle-tumbletoe", "text": "Nettle juggled in his old troupe, the Merry Perils. He has paid their bail twice and has never been thanked, only repaid in stolen cheese.", "public": "Old troupe-mates; he paid their bail twice" },
+      { "to": "odalys-quill", "text": "Corvin's apprentice. Tobias treats her like a kid sister and has no idea she made half the jewelry Corvin ever gave him.", "public": "Corvin's apprentice; he thinks of her as a kid sister" }
+    ],
+    "intro": "\"Tobias Larke, darling, at your service and under protest. Do tell me you have not seen a lute. Brown, sad, answers to Marigold.\""
+  },
+  "mech": {
+    "species": "Half-Elf",
+    "size": "Medium",
+    "background": "Entertainer",
+    "classes": [{ "name": "Bard", "subclass": "College of Lore", "level": 3 }],
+    "abilities": { "str": 8, "dex": 15, "con": 14, "int": 10, "wis": 12, "cha": 17 },
+    "saves": ["dex", "cha"],
+    "skills": ["acrobatics", "performance", "persuasion", "insight", "deception", "perception", "history", "arcana", "sleightOfHand", "investigation"],
+    "expertise": ["performance", "persuasion"],
+    "jackOfAllTrades": true,
+    "initiativeBonus": 1,
+    "hp": 24,
+    "ac": { "value": 13, "note": "Leather armor (11 + Dex)" },
+    "speed": 30,
+    "senses": ["Darkvision 60 ft"],
+    "languages": ["Common", "Elvish", "Halfling"],
+    "tools": ["Disguise Kit", "Lute", "Viol", "Flute", "Dulcimer"],
+    "armorTraining": ["Light"],
+    "weaponTraining": ["Simple", "Hand crossbows", "Longswords", "Rapiers", "Shortswords"],
+    "features": [
+      { "name": "Fey Ancestry", "source": "species", "text": "Advantage on saves against being charmed, and magic cannot put you to sleep." },
+      { "name": "Skill Versatility", "source": "species", "text": "You gained proficiency in two skills of your choice (Persuasion and Insight)." },
+      { "name": "Bardic Inspiration (d6)", "source": "class", "text": "Bonus action: give an ally within 60 ft who can hear you a d6 to add to one roll within the next 10 minutes.", "uses": { "max": 3, "per": "long" } },
+      { "name": "Jack of All Trades", "source": "class", "text": "Add half your proficiency bonus to ability checks you aren't already proficient in." },
+      { "name": "Song of Rest (d6)", "source": "class", "text": "During a short rest, allies who spend Hit Dice and hear your performance regain an extra d6 HP." },
+      { "name": "Expertise", "source": "class", "text": "Double proficiency on Performance and Persuasion." },
+      { "name": "Cutting Words", "source": "subclass", "text": "Reaction: spend a Bardic Inspiration die to subtract it from an enemy's attack roll, damage roll or ability check (within 60 ft, can hear you)." },
+      { "name": "Bonus Proficiencies", "source": "subclass", "text": "Lore bonus: three extra skills (Arcana, Sleight of Hand, Investigation)." },
+      { "name": "By Popular Demand", "source": "background", "text": "You can always find a place to perform and get free lodging and food for yourself and companions in exchange." }
+    ],
+    "attacks": [
+      { "name": "Rapier", "kind": "weapon", "ability": "dex", "dice": "1d8", "damageType": "piercing", "properties": ["Finesse"] },
+      { "name": "Vicious Mockery", "kind": "spell", "ability": "cha", "save": "wis", "dice": "1d4", "damageType": "psychic", "addMod": false, "range": "60 ft", "note": "Target has disadvantage on its next attack roll before the end of your next turn", "option": "cantrip" },
+      { "name": "Dissonant Whispers", "kind": "spell", "ability": "cha", "save": "wis", "dice": "3d6", "damageType": "psychic", "addMod": false, "range": "60 ft", "note": "1st-level slot; half on a save. On a fail the target uses its reaction to flee" }
+    ],
+    "spellcasting": {
+      "ability": "cha",
+      "slots": [4, 2],
+      "spells": [
+        { "name": "Vicious Mockery", "level": 0, "option": "cantrip" },
+        { "name": "Dancing Lights", "level": 0 },
+        { "name": "Healing Word", "level": 1 },
+        { "name": "Cure Wounds", "level": 1 },
+        { "name": "Charm Person", "level": 1 },
+        { "name": "Dissonant Whispers", "level": 1 },
+        { "name": "Tasha's Hideous Laughter", "level": 1 },
+        { "name": "Suggestion", "level": 2 }
+      ],
+      "note": "Knows 6 spells and 2 cantrips; can swap one known spell when gaining a level."
+    },
+    "equipment": [
+      { "name": "Rapier", "equipped": true },
+      { "name": "Leather Armor", "equipped": true },
+      { "name": "Dagger" },
+      { "name": "Lute", "note": "A cheap replacement. Old Marigold is somewhere in Pell House" },
+      { "name": "Disguise Kit" },
+      { "name": "Peacock-Blue Waistcoat", "note": "Costume; patched at the elbow" },
+      { "name": "Admirer's Love Letter", "note": "Favor of an admirer; written by Corvin, naturally" },
+      { "name": "Entertainer's Pack" }
+    ],
+    "gold": 15
+  },
+  "options": [
+    {
+      "kind": "spell",
+      "id": "cantrip",
+      "label": "Signature cantrip",
+      "choices": [
+        {
+          "id": "vicious-mockery",
+          "label": "Vicious Mockery",
+          "value": { "name": "Vicious Mockery", "level": 0 },
+          "attack": { "name": "Vicious Mockery", "kind": "spell", "ability": "cha", "save": "wis", "dice": "1d4", "damageType": "psychic", "addMod": false, "range": "60 ft", "note": "Target has disadvantage on its next attack roll before the end of your next turn" }
+        },
+        {
+          "id": "friends",
+          "label": "Friends",
+          "value": { "name": "Friends", "level": 0, "note": "Concentration; advantage on Charisma checks against one non-hostile creature, who realizes afterward" }
+        }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Keepsake",
+      "choices": [
+        { "id": "ring", "label": "Wedding band", "value": "A cracked wedding band on a leather cord, never worn" },
+        { "id": "ticket", "label": "Pawn ticket", "value": "A pawn ticket for a lute he no longer owns" },
+        { "id": "letter", "label": "Corvin's last letter", "value": "Corvin's last letter, folded small and worn soft" }
+      ]
+    }
+  ]
+}

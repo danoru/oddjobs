@@ -1,0 +1,104 @@
+{
+  "id": "nettle-tumbletoe",
+  "name": "Nettle Tumbletoe",
+  "order": 5,
+  "poster": {
+    "header": "WANTED",
+    "epithet": "the Harlequin",
+    "hook": "For questions regarding Lot Thirteen. Nimble, charming, and very bad at being questioned.",
+    "reward": "1,000 gp, on delivery",
+    "icon": "dagger"
+  },
+  "roles": ["scout", "striker", "face", "utility"],
+  "story": {
+    "pronouns": "they/them",
+    "age": "34",
+    "appearance": "Knee-high to a dinner guest, freckled, with copper curls pinned under a feathered mask that was definitely somebody else's. Their harlequin coat has seventeen pockets and a rapier worn like a conductor's baton.",
+    "concept": "Nettle is a gentleman-thief in the oldest, most flirtatious sense: they steal things that were going to be stolen anyway, politely, and sign the receipt. Lady Ysolde Marchbanks has paid 200 gp upfront and 1,000 more on delivery to take Lot Thirteen before the hammer falls. Nettle also got an invitation from Pell, which they find far more worrying than the job.",
+    "stake": "Lady Marchbanks holds the note on the Tumbletoe burrow-hold and will call it in if Nettle fails or talks. The 1,000 gp clears it.",
+    "goal": "Deliver Lot Thirteen to Marchbanks without anyone getting hurt, least of all the family burrow.",
+    "secret": "Marchbanks's dossier on tonight's guests names Odalys as Pell's forger. Marchbanks wants Lot Thirteen destroyed because it holds the ledger of her own purchases (fakes she overpaid for), and plans to expose the forger at midnight to cover her tracks. Nettle has told no one and has been very kind to Odalys ever since.",
+    "voice": "Breezy, flattering and always halfway to the door. Calls people by the wrong names on purpose, to make them smile and correct you.",
+    "mannerisms": [
+      "Pockets one small souvenir from every room, then returns it before leaving (usually)",
+      "Counts the exits aloud like a nursery rhyme",
+      "Tips their mask to anyone they have just robbed"
+    ],
+    "trinket": "A cut-glass button from Lady Marchbanks's coat",
+    "ties": [
+      { "to": "tobias-larke", "text": "Juggled in Tobias's troupe, the Merry Perils. He has paid their bail twice and Nettle repays him in stolen cheese. They would do anything for him except ask forgiveness.", "public": "Old troupe-mates; Nettle still owes him bail money" },
+      { "to": "odalys-quill", "text": "Knows from the dossier that Odalys is the forger. Says nothing and keeps being very, very kind to her.", "public": "Keeps being unusually kind to her" },
+      { "to": "dagny-brask", "text": "Dagny caught them casing the east wall a week ago and let them go with a warning. They respect each other the way two cats do.", "public": "Met at the east wall; both remember it" }
+    ],
+    "intro": "\"Nettle Tumbletoe, entertainer. No, don't look in my pockets. Look at this pocket. Now look at that wall.\""
+  },
+  "mech": {
+    "species": "Halfling",
+    "lineage": "Lightfoot",
+    "size": "Small",
+    "background": "Criminal",
+    "classes": [{ "name": "Rogue", "subclass": "Swashbuckler", "level": 3 }],
+    "abilities": { "str": 8, "dex": 17, "con": 13, "int": 10, "wis": 12, "cha": 15 },
+    "saves": ["dex", "int"],
+    "skills": ["deception", "stealth", "acrobatics", "sleightOfHand", "perception", "persuasion"],
+    "expertise": ["stealth", "sleightOfHand"],
+    "hp": 21,
+    "ac": { "value": 14, "note": "Leather armor (11 + Dex)" },
+    "speed": 25,
+    "initiativeBonus": 2,
+    "languages": ["Common", "Halfling", "Thieves' Cant"],
+    "tools": ["Thieves' Tools", "Dice Set"],
+    "armorTraining": ["Light"],
+    "weaponTraining": ["Simple", "Hand crossbows", "Longswords", "Rapiers", "Shortswords"],
+    "features": [
+      { "name": "Lucky", "source": "species", "text": "When you roll a natural 1 on an attack, ability check or save, reroll it and use the new result." },
+      { "name": "Brave", "source": "species", "text": "Advantage on saves against being frightened." },
+      { "name": "Halfling Nimbleness", "source": "species", "text": "You can move through the space of any creature larger than you." },
+      { "name": "Naturally Stealthy", "source": "species", "text": "You can try to hide behind a creature at least one size larger than you." },
+      { "name": "Expertise", "source": "class", "text": "Double proficiency on Stealth and Sleight of Hand." },
+      { "name": "Sneak Attack (2d6)", "source": "class", "text": "Once per turn, deal an extra 2d6 damage with a finesse or ranged weapon if you have advantage, or an ally is within 5 ft of the target and you don't have disadvantage." },
+      { "name": "Thieves' Cant", "source": "class", "text": "A secret mix of jargon and signs that carries hidden messages." },
+      { "name": "Cunning Action", "source": "class", "text": "Bonus action: Dash, Disengage or Hide." },
+      { "name": "Fancy Footwork", "source": "subclass", "text": "If you make a melee attack against a creature on your turn, it can't make opportunity attacks against you for the rest of that turn." },
+      { "name": "Rakish Audacity", "source": "subclass", "text": "Add your Charisma modifier (+2) to initiative. You can Sneak Attack a target without advantage if you are within 5 ft of it and no other creature is within 5 ft of you." },
+      { "name": "Criminal Contact", "source": "background", "text": "You have a reliable contact who passes along messages from the underworld." }
+    ],
+    "attacks": [
+      { "name": "Rapier", "kind": "weapon", "ability": "dex", "dice": "1d8", "damageType": "piercing", "properties": ["Finesse"] },
+      { "name": "Hand Crossbow", "kind": "weapon", "ability": "dex", "dice": "1d6", "damageType": "piercing", "range": "30/120 ft", "properties": ["Ammunition", "Light", "Loading"], "option": "ranged" },
+      { "name": "Dagger", "kind": "weapon", "ability": "dex", "dice": "1d4", "damageType": "piercing", "range": "20/60 ft", "properties": ["Finesse", "Light", "Thrown"] }
+    ],
+    "equipment": [
+      { "name": "Leather Armor", "equipped": true, "note": "Under the harlequin coat" },
+      { "name": "Rapier", "equipped": true },
+      { "name": "Dagger", "qty": 2 },
+      { "name": "Hand Crossbow", "option": "ranged" },
+      { "name": "Ammunition", "qty": 20, "note": "Bolts or arrows to match the ranged weapon" },
+      { "name": "Thieves' Tools" },
+      { "name": "Crowbar" },
+      { "name": "Burglar's Pack" }
+    ],
+    "gold": 15
+  },
+  "options": [
+    {
+      "kind": "attack",
+      "id": "ranged",
+      "label": "Ranged weapon",
+      "choices": [
+        { "id": "hand-crossbow", "label": "Hand crossbow", "value": { "name": "Hand Crossbow", "kind": "weapon", "ability": "dex", "dice": "1d6", "damageType": "piercing", "range": "30/120 ft", "properties": ["Ammunition", "Light", "Loading"] } },
+        { "id": "shortbow", "label": "Shortbow", "value": { "name": "Shortbow", "kind": "weapon", "ability": "dex", "dice": "1d6", "damageType": "piercing", "range": "80/320 ft", "properties": ["Ammunition", "Two-Handed"] } }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Pocket contents",
+      "choices": [
+        { "id": "button", "label": "Glass button", "value": "A cut-glass button from Lady Marchbanks's coat" },
+        { "id": "note", "label": "The burrow note", "value": "The mortgage note on the Tumbletoe burrow-hold, with Marchbanks's seal" },
+        { "id": "pick", "label": "Heron lockpick", "value": "A silver lockpick shaped like a heron, stolen with permission" }
+      ]
+    }
+  ]
+}

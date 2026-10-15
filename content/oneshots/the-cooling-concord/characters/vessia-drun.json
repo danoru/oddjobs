@@ -1,0 +1,105 @@
+{
+  "id": "vessia-drun",
+  "name": "Vessia Drun",
+  "order": 1,
+  "poster": {
+    "header": "MISSING",
+    "epithet": "Granddaughter of Ash",
+    "hook": "Tribune Torvak Drun, last seen entering a furnace, 1064. Kin still asking.",
+    "reward": "Fifty years of answers",
+    "icon": "shield"
+  },
+  "roles": ["tank", "striker"],
+  "story": {
+    "pronouns": "she/her",
+    "age": "37",
+    "appearance": "Tall red-scaled dragonborn with a chipped left horn and a legion-issue shield worn bare at the rim. Her Pyrosi armour is mended in four different thread colours and kept spotless anyway.",
+    "concept": "Vessia served twelve years as a Pyrosi legion optio and left with a pension, a bad knee and one ambition: to stand in front of the furnace door beneath the Thermae of the Quiet Hand on the night it opens. Her grandfather Torvak volunteered to be the Surety of the Cooling Concord before she was born. She grew up on his letters, which stopped arriving before she could read them.",
+    "stake": "Tonight the binding lapses. Her grandfather will be renewed, released or ruined, and for the first time in her life she has a vote in which.",
+    "goal": "Bring Torvak out of the fire alive, or at least hear him say what he wants.",
+    "secret": "Three weeks ago a Black Ash legion officer offered her a centurion's honours and a pyre for Torvak if she told them the hour and the route. She gave both. She carries the ash-black coin that calls them in. She truly believes they mean to free him.",
+    "voice": "Clipped, parade-ground plain. Says 'noted' when she disagrees. Counts off under her breath in Pyrosi marching tallies when she is trying not to feel something.",
+    "mannerisms": [
+      "Comes to attention whenever someone says 'Tribune'",
+      "Warms her hands at every fire she passes, then pulls them back as if burned",
+      "Thumbs the rim of her shield when she lies"
+    ],
+    "trinket": "Torvak's last letter, scorched at one edge and unreadable below the third line",
+    "ties": [
+      { "to": "sabra-kovane", "text": "Sabra tends her grandfather's shrine and has read her his words, or said she has. Vessia is not sure whether the priestess is loyal to the man or the altar.", "public": "Sabra tends her grandfather's shrine" },
+      { "to": "tamsin-brandle", "text": "Every Jubilee for six years the stoker has let her sit on the bench outside the furnace door. Vessia has never said thank you and knows it.", "public": "Tamsin lets her sit by the furnace door each Jubilee" },
+      { "to": "selenor-aetheis", "text": "His grandfather drafted the clause that bound hers. She has rehearsed what she will say to him for twenty years and still has not decided whether it is 'thank you' or a punch.", "public": "His grandfather's clause bound hers; they have not spoken" }
+    ],
+    "intro": "\"Optio Vessia Drun, retired. My grandfather is in that furnace. Noted that you have views. Walk with me.\""
+  },
+  "mech": {
+    "species": "Dragonborn",
+    "lineage": "Pyrosi, red (fire) ancestry",
+    "size": "Medium",
+    "background": "Soldier",
+    "classes": [{ "name": "Fighter", "subclass": "Battle Master", "level": 4 }],
+    "abilities": { "str": 19, "dex": 12, "con": 15, "int": 8, "wis": 13, "cha": 10 },
+    "saves": ["str", "con"],
+    "skills": ["athletics", "intimidation", "perception", "insight", "history"],
+    "hp": 36,
+    "ac": { "value": 19, "note": "Chain mail 16 + shield 2 + Defense style 1" },
+    "speed": 30,
+    "senses": ["Darkvision 60 ft"],
+    "languages": ["Common", "Draconic", "Dwarvish"],
+    "tools": ["Gaming set (dice)", "Smith's Tools"],
+    "armorTraining": ["Light", "Medium", "Heavy", "Shields"],
+    "weaponTraining": ["Simple", "Martial"],
+    "originFeat": "Savage Attacker",
+    "feats": ["Defense (Fighting Style)", "Ability Score Improvement (Str +2)"],
+    "weaponMasteries": ["Longsword (Sap)", "Javelin (Slow)", "Handaxe (Vex)", "Warhammer (Push)"],
+    "features": [
+      { "name": "Draconic Ancestry (Red)", "source": "species", "text": "Your breath and your resistance both use fire." },
+      { "name": "Breath Weapon", "source": "species", "text": "Replace one attack in an Attack action with a 15-ft cone of fire: Dex save or 1d10 fire damage, half on a success. DC 12.", "uses": { "max": 2, "per": "long" } },
+      { "name": "Damage Resistance", "source": "species", "text": "You resist fire damage." },
+      { "name": "Savage Attacker", "source": "feat", "text": "Once per turn when you hit with a weapon, roll its damage dice twice and use either total." },
+      { "name": "Fighting Style: Defense", "source": "class", "text": "+1 AC while you wear armor." },
+      { "name": "Second Wind", "source": "class", "text": "Bonus Action: regain 1d10 + 4 HP. One use returns on a Short Rest, all on a Long Rest.", "uses": { "max": 3, "per": "long" } },
+      { "name": "Action Surge", "source": "class", "text": "Take one additional action on your turn (not the Magic action).", "uses": { "max": 1, "per": "short" } },
+      { "name": "Tactical Mind", "source": "class", "text": "When you fail an ability check, spend a Second Wind use to add 1d10; if it still fails, the use is not spent." },
+      { "name": "Combat Superiority", "source": "subclass", "text": "Four d8 superiority dice, regained on a Short or Long Rest; one maneuver per attack. Maneuvers: Goading Attack (Wis save, target has disadvantage against others), Parry (reaction: reduce melee damage by die + Str mod), Precision Attack (add die to an attack roll). Save DC 14.", "uses": { "max": 4, "per": "short" } },
+      { "name": "Student of War", "source": "subclass", "text": "Proficiency with Smith's Tools and the History skill." }
+    ],
+    "attacks": [
+      { "name": "Longsword", "kind": "weapon", "ability": "str", "dice": "1d8", "damageType": "slashing", "properties": ["Versatile (1d10)"], "mastery": "Sap" },
+      { "name": "Javelin", "kind": "weapon", "ability": "str", "dice": "1d6", "damageType": "piercing", "range": "30/120 ft", "properties": ["Thrown"], "mastery": "Slow", "option": "thrown" },
+      { "name": "Breath Weapon", "kind": "spell", "ability": "con", "save": "dex", "proficient": false, "dice": "1d10", "damageType": "fire", "addMod": false, "range": "15-ft cone", "note": "Replaces one attack; 2 uses per Long Rest" }
+    ],
+    "equipment": [
+      { "name": "Chain Mail", "equipped": true, "note": "Pyrosi legion issue, re-stitched" },
+      { "name": "Shield", "equipped": true, "note": "Rim worn bare" },
+      { "name": "Longsword", "equipped": true },
+      { "name": "Javelin", "qty": 4, "option": "thrown" },
+      { "name": "Warhammer" },
+      { "name": "Dungeoneer's Pack" },
+      { "name": "Healer's Kit" },
+      { "name": "Ash-black coin", "note": "Calls the Black Ash cohort" }
+    ],
+    "gold": 18
+  },
+  "options": [
+    {
+      "kind": "attack",
+      "id": "thrown",
+      "label": "Thrown weapon",
+      "choices": [
+        { "id": "javelin", "label": "Javelins", "value": { "name": "Javelin", "kind": "weapon", "ability": "str", "dice": "1d6", "damageType": "piercing", "range": "30/120 ft", "properties": ["Thrown"], "mastery": "Slow" } },
+        { "id": "handaxe", "label": "Handaxes", "value": { "name": "Handaxe", "kind": "weapon", "ability": "str", "dice": "1d6", "damageType": "slashing", "range": "20/60 ft", "properties": ["Light", "Thrown"], "mastery": "Vex" } }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Keepsake",
+      "choices": [
+        { "id": "letter", "label": "Torvak's last letter", "value": "Torvak's last letter, scorched at one edge and unreadable below the third line" },
+        { "id": "torc", "label": "Tribune's torc", "value": "A Pyrosi tribune's torc, too big for her, kept polished" },
+        { "id": "tin", "label": "Ration tin", "value": "A legion ration tin with 'T. DRUN' scratched inside the lid" }
+      ]
+    }
+  ]
+}

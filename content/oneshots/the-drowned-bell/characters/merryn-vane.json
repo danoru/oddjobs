@@ -1,0 +1,436 @@
+{
+  "id": "merryn-vane",
+  "name": "Merryn Vane",
+  "order": 5,
+  "poster": {
+    "header": "NOTICE",
+    "epithet": "the Ghost",
+    "alias": "????",
+    "hook": "Hears a bell no one else can. Has not slept in eleven years. Knows the tides.",
+    "reward": "A quiet night",
+    "icon": "ghost"
+  },
+  "roles": [
+    "control",
+    "striker",
+    "utility"
+  ],
+  "story": {
+    "pronouns": "she/her",
+    "age": "23",
+    "appearance": "Slight, ivory-scaled dragonborn with a dull ice-blue frill, tidewater-grey eyes, and cuffs that are always damp. Wears a salvaged oilskin coat two sizes too big and never sits with her back to the water.",
+    "concept": "Merryn was twelve when the Tern went down. She drowned, and for the length of a long minute something in the dark asked whether she wanted to breathe. She woke on the shingle with a fisherman's hand pressed to her chest. She hasn't slept properly since. Saltmere calls her the Ghost: she lives in a boat shed and reads tide-tables like scripture.",
+    "stake": "The bell in her head went silent when it was cut from the tower. Tonight it started again, from under the water, and it is saying her name.",
+    "goal": "Find out what the bell really is before somebody rings it, or fails to.",
+    "secret": "Her patron is the Tidemother, the same drowned goddess the stranger in the sea-green coat serves. Eleven years ago she promised to answer when the bell next went into the water. Now she knows what it is: the bell is the Tidemother's collar, and it only rings true under the hands of someone the sea already owns. Merryn is the only one of the party who has already drowned. The Tidemother offers a deal, never a command: Merryn takes the rope, the drowned sleep, her debt is paid, and she goes down with them. Or she refuses, and someone she loves stays on the rope instead. She hasn't told anyone, and she suspects the bell lies in the Tern's ribs.",
+    "voice": "Quiet, level, and a little too calm about death. Answers questions before you finish asking them. Goes silent mid-sentence when the bell sounds for her.",
+    "mannerisms": [
+      "Tilts her head toward sounds nobody else hears",
+      "Taps three times on whatever is nearest before she speaks of the dead",
+      "Keeps one hand on a wall, post, or railing, as if the ground might leave"
+    ],
+    "trinket": "A page torn from the Tern's log, still damp after eleven years",
+    "ties": [
+      {
+        "to": "marrow",
+        "text": "He hauled her out of the Tern's wreckage. She saw him cut the lashing and has never said so.",
+        "public": "He pulled her from the wreck of the Tern"
+      },
+      {
+        "to": "sister-vell",
+        "text": "Vell washed her for burial that night and felt her breathe. Neither has ever spoken of it.",
+        "public": "Vell tended her the night the Tern went down"
+      },
+      {
+        "to": "rook",
+        "text": "The coin in his pocket bears her patron's face. She wants to hold it. He wants it gone.",
+        "public": "She keeps looking at his coin"
+      },
+      {
+        "to": "odo-brambletoe",
+        "text": "His storm-hymn has a final verse he never finishes. She hums it in her sleep, on the rare nights she sleeps.",
+        "public": "She hums his storm-hymn"
+      }
+    ],
+    "intro": "\"Merryn. The tide turns in an hour and twelve minutes. You can hear it too, can't you? No? That's all right.\""
+  },
+  "mech": {
+    "species": "Dragonborn",
+    "lineage": "White Dragon ancestry",
+    "background": "Wayfarer",
+    "classes": [
+      {
+        "name": "Warlock",
+        "subclass": "Great Old One Patron",
+        "level": 5
+      }
+    ],
+    "abilities": {
+      "str": 8,
+      "dex": 15,
+      "con": 14,
+      "int": 10,
+      "wis": 12,
+      "cha": 18
+    },
+    "saves": [
+      "wis",
+      "cha"
+    ],
+    "skills": [
+      "insight",
+      "stealth",
+      "religion",
+      "arcana"
+    ],
+    "hp": 38,
+    "ac": {
+      "value": 15,
+      "note": "Mage Armor via Armor of Shadows: 13 + Dex"
+    },
+    "speed": 30,
+    "senses": [
+      "Darkvision 60 ft",
+      "Devil's Sight 120 ft"
+    ],
+    "languages": [
+      "Common",
+      "Draconic",
+      "Halfling"
+    ],
+    "tools": [
+      "Thieves' Tools"
+    ],
+    "armorTraining": [
+      "Light"
+    ],
+    "weaponTraining": [
+      "Simple"
+    ],
+    "originFeat": "Lucky",
+    "feats": [
+      "Ability Score Improvement (Cha +1, Con +1)"
+    ],
+    "features": [
+      {
+        "name": "Draconic Ancestry (White)",
+        "source": "species",
+        "text": "Your breath weapon and damage resistance are Cold."
+      },
+      {
+        "name": "Breath Weapon",
+        "source": "species",
+        "text": "In place of one attack, exhale cold in a 15-ft cone: Dex save DC 13 or 2d10 Cold damage (half on a success).",
+        "uses": {
+          "max": 3,
+          "per": "long"
+        }
+      },
+      {
+        "name": "Damage Resistance",
+        "source": "species",
+        "text": "You have Resistance to Cold damage."
+      },
+      {
+        "name": "Darkvision",
+        "source": "species",
+        "text": "You see in dim light as if bright, and in darkness as if dim light, out to 60 ft."
+      },
+      {
+        "name": "Draconic Flight",
+        "source": "species",
+        "text": "Bonus Action: manifest spectral wings for 10 minutes and gain a Fly Speed equal to your Speed.",
+        "uses": {
+          "max": 1,
+          "per": "long"
+        }
+      },
+      {
+        "name": "Lucky",
+        "source": "feat",
+        "text": "Spend a Luck Point to gain Advantage on a D20 Test, or to impose Disadvantage on an attack roll made against you. Regain all points on a Long Rest.",
+        "uses": {
+          "max": 3,
+          "per": "long"
+        }
+      },
+      {
+        "name": "Pact Magic",
+        "source": "class",
+        "text": "You have two 3rd-level spell slots that return on a Short or Long Rest. Cha is your spellcasting ability."
+      },
+      {
+        "name": "Magical Cunning",
+        "source": "class",
+        "text": "A one-minute rite restores half your expended Pact Magic slots, rounded up.",
+        "uses": {
+          "max": 1,
+          "per": "long"
+        }
+      },
+      {
+        "name": "Eldritch Invocation: Agonizing Blast",
+        "source": "class",
+        "text": "Eldritch Blast beams add your Charisma modifier to their damage."
+      },
+      {
+        "name": "Eldritch Invocation: Pact of the Chain",
+        "source": "class",
+        "text": "Learn Find Familiar and cast it without a slot, choosing a special form. Her familiar is a skeletal gull named Bosun."
+      },
+      {
+        "name": "Eldritch Invocation: Armor of Shadows",
+        "source": "class",
+        "text": "Cast Mage Armor on yourself at will without a slot."
+      },
+      {
+        "name": "Eldritch Invocation: Devil's Sight",
+        "source": "class",
+        "text": "You see normally in darkness, magical or not, out to 120 ft."
+      },
+      {
+        "name": "Eldritch Invocation: Eldritch Mind",
+        "source": "class",
+        "text": "You have Advantage on Constitution saves to maintain Concentration."
+      },
+      {
+        "name": "Psychic Spells",
+        "source": "subclass",
+        "text": "Your Warlock damage spells can deal Psychic damage instead, and your Warlock Enchantment and Illusion spells need no Verbal or Somatic components."
+      },
+      {
+        "name": "Awakened Mind",
+        "source": "subclass",
+        "text": "Bonus Action: link minds with a creature you can see within 30 ft who shares a language; you can speak telepathically for minutes equal to your Warlock level, across a number of miles equal to your Cha modifier."
+      }
+    ],
+    "attacks": [
+      {
+        "name": "Eldritch Blast",
+        "kind": "spell",
+        "ability": "cha",
+        "dice": "1d10",
+        "damageType": "force",
+        "range": "120 ft",
+        "note": "Two beams, one attack roll each; Agonizing Blast adds Cha to each hit. Psychic Spells can turn it Psychic."
+      },
+      {
+        "name": "Chill Touch",
+        "kind": "spell",
+        "ability": "cha",
+        "dice": "2d10",
+        "damageType": "necrotic",
+        "addMod": false,
+        "range": "Touch",
+        "note": "Melee spell attack; the target can't regain HP until the end of your next turn",
+        "option": "grave-cantrip"
+      },
+      {
+        "name": "Dagger",
+        "kind": "weapon",
+        "ability": "dex",
+        "dice": "1d4",
+        "damageType": "piercing",
+        "range": "20/60 ft",
+        "properties": [
+          "Finesse",
+          "Light",
+          "Thrown"
+        ]
+      }
+    ],
+    "spellcasting": {
+      "ability": "cha",
+      "slots": [],
+      "pact": {
+        "count": 2,
+        "level": 3
+      },
+      "spells": [
+        {
+          "name": "Eldritch Blast",
+          "level": 0
+        },
+        {
+          "name": "Minor Illusion",
+          "level": 0
+        },
+        {
+          "name": "Chill Touch",
+          "level": 0,
+          "option": "grave-cantrip"
+        },
+        {
+          "name": "Hex",
+          "level": 1
+        },
+        {
+          "name": "Armor of Agathys",
+          "level": 1
+        },
+        {
+          "name": "Dissonant Whispers",
+          "level": 1,
+          "always": true,
+          "note": "Great Old One"
+        },
+        {
+          "name": "Tasha's Hideous Laughter",
+          "level": 1,
+          "always": true,
+          "note": "Great Old One"
+        },
+        {
+          "name": "Mage Armor",
+          "level": 1,
+          "always": true,
+          "note": "Armor of Shadows; at will on self"
+        },
+        {
+          "name": "Find Familiar",
+          "level": 1,
+          "always": true,
+          "note": "Pact of the Chain; no slot"
+        },
+        {
+          "name": "Mirror Image",
+          "level": 2
+        },
+        {
+          "name": "Misty Step",
+          "level": 2
+        },
+        {
+          "name": "Detect Thoughts",
+          "level": 2,
+          "always": true,
+          "note": "Great Old One"
+        },
+        {
+          "name": "Phantasmal Force",
+          "level": 2,
+          "always": true,
+          "note": "Great Old One"
+        },
+        {
+          "name": "Counterspell",
+          "level": 3
+        },
+        {
+          "name": "Fear",
+          "level": 3
+        },
+        {
+          "name": "Clairvoyance",
+          "level": 3,
+          "always": true,
+          "note": "Great Old One"
+        },
+        {
+          "name": "Hunger of Hadar",
+          "level": 3,
+          "always": true,
+          "note": "Great Old One"
+        }
+      ],
+      "note": "Knows 3 cantrips and prepares 6 warlock spells (patron spells are always prepared). All Pact Magic slots are cast at 3rd level."
+    },
+    "equipment": [
+      {
+        "name": "Dagger",
+        "qty": 2,
+        "equipped": true
+      },
+      {
+        "name": "Arcane Focus (orb)",
+        "note": "A green-glass fisherman's float, always cold"
+      },
+      {
+        "name": "Book (occult lore)",
+        "note": "Tide-tables with pages added in a hand that isn't hers"
+      },
+      {
+        "name": "Thieves' Tools"
+      },
+      {
+        "name": "Bedroll"
+      },
+      {
+        "name": "Traveler's Clothes"
+      },
+      {
+        "name": "Oilskin Coat",
+        "note": "Two sizes too big"
+      }
+    ],
+    "gold": 16
+  },
+  "options": [
+    {
+      "kind": "spell",
+      "id": "grave-cantrip",
+      "label": "Grave cantrip",
+      "choices": [
+        {
+          "id": "chill-touch",
+          "label": "Chill Touch",
+          "value": {
+            "name": "Chill Touch",
+            "level": 0
+          },
+          "attack": {
+            "name": "Chill Touch",
+            "kind": "spell",
+            "ability": "cha",
+            "dice": "2d10",
+            "damageType": "necrotic",
+            "addMod": false,
+            "range": "Touch",
+            "note": "Melee spell attack; the target can't regain HP until the end of your next turn"
+          }
+        },
+        {
+          "id": "thunderclap",
+          "label": "Thunderclap",
+          "value": {
+            "name": "Thunderclap",
+            "level": 0
+          },
+          "attack": {
+            "name": "Thunderclap",
+            "kind": "spell",
+            "ability": "cha",
+            "save": "con",
+            "dice": "2d6",
+            "damageType": "thunder",
+            "addMod": false,
+            "range": "5-ft emanation",
+            "note": "Audible out to 100 ft"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Keepsake",
+      "choices": [
+        {
+          "id": "log",
+          "label": "Log page",
+          "value": "A page torn from the Tern's log, still damp after eleven years"
+        },
+        {
+          "id": "float",
+          "label": "Glass float",
+          "value": "A green-glass fisherman's float that stays cold in a hot hand"
+        },
+        {
+          "id": "shoe",
+          "label": "Child's shoe",
+          "value": "A child's leather shoe, one of a pair, never dry"
+        }
+      ]
+    }
+  ]
+}

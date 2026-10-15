@@ -1,0 +1,100 @@
+{
+  "id": "dagny-brask",
+  "name": "Dagny Brask",
+  "order": 3,
+  "poster": {
+    "header": "NOTICE",
+    "epithet": "the Wall",
+    "hook": "Ex-captain of the Pell House guard seeks her good name and eight years of pension.",
+    "reward": "Her name, cleared",
+    "icon": "shield"
+  },
+  "roles": ["tank", "striker"],
+  "story": {
+    "pronouns": "she/her",
+    "age": "52",
+    "appearance": "Squat and square, with iron-grey braids pinned flat and a nose broken twice in the line of duty. She wears a rented evening coat over her chain shirt and tells everyone it is a fashion statement.",
+    "concept": "For eight years Dagny kept the doors of Pell House, which meant stopping creditors, suitors and the occasional escaped mimic. Three months ago a letter in her own hand 'proved' she had been selling access to the vault, and she was dismissed without pension or reference. Corvin Pell died a few weeks later. She has not forgiven him, which is awkward, because he is dead.",
+    "stake": "The letter that ruined her, and the pension bond he voided, are what he took from her. Her invitation says both are in Lot Thirteen. Without them she is a disgraced soldier with no pay and no prospects.",
+    "goal": "Get the original forged letter into the hands of the Watch and her pension bond back into her own.",
+    "secret": "Since the funeral, 20 gp has arrived on the first of every month in an unmarked envelope sealed with a wax magpie. She has told no one, because the money is the only thing keeping her in a room, and because she is almost certain a dead man doesn't post letters.",
+    "voice": "Flat, unhurried, dry as chalk. Speaks in short sentences and orders. Calls everyone 'sir' or 'ma'am', whatever they are.",
+    "mannerisms": [
+      "Counts the doors and windows when she enters a room",
+      "Keeps her shield-arm turned to the nearest stranger",
+      "Straightens a gorget that is no longer there"
+    ],
+    "trinket": "Her captain's gorget with the badge pried off",
+    "ties": [
+      { "to": "odalys-quill", "text": "The apprentice who worked through the nights. Dagny brought her soup and knew the girl was being used. She would stand between Odalys and any trouble.", "public": "Brings the girl soup; thinks she works too hard" },
+      { "to": "anselm-pyke", "text": "She carried the coffin with five other guards. She said it felt too light. Anselm told her to sing the hymn and she did, and has regretted it since.", "public": "Carried the same coffin as he blessed it" },
+      { "to": "nettle-tumbletoe", "text": "Caught Nettle casing the east wall a week ago. Let them go with a warning, and found her own lockpick missing afterward.", "public": "Threw them off the east wall once; mutual respect" }
+    ],
+    "intro": "\"Dagny Brask. Eight years I kept this door. Tonight I'm a guest, so hold your own coat.\""
+  },
+  "mech": {
+    "species": "Dwarf",
+    "lineage": "Mountain Dwarf",
+    "size": "Medium",
+    "background": "Soldier",
+    "classes": [{ "name": "Fighter", "subclass": "Battle Master", "level": 3 }],
+    "abilities": { "str": 17, "dex": 13, "con": 16, "int": 8, "wis": 12, "cha": 10 },
+    "saves": ["str", "con"],
+    "skills": ["athletics", "intimidation", "insight", "perception"],
+    "hp": 31,
+    "ac": { "value": 19, "note": "Chain mail 16 + shield 2 + Defense 1" },
+    "speed": 25,
+    "senses": ["Darkvision 60 ft"],
+    "languages": ["Common", "Dwarvish"],
+    "tools": ["Brewer's Supplies", "Cook's Utensils", "Playing Cards", "Land Vehicles"],
+    "armorTraining": ["Light", "Medium", "Heavy", "Shields"],
+    "weaponTraining": ["Simple", "Martial"],
+    "features": [
+      { "name": "Dwarven Resilience", "source": "species", "text": "Advantage on saves against poison, and resistance to poison damage." },
+      { "name": "Stonecunning", "source": "species", "text": "On History checks about the origin of stonework, you count as proficient and add double your proficiency bonus." },
+      { "name": "Dwarven Combat Training", "source": "species", "text": "You are proficient with the battleaxe, handaxe, light hammer and warhammer." },
+      { "name": "Fighting Style: Defense", "source": "class", "text": "+1 AC while wearing armor (already included)." },
+      { "name": "Second Wind", "source": "class", "text": "Bonus action: regain 1d10 + 3 HP.", "uses": { "max": 1, "per": "short" } },
+      { "name": "Action Surge", "source": "class", "text": "Take one additional action on your turn.", "uses": { "max": 1, "per": "short" } },
+      { "name": "Combat Superiority", "source": "subclass", "text": "You have 4 d8 superiority dice (save DC 13) and know three maneuvers: Parry (reaction; reduce damage by die + Dex), Riposte (reaction when a foe misses you; counter-attack and add the die to damage) and Goading Attack (add the die to damage; Wis save or the foe has disadvantage on attacks against anyone but you).", "uses": { "max": 4, "per": "short" } },
+      { "name": "Student of War", "source": "subclass", "text": "Proficiency with one set of artisan's tools (Cook's Utensils)." },
+      { "name": "Military Rank", "source": "background", "text": "Soldiers and guards of your old rank still defer to you, and you can requisition simple gear or passage for yourself and companions." }
+    ],
+    "attacks": [
+      { "name": "Longsword", "kind": "weapon", "ability": "str", "dice": "1d8", "damageType": "slashing", "properties": ["Versatile (1d10)"], "option": "main-weapon" },
+      { "name": "Handaxe", "kind": "weapon", "ability": "str", "dice": "1d6", "damageType": "slashing", "range": "20/60 ft", "properties": ["Light", "Thrown"] }
+    ],
+    "equipment": [
+      { "name": "Chain Mail", "equipped": true, "note": "Hidden under a rented evening coat" },
+      { "name": "Shield", "equipped": true, "note": "Painted with the Pell House crest, which she hasn't sanded off" },
+      { "name": "Longsword", "equipped": true, "option": "main-weapon" },
+      { "name": "Handaxe", "qty": 2 },
+      { "name": "Insignia of Rank", "note": "Her captain's badge, pried off" },
+      { "name": "Explorer's Pack" },
+      { "name": "Envelope with a Wax Magpie", "note": "This month's 20 gp" }
+    ],
+    "gold": 10
+  },
+  "options": [
+    {
+      "kind": "attack",
+      "id": "main-weapon",
+      "label": "Main weapon",
+      "choices": [
+        { "id": "longsword", "label": "Longsword", "value": { "name": "Longsword", "kind": "weapon", "ability": "str", "dice": "1d8", "damageType": "slashing", "properties": ["Versatile (1d10)"] } },
+        { "id": "warhammer", "label": "Warhammer", "value": { "name": "Warhammer", "kind": "weapon", "ability": "str", "dice": "1d8", "damageType": "bludgeoning", "properties": ["Versatile (1d10)"] } },
+        { "id": "battleaxe", "label": "Battleaxe", "value": { "name": "Battleaxe", "kind": "weapon", "ability": "str", "dice": "1d8", "damageType": "slashing", "properties": ["Versatile (1d10)"] } }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Keepsake",
+      "choices": [
+        { "id": "gorget", "label": "Captain's gorget", "value": "Her captain's gorget with the badge pried off" },
+        { "id": "bond", "label": "Pension receipt", "value": "A pension bond receipt, stamped and folded soft as cloth" },
+        { "id": "tankard", "label": "Hold tankard", "value": "A dented tankard from her mountain hold, still smelling of barley" }
+      ]
+    }
+  ]
+}

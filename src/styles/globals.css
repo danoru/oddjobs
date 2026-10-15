@@ -1,0 +1,45 @@
+:root {
+  --cork: #a8743f;
+  --cork-dark: #7d5229;
+  --timber: #3b2616;
+  --timber-dark: #24170d;
+  --parchment: #f3e7cb;
+  --parchment-dark: #e2cfa4;
+  --ink: #2b1d0e;
+  --ink-soft: #5b4426;
+  --wax: #9e2f22;
+  --brass: #d2a85a;
+  --font-poster: "Rye", serif;
+  --font-print: "IM Fell English", serif;
+  --font-sheet: "Alegreya", serif;
+  --font-label: "Alegreya Sans SC", sans-serif;
+}
+
+body {
+  font-variant-numeric: lining-nums;
+  background-color: #1c140e;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0 2px, transparent 2px 140px),
+    linear-gradient(180deg, #24170d, #1c140e);
+}
+
+a {
+  color: inherit;
+}
+
+@page {
+  margin: 0.45in;
+}
+
+@media print {
+  body {
+    background: #fff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .MuiContainer-root {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+}

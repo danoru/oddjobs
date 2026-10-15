@@ -1,0 +1,37 @@
+{
+  "slug": "the-cooling-concord",
+  "title": "The Cooling Concord",
+  "pitch": "A fifty-year peace is kept by one man burning in the furnace beneath a bathhouse. It lapses at midnight, and the five people who must decide his fate each want something different.",
+  "premise": "Fifty years ago tonight the Ouran Empire dissolved, and the Cooling Concord kept the peace that followed: the Pyrosi gave a living surety, Tribune Torvak Drun, and Ouran engineers bound him into the great furnace beneath New Ouransgard's Thermae of the Quiet Hand, where his fire has warmed the city's baths and held its border quiet ever since. The Concord names five Hands who must renew or end it at the fiftieth midnight: the Surety's blood, the Chancery's pen, the Altar's flame, the Hearth's stoker, and a neutral Witness from the sea. Tonight the bathwater is boiling five hours early, steam mephits are nesting in the flues, and somebody has told a Pyrosi hardline cohort exactly when the wards will fall. You are the five Hands. Each of you holds a bronze bath-check that has begun to glow, and each of you has a different answer about what to do with a man who has been on fire for fifty years.",
+  "ruleset": "2024",
+  "system": "dnd5e",
+  "level": 4,
+  "players": { "min": 3, "max": 5 },
+  "durationHrs": 4,
+  "tone": ["elegiac intrigue", "steam and brass", "cold-war peace under strain"],
+  "setting": "New Ouransgard, a city of the dissolved Ouran Empire, on Jubilee Night (8th of the 10th month, 1114 by the Pyrosi Calendar). Mostly the Thermae of the Quiet Hand and the furnace works beneath it. Fits any setting with two exhausted powers and a hot spring.",
+  "posting": {
+    "header": "FIVE HANDS WANTED FOR JUBILEE NIGHT, THE THERMAE OF THE QUIET HAND",
+    "reward": "A free soak, the city's thanks, and 250 gp from the Chancery purse (if the water is still warm)"
+  },
+  "coreRoles": ["vessia-drun", "sabra-kovane", "tamsin-brandle"],
+  "gmNotes": "THE SITUATION. The Concord is a mutual hostage. The Pyrosi gave Tribune Torvak Drun as surety that the legions would not march on the Ouran successor states; the Ouran gave the city's water and its engineers' word that he would be kept as a hearth, not a weapon. His fire is the Thermae's furnace. At the fiftieth midnight the binding lapses unless the five Hands act. The rite is a vote at the Heart-furnace: RENEW (another fifty years, baths stay warm, he stays bound), RELEASE (he is freed to a true death on a Pyrosi pyre; the baths go cold; the city's economy and the Chancery's pride take a hit), or REKINDLE (the third path: he chooses to remain as the city's hearth by free covenant, which needs every Hand to give up something real, namely their secret). Corwen's original text says the Witness holds the casting vote and that renewal needs the bound one's own consent. The Chancery copy, certified in Amberhall, has lost that page.\n\nACT 1: THE DOOR OF THE QUIET HAND (about 45 min). The Thermae is packed for the free Jubilee soak. The water boils, the bronze bath-checks glow, and steam mephits (4 steam mephits, use stock stat blocks) erupt from the vents. Skirmish while rescuing panicked bathers (Dex or Athletics to haul people clear, hazard: scalding steam, 2d6 fire on a failed Dex save). Steward Naeris Oulane (friendly Ouran noble, commoner stats) explains the Concord and sets the clock: five hands must reach the Heart-furnace before midnight.\n\nACT 2: THE HYPOCAUST (about 75 min). A descent through brick flues, stokers' galleries and the Ash Shrine. Run it as a three-success challenge with a combat bookend: Tamsin knows the short routes, Sabra's shrine lamp lights the way, Selenor can command the Ouran bronze lamplighters (2 animated armors with lamps for heads) or Vessia can fight them. Magma mephits (3) in the old coal-hold. This is where each Hand's private truth should start to leak.\n\nACT 3: THE BLACK ASH (about 60 min). Centurion Kadrax Vorn (veteran) and four legionaries (guards), one of them a cinder-priest (acolyte), come through the old Pyrosi pilgrims' gate, led by the ash-black coin Vessia gave them. They intend to cut the Surety's chains and carry him home as a living weapon, not to free him. The fight can end by surrender, flight, or Vessia's defection; the cohort's retreat should not feel like a complete victory.\n\nACT 4: THE HEART-FURNACE (about 60 min). Torvak Drun, the Last Ember, speaks. He is lucid because Tamsin has been propping Damper Seven open for six years; the wards fray because of that. Play the parley first: each Hand states a position, texts are compared (Selenor's copy against Corwen's original), the Rider and the casting vote come out, and Torvak is asked what he wants. Then the vote, and consequences. If the vote goes badly or the parley fails, the binding breaks and he becomes a fire elemental (use stock fire elemental stats at 60 HP, no Fire Form engulf until round 3), grieving and enraged, and the party must calm or contain him. REKINDLE ends with a quiet, hot, warm scene; RELEASE with a pyre and a cold city; RENEW with a bitter, stable peace.\n\nFEWER THAN FIVE PLAYERS. Unplayed Hands are answered by NPC stand-ins who can be talked around, or by the Ember himself. If Corwen is unplayed, the casting vote passes to Torvak. Everything needed for the vote can be spoken aloud by the GM.\n\nCANON AND INVENTION. Drawn from the gazetteer: the Pyrosi (fire-aligned, militaristic) and Ouran (dissolved about 50 years ago, civic and arcane, bathhouse culture) cultures, New Ouransgard, Nova Pyra, Amberhall, Aldwick, Driftwood, Igwe and Akanai as named places, the Pyrosi Calendar date 1114-10-8, and the naming styles for each culture. Invented here and easy to change: the Concord itself, Torvak Drun, the Thermae, and the exact date of the Dissolution. If your canon says Pyrosi and Ouran history went differently, keep the structure (two powers, one hostage, five hands) and rename.",
+  "content": {
+    "sources": [
+      "world-gazetteer: README.md (Aedrassil & Ouros; Pyrosi and Ouran cultures)",
+      "world-gazetteer: ROADMAP.md (section 1, empires; section 5 canon vocabulary; Pyrosi Calendar current date 1114-10-8)",
+      "world-gazetteer: src/lib/rules/worldmap.ts (canon settlements: Nova Pyra, Amberhall, Akanai, New Ouransgard, Aldwick, Igwe, Driftwood)",
+      "world-gazetteer: src/lib/rules/phonologies.ts (Pyrosi and Ouran naming styles and sample names)",
+      "world-gazetteer: src/pages/settlements.tsx (Pyrosi military and religious tilt; Ouran civic, arcane, lawyers and bathhouses)",
+      "world-gazetteer: src/pages/atlas.tsx (Nova Pyra as Pyrosi capital; New Ouransgard as heart of the Ouran successor states)",
+      "PHB 2024"
+    ],
+    "warnings": [
+      "fire, burning and scalding steam",
+      "a person held captive for a political peace",
+      "war guilt and inherited trauma",
+      "mercy-death (the Release outcome)",
+      "bathhouse setting (nudity implied, none depicted)"
+    ]
+  }
+}

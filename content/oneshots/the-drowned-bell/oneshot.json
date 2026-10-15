@@ -1,0 +1,17 @@
+{
+  "slug": "the-drowned-bell",
+  "title": "The Drowned Bell",
+  "pitch": "Saltmere's storm-bell has been stolen and sunk. The tide is turning, the drowned are walking up the beach, and the only people who can fix it are the ones who broke it.",
+  "premise": "For three hundred years the great bell of Saltmere has rung before every storm, and every time it rang the drowned dead stayed asleep beneath the bay. Three nights ago someone cut it from its tower and rowed it out past the breakwater. Tonight the worst storm in a generation is coming in, and lantern-light has been seen moving under the water. You are the five people in Saltmere with a reason to go out and bring it back: the one who stole it, the one who kept it, the one who sang for it, the one who owes the sea a debt, and the one who hears it ringing still.",
+  "ruleset": "2024",
+  "system": "dnd5e",
+  "level": 5,
+  "players": { "min": 3, "max": 5 },
+  "durationHrs": 4,
+  "tone": ["coastal horror", "found family", "storm"],
+  "setting": "Generic coastal fishing town (Saltmere); drop into any setting with a sea.",
+  "posting": { "header": "HANDS WANTED FOR A NIGHT'S WORK", "reward": "The town's gratitude, and 300 gp from the harbourmaster" },
+  "coreRoles": ["sister-vell", "rook"],
+  "gmNotes": "Act 1: the beach as the drowned rise (skirmish, rescue villagers). Act 2: the smugglers' cave where Rook delivered the bell — the buyer was a cultist of the Tidemother. Act 3: row out in the storm; the bell is tangled in a wreck 30 ft down, guarded by a drowned knight. Act 4: ring it before the tide turns — someone has to stay at the rope while the drowned climb the hull.",
+  "content": { "sources": ["PHB 2024"], "warnings": ["undead", "drowning"] }
+}

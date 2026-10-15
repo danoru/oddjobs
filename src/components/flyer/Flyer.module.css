@@ -1,0 +1,161 @@
+/* A real tear-off flyer: print it, pin it up, let players tear a strip. */
+
+.flyer {
+  position: relative;
+  color: #1b1209;
+  background: #fbf5e6;
+  max-width: 8.5in;
+  margin: 0 auto;
+  padding: 0.45in 0.45in 0;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  min-height: 10.6in;
+}
+
+.header {
+  font-family: var(--font-label);
+  font-size: 15px;
+  letter-spacing: 0.3em;
+  text-align: center;
+  border-top: 3px double currentColor;
+  border-bottom: 3px double currentColor;
+  padding: 6px 0;
+}
+
+.title {
+  font-family: var(--font-poster);
+  font-size: clamp(42px, 9vw, 74px);
+  line-height: 1;
+  text-align: center;
+  margin: 20px 0 14px;
+}
+
+.premise {
+  font-family: var(--font-print);
+  font-size: 18px;
+  line-height: 1.4;
+  margin: 0 0 14px;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.details {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  font-family: var(--font-label);
+  font-size: 15px;
+}
+
+.reward {
+  text-align: center;
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 19px;
+  margin: 12px 0 0;
+}
+
+.instructions {
+  margin-top: auto;
+  padding: 16px 0 8px;
+  text-align: center;
+  font-family: var(--font-poster);
+  font-size: 20px;
+}
+
+.strips {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  border-top: 2px dashed currentColor;
+  margin: 0 -0.45in;
+}
+
+.strip {
+  position: relative;
+  height: 3.3in;
+  border-right: 2px dashed currentColor;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 4px 12px;
+  overflow: hidden;
+}
+
+.strip:last-child {
+  border-right: 0;
+}
+
+.stripText {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.stripName {
+  font-family: var(--font-poster);
+  font-size: 19px;
+  line-height: 1.05;
+}
+
+.stripEpithet {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 15px;
+}
+
+.stripClass {
+  font-family: var(--font-label);
+  font-size: 12px;
+}
+
+.qr {
+  width: 0.85in;
+  height: 0.85in;
+  flex: none;
+}
+
+.qr svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.scissors {
+  position: absolute;
+  top: -11px;
+  left: 6px;
+  font-size: 16px;
+  background: #fbf5e6;
+  padding: 0 2px;
+}
+
+@media print {
+  /* Fits one page on both Letter and A4 (the shorter usable height is Letter's ~10.1in). */
+  .flyer {
+    box-shadow: none;
+    background: #fff;
+    min-height: 0;
+    height: 9.9in;
+    padding: 0;
+    overflow: hidden;
+    break-inside: avoid;
+  }
+  .strip {
+    height: 3in;
+  }
+  .strips {
+    margin: 0;
+  }
+  .scissors {
+    background: #fff;
+  }
+}

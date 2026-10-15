@@ -1,0 +1,138 @@
+{
+  "id": "corwen-tidewrack",
+  "name": "Corwen Tidewrack",
+  "order": 5,
+  "poster": {
+    "header": "WANTED",
+    "epithet": "the Tide-Reader",
+    "hook": "Driftwood's tide-reader, sworn to witness a thing he never wanted to see.",
+    "reward": "Passage home, by sea",
+    "icon": "anchor"
+  },
+  "roles": ["control", "utility", "support"],
+  "story": {
+    "pronouns": "he/him",
+    "age": "58",
+    "appearance": "Weathered, long-limbed human with salt-white stubble, rope-scarred hands and a coat the colour of low tide. Carries a bleached driftwood staff and a sealed whale-oil tube across his back, and keeps glancing at the ceiling as if it might fall.",
+    "concept": "Corwen is the tide-reader of Driftwood, the harbour town whose boats carried the Concord to its signing. His order's office, the Witness, has stood neutral between Pyrosi and Ouran since the day the treaty was signed on a ship in the bay. He has never left the coast for more than a week, and he does not enjoy buildings, and now he is in the biggest bathhouse in New Ouransgard with the fate of two peoples in a tube on his back.",
+    "stake": "The Witness holds the casting vote if the Hands split. He would rather lose a limb than cast it.",
+    "goal": "See the Concord ended or renewed honestly, then get back to a boat.",
+    "secret": "His tube holds the original Concord. It says that renewal requires the Surety's own consent, that any Hand may withdraw from the rite, and that the Witness breaks ties. His order forbids him to speak of it before midnight. He has noticed that the Chancery's copy does not agree, and he knows exactly who it would hurt.",
+    "voice": "Slow, quiet, plain; speaks in sea-weather images because it is the only way he can think. Pauses a long time before answering anything that matters.",
+    "mannerisms": [
+      "Checks the water in any basin as if it might tell him something",
+      "Looks for the horizon in every room and then apologises",
+      "Taps the whale-oil tube twice for luck without noticing"
+    ],
+    "trinket": "A tide-table etched on a gull-bone, accurate to the hour for the last thirty years",
+    "ties": [
+      { "to": "selenor-aetheis", "text": "A decade of formal letters between the tide-court and the Chancery. He thinks the advocate is a decent man who writes like one, and has never decided whether to trust him with the tube.", "public": "Ten years of formal letters; they have never met" },
+      { "to": "tamsin-brandle", "text": "She hauled him out of the outflow sluice this afternoon when he tried to taste the seawater. He has promised to bring her a proper tide-table; she has promised not to tell anyone he fell in.", "public": "Hauled him out of the outflow sluice this afternoon" },
+      { "to": "sabra-kovane", "text": "She found him a seat and a cup of tea when he arrived off the barge looking green. He means to repay her kindness by being truthful, and dreads what that will cost her.", "public": "Gave him a seat and tea when he arrived today" }
+    ],
+    "intro": "\"Corwen Tidewrack, tide-reader of Driftwood. I'm only here to witness. Is there a window anywhere in this place?\""
+  },
+  "mech": {
+    "species": "Human",
+    "lineage": "Driftwood coaster",
+    "size": "Medium",
+    "background": "Guide",
+    "classes": [{ "name": "Druid", "subclass": "Circle of the Sea", "level": 4 }],
+    "abilities": { "str": 8, "dex": 14, "con": 15, "int": 12, "wis": 18, "cha": 10 },
+    "saves": ["int", "wis"],
+    "skills": ["stealth", "survival", "insight", "perception", "medicine"],
+    "hp": 39,
+    "ac": { "value": 16, "note": "Hide armor 12 + Dex 2 + shield 2" },
+    "speed": 30,
+    "languages": ["Common", "Druidic", "Halfling", "Elvish"],
+    "tools": ["Cartographer's Tools"],
+    "armorTraining": ["Light", "Medium", "Shields"],
+    "weaponTraining": ["Simple", "Martial"],
+    "originFeat": "Magic Initiate (Druid)",
+    "feats": ["Tough (Human Versatile)", "Ability Score Improvement (Wis +1, Dex +1)"],
+    "weaponMasteries": [],
+    "features": [
+      { "name": "Resourceful", "source": "species", "text": "You gain Heroic Inspiration whenever you finish a Long Rest." },
+      { "name": "Skillful", "source": "species", "text": "Proficiency in one extra skill (Medicine)." },
+      { "name": "Tough", "source": "feat", "text": "Your HP maximum rises by 2 per level." },
+      { "name": "Magic Initiate", "source": "feat", "text": "Druidcraft and Mending cantrips; cast Healing Word once per Long Rest without a slot. Spell ability is Wisdom.", "uses": { "max": 1, "per": "long" } },
+      { "name": "Primal Order: Warden", "source": "class", "text": "Trained for battle: Martial weapons and Medium armor." },
+      { "name": "Druidic", "source": "class", "text": "You know the secret druid language and can leave hidden messages in it." },
+      { "name": "Wild Shape", "source": "class", "text": "Bonus Action: become a beast of CR 1/2 or lower, no flying speed. Two uses; regain one on a Short Rest, all on a Long Rest.", "uses": { "max": 2, "per": "long" } },
+      { "name": "Wild Companion", "source": "class", "text": "Spend a Wild Shape use to cast Find Familiar, with no components." },
+      { "name": "Circle Spells (Sea)", "source": "subclass", "text": "Fog Cloud, Gust of Wind, Ray of Frost, Shatter and Thunderwave are always prepared." },
+      { "name": "Wrath of the Sea", "source": "subclass", "text": "Bonus Action, spend a Wild Shape use: a 5-ft emanation of sea spray surrounds you for 10 minutes. Each turn, choose a creature in it: Con save or cold damage (d6s equal to your Wis modifier) and a 15-ft push." }
+    ],
+    "attacks": [
+      { "name": "Quarterstaff (Shillelagh)", "kind": "weapon", "ability": "wis", "dice": "1d8", "damageType": "bludgeoning", "properties": ["Versatile"], "note": "Shillelagh is active; uses Wisdom for attack and damage" },
+      { "name": "Ray of Frost", "kind": "spell", "ability": "wis", "dice": "1d8", "damageType": "cold", "addMod": false, "range": "60 ft", "note": "Target's Speed drops by 10 ft until your next turn" },
+      { "name": "Produce Flame", "kind": "spell", "ability": "wis", "dice": "1d8", "damageType": "fire", "addMod": false, "range": "60 ft", "note": "Hurl the flame, or just use it as a light", "option": "druid-cantrip" }
+    ],
+    "spellcasting": {
+      "ability": "wis",
+      "slots": [4, 3],
+      "spells": [
+        { "name": "Guidance", "level": 0 },
+        { "name": "Shillelagh", "level": 0 },
+        { "name": "Produce Flame", "level": 0, "option": "druid-cantrip" },
+        { "name": "Ray of Frost", "level": 0, "always": true, "note": "Circle of the Sea" },
+        { "name": "Druidcraft", "level": 0, "note": "Magic Initiate" },
+        { "name": "Mending", "level": 0, "note": "Magic Initiate" },
+        { "name": "Fog Cloud", "level": 1, "always": true, "note": "Circle of the Sea" },
+        { "name": "Thunderwave", "level": 1, "always": true, "note": "Circle of the Sea" },
+        { "name": "Healing Word", "level": 1, "always": true, "note": "Magic Initiate; 1/long rest free" },
+        { "name": "Cure Wounds", "level": 1 },
+        { "name": "Entangle", "level": 1 },
+        { "name": "Goodberry", "level": 1 },
+        { "name": "Gust of Wind", "level": 2, "always": true, "note": "Circle of the Sea" },
+        { "name": "Shatter", "level": 2, "always": true, "note": "Circle of the Sea" },
+        { "name": "Moonbeam", "level": 2 },
+        { "name": "Pass Without Trace", "level": 2 },
+        { "name": "Barkskin", "level": 2 },
+        { "name": "Lesser Restoration", "level": 2 }
+      ],
+      "note": "Prepares 7 druid spells after a Long Rest; circle spells are always prepared. Spell save DC 14, spell attack +6."
+    },
+    "equipment": [
+      { "name": "Hide Armor", "equipped": true, "note": "Sealskin, oiled" },
+      { "name": "Shield", "equipped": true, "note": "Driftwood, with a bound tide-mark" },
+      { "name": "Quarterstaff", "equipped": true, "note": "Bleached driftwood" },
+      { "name": "Whale-oil tube", "note": "Sealed. The original Concord text, not to be opened before midnight" },
+      { "name": "Cartographer's Tools" },
+      { "name": "Explorer's Pack" },
+      { "name": "Druidic focus", "note": "A gull-bone tide-table" }
+    ],
+    "gold": 12
+  },
+  "options": [
+    {
+      "kind": "spell",
+      "id": "druid-cantrip",
+      "label": "Signature cantrip",
+      "choices": [
+        {
+          "id": "produce-flame",
+          "label": "Produce Flame",
+          "value": { "name": "Produce Flame", "level": 0 },
+          "attack": { "name": "Produce Flame", "kind": "spell", "ability": "wis", "dice": "1d8", "damageType": "fire", "addMod": false, "range": "60 ft", "note": "Hurl the flame, or just use it as a light" }
+        },
+        {
+          "id": "thorn-whip",
+          "label": "Thorn Whip",
+          "value": { "name": "Thorn Whip", "level": 0 },
+          "attack": { "name": "Thorn Whip", "kind": "spell", "ability": "wis", "dice": "1d6", "damageType": "piercing", "addMod": false, "range": "30 ft", "note": "Pulls a Large or smaller target up to 10 ft toward you" }
+        }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Keepsake",
+      "choices": [
+        { "id": "tide-bone", "label": "Gull-bone tide table", "value": "A tide-table etched on a gull-bone, accurate to the hour for the last thirty years" },
+        { "id": "knot", "label": "Pilot's knot", "value": "A pilot's knot of tarred line, tied by the Driftwood harbourmaster who taught him to read water" },
+        { "id": "shell", "label": "Whelk shell", "value": "A whelk shell that is faintly warm and, if you hold it up, whispers the weather" }
+      ]
+    }
+  ]
+}

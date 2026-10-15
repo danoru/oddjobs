@@ -1,0 +1,23 @@
+{
+  "slug": "lot-thirteen",
+  "title": "Lot Thirteen",
+  "pitch": "A dead collector's estate goes under the hammer at a masked ball, and five guests hold invitations promising the one thing he stole from each of them. Lot Thirteen is locked, hungry, and not remotely what the catalogue says.",
+  "premise": "Six weeks ago Magister Corvin Pell, collector, hedge-wizard, and the most charming bankrupt in the city, died. Tonight his whole estate goes under the hammer at Pell House, and his will insists on a masked sale ('anonymous bids, honest prices'). Five people hold black-sealed invitations in five different handwritings, and every one says the same thing in different words: what he took from you is waiting in Lot Thirteen. You are the apprentice he exploited, the fiance he left at the altar, the guard captain he disgraced, the priest who buried him, and the thief hired to rob him. Each of you has a very good reason to be in that room tonight, and a very good reason not to explain it to the others.",
+  "ruleset": "2014",
+  "system": "dnd5e",
+  "level": 3,
+  "players": { "min": 3, "max": 5 },
+  "durationHrs": 3.5,
+  "tone": ["masquerade heist", "farce", "twisty mystery"],
+  "setting": "Pell House, a faded townhouse in any city with nobles, a city Watch, and a taste for masquerades. Drop it into any setting.",
+  "posting": {
+    "header": "ESTATE SALE OF MAGISTER CORVIN PELL: MASKS MANDATORY, DOORS AT EIGHT",
+    "reward": "Whatever you can carry out, and the return of what was yours"
+  },
+  "coreRoles": ["tobias-larke", "dagny-brask", "nettle-tumbletoe"],
+  "gmNotes": "THE TRUTH: Corvin Pell faked his death six weeks ago to escape his creditors. Tonight is his exit. He is the auctioneer, 'Mr. Sprott', in a powdered wig and a Disguise Self (the real Sprott is gagged in the pantry). He invited the five people who could prove he is alive so he can pin the night's thefts and frauds on them; the Watch has been tipped. Lot Thirteen, the 'Magpie's Chest', is Biscuit, his pet mimic, whose gut holds his real hoard plus the item he took from each cast member. Biscuit is calmed by Corvin's whistled 'Magpie's Waltz' (Tobias knows the tune). ACT 1, MASKS ON (30-40 min): arrival, the mask table, mingling. Meet Lady Ysolde Marchbanks (rival bidder, Nettle's patron), Captain Maud Holloway (Watch, undercover as a wine bore), and the auctioneer. Run lots 1-12 as a bidding farce: most 'relics' are Odalys's forgeries, so let her squirm. Plant: the auctioneer whistles; the portraits whisper. ACT 2, LOT THIRTEEN (30 min): the chest rolls out, the whistle sounds, the lights die, the doors lock. The chest scuttles off into the house and two animated armor 'bailiffs' (MM) wake and demand everyone's masks stay on. Let each secret start to leak. ACT 3, THE HOUSE WAKES (60-75 min): chase Biscuit through the portrait gallery (talking portraits gossip; Odalys's forged saints heckle her), the kitchen (animated cookware, skill challenge), and the cellar to the crypt, where Pell's grave is a trapdoor to a river tunnel. Fight or tame the mimic (MM mimic; a few bars of the Waltz, Animal Handling, or a sausage calms it). Its gut holds each cast member's stolen item. ACT 4, THE UNMASKING (45-60 min): the boathouse. Corvin (use the Spy stat block with Misty Step and Invisibility once each; add two Thugs for a 5-player table) tries to leave with Biscuit in a trunk. The Watch arrives, expecting five thieves. The party must unmask him (Investigation or Insight against the disguise, Anselm's sworn word, Dagny's forged-letter proof, Odalys's illusion-craft, Tobias's tune). Endings: hand Corvin to Captain Holloway, trade his freedom for their stolen things, or let Biscuit eat the evidence. TABLE NOTES: secrets are levers, not obligations. Nobody has to betray anybody; the fun is the reveal and the divided loyalties. Nudge a reveal at the end of Act 2 and another during the Act 3 crypt. For 3 players drop one armor and use a single mimic; for 5 add the Thugs in Act 4. Lady Marchbanks wants Lot Thirteen destroyed and Odalys exposed; she can be a rival, an ally, or a pawn.",
+  "content": {
+    "sources": ["PHB 2014", "Xanathar's Guide to Everything", "Monster Manual 2014"],
+    "warnings": ["faked death and grief", "fraud and impersonation", "an NPC bound and gagged (offscreen)", "cartoonish violence"]
+  }
+}

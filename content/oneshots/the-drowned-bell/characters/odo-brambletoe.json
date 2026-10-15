@@ -1,0 +1,383 @@
+{
+  "id": "odo-brambletoe",
+  "name": "Odo Brambletoe",
+  "order": 3,
+  "poster": {
+    "header": "LOST",
+    "epithet": "the Fool",
+    "hook": "Halfling, loud, mid-verse. Last seen leaving the Gull & Anchor owing for three pints.",
+    "reward": "A round on the harbourmaster",
+    "icon": "music"
+  },
+  "roles": [
+    "face",
+    "support",
+    "control"
+  ],
+  "story": {
+    "pronouns": "he/him",
+    "age": "47",
+    "appearance": "Round, windburned, and ginger, with salt-stiff curls and a patched velvet coat in three clashing shades of blue. Carries a battered lute called Biddy that has a gull-shaped dent in the back.",
+    "concept": "Odo came to Saltmere for one night's work twenty-odd years ago and never left. He wrote the storm-hymn the whole town sings when the bell rings, and he has been dining on it ever since. He is loud, generous, perpetually broke, and the first to laugh at his own jokes, which is how nobody notices he's frightened.",
+    "stake": "Every storm night the town sings his hymn in the dark. If the bell stays silent tonight, the last thing the drowned will hear is a chorus of his words.",
+    "goal": "Get the bell rung with the whole town singing under it, and finally write the last verse.",
+    "secret": "He didn't write the hymn. Twenty years ago he rowed out drunk on a black night and heard it sung from under the water; he scribbled down what he could and called it his own. The final verse never stayed in his head, and every time he tries to play it Biddy's strings go slack and the nearest cup of water starts to shiver. He suspects it's the verse meant for the bell.",
+    "voice": "Warm, theatrical, incorrigible. Calls everyone 'my friend' and narrates tense moments like a minstrel at a feast. Goes quiet and plain-spoken only when he's truly scared.",
+    "mannerisms": [
+      "Tunes Biddy whenever he's about to lie",
+      "Hums the hymn's last note, then stops dead",
+      "Bows to anything that is about to hit him"
+    ],
+    "trinket": "A tarnished silver tuning fork that only ever hums the hymn's last note",
+    "ties": [
+      {
+        "to": "sister-vell",
+        "text": "Has sung under her tower every storm night for nineteen years. She calls him 'child' and tells him to hush; she has never once told him to leave.",
+        "public": "Sings under her bell-tower every storm night"
+      },
+      {
+        "to": "merryn-vane",
+        "text": "She hums a tune he swears he has never played for anyone. It is the last verse.",
+        "public": "She hums his storm-hymn"
+      },
+      {
+        "to": "rook",
+        "text": "Rook has picked his pocket twice and given it back once, with interest. Odo considers this a friendship.",
+        "public": "Rook picks his pocket; Odo calls it friendship"
+      }
+    ],
+    "intro": "\"Odo Brambletoe, bard, baritone, and yes, that is my hymn you hear every storm night. No, I don't take requests during a crisis. Well. Perhaps one.\""
+  },
+  "mech": {
+    "species": "Halfling",
+    "size": "Small",
+    "background": "Entertainer",
+    "classes": [
+      {
+        "name": "Bard",
+        "subclass": "College of Lore",
+        "level": 5
+      }
+    ],
+    "abilities": {
+      "str": 8,
+      "dex": 16,
+      "con": 13,
+      "int": 10,
+      "wis": 12,
+      "cha": 18
+    },
+    "saves": [
+      "dex",
+      "cha"
+    ],
+    "skills": [
+      "acrobatics",
+      "performance",
+      "persuasion",
+      "insight",
+      "stealth",
+      "history",
+      "religion",
+      "deception"
+    ],
+    "expertise": [
+      "performance",
+      "persuasion"
+    ],
+    "jackOfAllTrades": true,
+    "hp": 33,
+    "ac": {
+      "value": 14,
+      "note": "Leather armor"
+    },
+    "speed": 30,
+    "initiativeBonus": 1,
+    "languages": [
+      "Common",
+      "Halfling",
+      "Elvish"
+    ],
+    "tools": [
+      "Lute",
+      "Fiddle",
+      "Drum",
+      "Horn",
+      "Pan Flute"
+    ],
+    "armorTraining": [
+      "Light"
+    ],
+    "weaponTraining": [
+      "Simple"
+    ],
+    "originFeat": "Musician",
+    "feats": [
+      "Ability Score Improvement (Cha +1, Dex +1)"
+    ],
+    "features": [
+      {
+        "name": "Brave",
+        "source": "species",
+        "text": "You have Advantage on saving throws against the Frightened condition."
+      },
+      {
+        "name": "Halfling Nimbleness",
+        "source": "species",
+        "text": "You can move through the space of any creature that is larger than you, though you can't stop there."
+      },
+      {
+        "name": "Luck",
+        "source": "species",
+        "text": "When you roll a 1 on the d20 of a D20 Test, you can reroll the die and must use the new roll."
+      },
+      {
+        "name": "Naturally Stealthy",
+        "source": "species",
+        "text": "You can take the Hide action even when you are obscured only by a creature at least one size larger than you."
+      },
+      {
+        "name": "Musician: Encouraging Song",
+        "source": "feat",
+        "text": "When you finish a Short or Long Rest, play a song on an instrument you know; up to 3 allies who hear it gain Heroic Inspiration."
+      },
+      {
+        "name": "Bardic Inspiration (d8)",
+        "source": "class",
+        "text": "Bonus Action: give a creature within 60 ft other than you a d8. Within the next hour, after it fails a D20 Test, it can add the die. You regain all uses on a Short or Long Rest.",
+        "uses": {
+          "max": 4,
+          "per": "short"
+        }
+      },
+      {
+        "name": "Expertise",
+        "source": "class",
+        "text": "Your proficiency bonus is doubled for Performance and Persuasion."
+      },
+      {
+        "name": "Jack of All Trades",
+        "source": "class",
+        "text": "Add half your proficiency bonus (rounded down) to ability checks that don't already include it, Initiative included."
+      },
+      {
+        "name": "Font of Inspiration",
+        "source": "class",
+        "text": "Your Bardic Inspiration returns on a Short Rest as well as a Long Rest, and you can spend a spell slot to regain one use."
+      },
+      {
+        "name": "Bonus Proficiencies",
+        "source": "subclass",
+        "text": "You gained three extra skill proficiencies (History, Religion, Deception)."
+      },
+      {
+        "name": "Cutting Words",
+        "source": "subclass",
+        "text": "Reaction: spend a Bardic Inspiration die to subtract it from the damage roll, attack roll, or ability check of a creature you can see within 60 ft.",
+        "uses": {
+          "max": 4,
+          "per": "short"
+        }
+      }
+    ],
+    "attacks": [
+      {
+        "name": "Dagger",
+        "kind": "weapon",
+        "ability": "dex",
+        "dice": "1d4",
+        "damageType": "piercing",
+        "range": "20/60 ft",
+        "properties": [
+          "Finesse",
+          "Light",
+          "Thrown"
+        ]
+      },
+      {
+        "name": "Vicious Mockery",
+        "kind": "spell",
+        "ability": "cha",
+        "save": "wis",
+        "dice": "2d6",
+        "damageType": "psychic",
+        "addMod": false,
+        "range": "60 ft",
+        "note": "Target has Disadvantage on its next attack roll before the end of its next turn"
+      },
+      {
+        "name": "Thunderclap",
+        "kind": "spell",
+        "ability": "cha",
+        "save": "con",
+        "dice": "2d6",
+        "damageType": "thunder",
+        "addMod": false,
+        "range": "5-ft emanation",
+        "note": "Audible out to 100 ft",
+        "option": "storm-cantrip"
+      }
+    ],
+    "spellcasting": {
+      "ability": "cha",
+      "slots": [
+        4,
+        3,
+        2
+      ],
+      "spells": [
+        {
+          "name": "Vicious Mockery",
+          "level": 0
+        },
+        {
+          "name": "Minor Illusion",
+          "level": 0
+        },
+        {
+          "name": "Thunderclap",
+          "level": 0,
+          "option": "storm-cantrip"
+        },
+        {
+          "name": "Healing Word",
+          "level": 1
+        },
+        {
+          "name": "Dissonant Whispers",
+          "level": 1
+        },
+        {
+          "name": "Thunderwave",
+          "level": 1
+        },
+        {
+          "name": "Tasha's Hideous Laughter",
+          "level": 1
+        },
+        {
+          "name": "Shatter",
+          "level": 2
+        },
+        {
+          "name": "Invisibility",
+          "level": 2
+        },
+        {
+          "name": "Suggestion",
+          "level": 2
+        },
+        {
+          "name": "Hypnotic Pattern",
+          "level": 3
+        },
+        {
+          "name": "Dispel Magic",
+          "level": 3
+        }
+      ],
+      "note": "Knows 3 cantrips; prepares 9 bard spells and can swap one after a Long Rest. Uses his lute as a spellcasting focus."
+    },
+    "equipment": [
+      {
+        "name": "Leather Armor",
+        "equipped": true
+      },
+      {
+        "name": "Dagger",
+        "qty": 2,
+        "equipped": true
+      },
+      {
+        "name": "Lute (Biddy)",
+        "note": "Spellcasting focus"
+      },
+      {
+        "name": "Entertainer's Pack"
+      },
+      {
+        "name": "Costume",
+        "qty": 2,
+        "note": "One bright, one plain"
+      },
+      {
+        "name": "Mirror"
+      },
+      {
+        "name": "Perfume"
+      },
+      {
+        "name": "Traveler's Clothes"
+      }
+    ],
+    "gold": 30
+  },
+  "options": [
+    {
+      "kind": "spell",
+      "id": "storm-cantrip",
+      "label": "Storm cantrip",
+      "choices": [
+        {
+          "id": "thunderclap",
+          "label": "Thunderclap",
+          "value": {
+            "name": "Thunderclap",
+            "level": 0
+          },
+          "attack": {
+            "name": "Thunderclap",
+            "kind": "spell",
+            "ability": "cha",
+            "save": "con",
+            "dice": "2d6",
+            "damageType": "thunder",
+            "addMod": false,
+            "range": "5-ft emanation",
+            "note": "Audible out to 100 ft"
+          }
+        },
+        {
+          "id": "starry-wisp",
+          "label": "Starry Wisp",
+          "value": {
+            "name": "Starry Wisp",
+            "level": 0
+          },
+          "attack": {
+            "name": "Starry Wisp",
+            "kind": "spell",
+            "ability": "cha",
+            "dice": "2d8",
+            "damageType": "radiant",
+            "addMod": false,
+            "range": "60 ft",
+            "note": "Target sheds dim light until the end of your next turn and can't benefit from being Invisible"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Keepsake",
+      "choices": [
+        {
+          "id": "fork",
+          "label": "Tuning fork",
+          "value": "A tarnished silver tuning fork that only ever hums the hymn's last note"
+        },
+        {
+          "id": "slate",
+          "label": "Tavern slate",
+          "value": "A chalk slate listing every tavern in Saltmere and what he owes each"
+        },
+        {
+          "id": "page",
+          "label": "Hymn sheet",
+          "value": "A folded hymn sheet with the last verse scratched out so hard it tore"
+        }
+      ]
+    }
+  ]
+}

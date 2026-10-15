@@ -1,0 +1,425 @@
+/* ---- The board itself: cork in a timber frame ---------------------------- */
+
+.frame {
+  position: relative;
+  border: 16px solid #4a2e18;
+  border-radius: 4px;
+  outline: 3px solid #2a190c;
+  box-shadow:
+    inset 0 0 0 2px #6b4425,
+    inset 0 0 50px rgba(0, 0, 0, 0.5),
+    0 24px 50px rgba(0, 0, 0, 0.55);
+  background-color: var(--cork);
+  background-image:
+    radial-gradient(rgba(60, 30, 10, 0.4) 1px, transparent 1.6px),
+    radial-gradient(rgba(255, 220, 170, 0.2) 1px, transparent 1.6px),
+    radial-gradient(rgba(60, 30, 10, 0.25) 1.5px, transparent 2px);
+  background-size: 7px 7px, 11px 11px, 17px 17px;
+  background-position: 0 0, 3px 5px, 8px 2px;
+  padding: clamp(16px, 3vw, 36px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: clamp(20px, 3vw, 36px);
+  align-items: start;
+}
+
+.wideGrid {
+  composes: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+}
+
+/* ---- Paper + pin, shared by postings and posters ------------------------- */
+
+.paper {
+  position: relative;
+  color: var(--ink);
+  background-color: var(--parchment);
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 255, 255, 0.45), transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(150, 100, 40, 0.18), transparent 55%),
+    linear-gradient(180deg, transparent 96%, rgba(120, 80, 30, 0.12));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 8px 16px rgba(0, 0, 0, 0.35),
+    0 2px 3px rgba(0, 0, 0, 0.3);
+  transform: rotate(var(--tilt, 0deg));
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.paper:hover,
+.paper:focus-within {
+  transform: rotate(0deg) translateY(-3px) scale(1.015);
+  box-shadow: 0 16px 28px rgba(0, 0, 0, 0.45);
+  z-index: 2;
+}
+
+.pin {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f3a08f, #b5402f 45%, #5a160d);
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.45);
+  z-index: 3;
+}
+
+.brassPin {
+  composes: pin;
+  background: radial-gradient(circle at 35% 30%, #fff1c8, #d2a85a 45%, #6e4f17);
+}
+
+/* ---- Job postings (home page) ------------------------------------------- */
+
+.posting {
+  composes: paper;
+  display: block;
+  padding: 34px 24px 20px;
+  text-decoration: none;
+}
+
+.postingHeader {
+  font-family: var(--font-label);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-align: center;
+  color: var(--ink-soft);
+  border-bottom: 1px solid rgba(43, 29, 14, 0.35);
+  padding-bottom: 6px;
+}
+
+.postingTitle {
+  font-family: var(--font-poster);
+  font-size: clamp(24px, 3vw, 30px);
+  line-height: 1.1;
+  text-align: center;
+  margin: 12px 0 10px;
+}
+
+.postingPitch {
+  font-family: var(--font-print);
+  font-size: 17px;
+  line-height: 1.35;
+  margin: 0 0 14px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-family: var(--font-label);
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.reward {
+  margin-top: 12px;
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 15px;
+}
+
+.castRow {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+  color: var(--ink-soft);
+}
+
+.stamp {
+  position: absolute;
+  right: 14px;
+  top: 30px;
+  transform: rotate(9deg);
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-family: var(--font-label);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  opacity: 0.85;
+}
+
+.stamp2014 {
+  composes: stamp;
+  color: #2f5d7c;
+}
+
+.stamp2024 {
+  composes: stamp;
+  color: var(--wax);
+}
+
+.tones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.tone {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 14px;
+  padding: 0 8px;
+  background: rgba(43, 29, 14, 0.08);
+  border-radius: 2px;
+}
+
+/* ---- Character posters --------------------------------------------------- */
+
+.poster {
+  composes: paper;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  padding: 30px 16px 0;
+}
+
+.posterLink {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+}
+
+.posterLink:focus-visible {
+  outline: 2px dashed var(--wax);
+  outline-offset: 4px;
+}
+
+.posterHeader {
+  font-family: var(--font-poster);
+  font-size: clamp(28px, 3.4vw, 36px);
+  letter-spacing: 0.06em;
+  line-height: 1;
+  padding-bottom: 6px;
+  border-bottom: 3px double var(--ink);
+}
+
+.engraving {
+  margin: 12px auto 10px;
+  width: 112px;
+  height: 112px;
+  display: grid;
+  place-items: center;
+  border: 3px double var(--ink);
+  background:
+    repeating-linear-gradient(135deg, rgba(43, 29, 14, 0.07) 0 1px, transparent 1px 4px),
+    rgba(43, 29, 14, 0.04);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.engraving img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) sepia(0.6) contrast(1.3);
+}
+
+.posterName {
+  font-family: var(--font-print);
+  font-size: 23px;
+  line-height: 1.1;
+}
+
+.posterEpithet {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+
+.posterHook {
+  font-family: var(--font-print);
+  font-size: 15.5px;
+  line-height: 1.3;
+  margin: 10px 4px 8px;
+}
+
+.posterReward {
+  font-family: var(--font-label);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+.posterTag {
+  font-family: var(--font-label);
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 6px 0 12px;
+}
+
+.coreTag {
+  position: absolute;
+  left: -8px;
+  top: 4px;
+  transform: rotate(-8deg);
+  background: var(--brass);
+  color: var(--ink);
+  font-family: var(--font-label);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  padding: 1px 8px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* Tear strip — the bottom of the poster */
+.strip {
+  margin: 0 -16px;
+  border: 0;
+  border-top: 2px dashed rgba(43, 29, 14, 0.5);
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--font-label);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  padding: 9px 0 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.strip:hover,
+.strip:focus-visible {
+  background: rgba(43, 29, 14, 0.07);
+  color: var(--wax);
+  outline: none;
+}
+
+.claimed {
+  clip-path: polygon(
+    0 0, 100% 0, 100% calc(100% - 6px), 93% 100%, 86% calc(100% - 7px), 78% calc(100% - 1px),
+    70% calc(100% - 8px), 61% 100%, 52% calc(100% - 6px), 44% calc(100% - 1px), 36% calc(100% - 8px),
+    27% 100%, 19% calc(100% - 7px), 10% calc(100% - 1px), 0 calc(100% - 6px)
+  );
+}
+
+.claimedStamp {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-14deg);
+  border: 3px solid var(--wax);
+  color: var(--wax);
+  font-family: var(--font-poster);
+  font-size: 26px;
+  letter-spacing: 0.08em;
+  padding: 2px 12px;
+  background: rgba(243, 231, 203, 0.55);
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.unclaim {
+  margin: 0 0 10px;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font-family: var(--font-label);
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.falling {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40px;
+  background: var(--parchment);
+  border-top: 2px dashed rgba(43, 29, 14, 0.5);
+  pointer-events: none;
+  animation: fall 0.9s cubic-bezier(0.4, 0, 0.8, 0.6) forwards;
+  transform-origin: 20% 0;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0);
+    opacity: 1;
+  }
+  20% {
+    transform: translateY(6px) rotate(-4deg);
+  }
+  100% {
+    transform: translateY(260px) rotate(-28deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paper,
+  .paper:hover {
+    transition: none;
+    transform: none;
+  }
+  .falling {
+    display: none;
+  }
+}
+
+/* ---- Notes pinned around the posters ------------------------------------ */
+
+.note {
+  composes: paper;
+  padding: 30px 22px 18px;
+}
+
+.noteTitle {
+  font-family: var(--font-poster);
+  font-size: 22px;
+  margin: 0 0 8px;
+}
+
+.yarnList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-print);
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.yarnList li {
+  padding: 6px 0;
+  border-bottom: 1px dotted rgba(43, 29, 14, 0.3);
+}
+
+.yarn {
+  color: var(--wax);
+  font-weight: 600;
+}
+
+.roleChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.roleChip {
+  font-family: var(--font-label);
+  font-size: 13px;
+  padding: 1px 8px;
+  border: 1px solid rgba(43, 29, 14, 0.4);
+  border-radius: 2px;
+}
+
+.roleChipOn {
+  composes: roleChip;
+  background: var(--ink);
+  color: var(--parchment);
+  border-color: var(--ink);
+}

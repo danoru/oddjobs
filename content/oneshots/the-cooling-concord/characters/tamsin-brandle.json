@@ -1,0 +1,115 @@
+{
+  "id": "tamsin-brandle",
+  "name": "Tamsin Brandle",
+  "order": 4,
+  "poster": {
+    "header": "LOST",
+    "epithet": "Soot-Pocket",
+    "hook": "One gnome stoker, answers to Tam. Last seen climbing into a chimney. Again.",
+    "reward": "A warm loaf",
+    "icon": "dagger"
+  },
+  "roles": ["scout", "striker", "utility"],
+  "story": {
+    "pronouns": "she/her",
+    "age": "46",
+    "appearance": "Small, wiry rock gnome with rolled sleeves, burn-pocked forearms and a leather tool apron whose pockets are named in chalk. Goggles pushed up into a lot of grey-brown hair that has never once been brushed.",
+    "concept": "Tamsin is the chief stoker of the Thermae's Heart-furnace, the third in her family to hold the job. She knows every flue, damper and bellows in the works by sound. She also talks to the man in the fire, every day, because nobody else did when she started, and he is the best listener she has ever worked beside.",
+    "stake": "If the Concord is renewed she keeps her post; if Torvak is released she loses her furnace and her friend. If the binding breaks badly she is closest to the fire when it happens.",
+    "goal": "Make sure the vote is the one Torvak actually wants, whatever that turns out to be.",
+    "secret": "For six years she has quietly propped Damper Seven open and fed Torvak spiced cinder-oil, so that he could breathe, think and talk. That's why the wards are fraying early. The Chancery would call it sabotage. She calls it kindness, and is no longer sure there is a difference.",
+    "voice": "Fast, practical, over-friendly. Explains everything in terms of heat and draught. Calls fire 'he', and the furnace 'the old man'.",
+    "mannerisms": [
+      "Cocks her head to listen to pipes as if they were gossiping",
+      "Taps anything metal twice before touching it",
+      "Eats while she works and offers you some, with sooty fingers"
+    ],
+    "trinket": "A wind-up bronze beetle that opens and closes Damper Seven's lock",
+    "ties": [
+      { "to": "sabra-kovane", "text": "They share the furnace-room, a kettle and a running argument about the shrine schedule. Tamsin would take a knife for her and has never said so.", "public": "Share the furnace-room, a kettle and an argument" },
+      { "to": "vessia-drun", "text": "She lets the old tribune's granddaughter sit on the stoker's bench every Jubilee. She has been wanting to tell Vessia what Torvak says about her for six years.", "public": "Lets Vessia sit on the stoker's bench each Jubilee" },
+      { "to": "corwen-tidewrack", "text": "She met him this afternoon at the outflow culvert, where he was trying to sniff the seawater. She hauled him out of the sluice and he hasn't stopped apologising.", "public": "Hauled him out of the outflow sluice this afternoon" }
+    ],
+    "intro": "\"Tam. Stoker. I know where every pipe goes, and which ones to avoid. This way. Duck.\""
+  },
+  "mech": {
+    "species": "Gnome",
+    "lineage": "Rock gnome",
+    "size": "Small",
+    "background": "Artisan",
+    "classes": [{ "name": "Rogue", "subclass": "Thief", "level": 4 }],
+    "abilities": { "str": 8, "dex": 18, "con": 15, "int": 14, "wis": 12, "cha": 10 },
+    "saves": ["dex", "int"],
+    "skills": ["investigation", "persuasion", "stealth", "perception", "sleightOfHand", "acrobatics"],
+    "expertise": ["stealth", "perception"],
+    "hp": 31,
+    "ac": { "value": 16, "note": "Studded leather" },
+    "speed": 30,
+    "senses": ["Darkvision 60 ft"],
+    "languages": ["Common", "Gnomish", "Dwarvish", "Draconic", "Thieves' Cant"],
+    "tools": ["Thieves' Tools", "Tinker's Tools", "Smith's Tools", "Mason's Tools", "Carpenter's Tools"],
+    "armorTraining": ["Light"],
+    "weaponTraining": ["Simple", "Martial (Finesse or Light)"],
+    "originFeat": "Crafter",
+    "feats": ["Ability Score Improvement (Dex +1, Con +1)"],
+    "weaponMasteries": ["Dagger (Nick)", "Hand Crossbow (Vex)"],
+    "features": [
+      { "name": "Gnomish Cunning", "source": "species", "text": "Advantage on Intelligence, Wisdom and Charisma saves." },
+      { "name": "Gnomish Lineage (Rock)", "source": "species", "text": "Know Mending and Prestidigitation (Intelligence)." },
+      { "name": "Tinker", "source": "species", "text": "Spend 10 minutes casting Prestidigitation to build a Tiny clockwork gadget (toy, fire-starter or music box) that lasts 8 hours; you can keep up to three going." },
+      { "name": "Crafter", "source": "feat", "text": "Proficiency with three artisan's tool sets; 20% discount on nonmagical gear; fast crafting of simple items." },
+      { "name": "Sneak Attack (2d6)", "source": "class", "text": "Once per turn, deal an extra 2d6 damage with a Finesse or Ranged weapon if you have Advantage or an ally is within 5 ft of the target and you don't have Disadvantage." },
+      { "name": "Expertise", "source": "class", "text": "Double proficiency in Stealth and Perception." },
+      { "name": "Thieves' Cant", "source": "class", "text": "A secret language of signs and slang, plus one other language of your choice." },
+      { "name": "Cunning Action", "source": "class", "text": "Bonus Action: Dash, Disengage or Hide." },
+      { "name": "Steady Aim", "source": "class", "text": "Bonus Action: gain Advantage on your next attack roll this turn if you did not move. Your Speed is 0 until the end of the turn." },
+      { "name": "Fast Hands", "source": "subclass", "text": "Cunning Action also lets you make a Sleight of Hand check, use Thieves' Tools to pick a lock or disarm a trap, or take the Utilize action." },
+      { "name": "Second-Story Work", "source": "subclass", "text": "Climb Speed equal to your Speed; use Dexterity for jump distance." }
+    ],
+    "attacks": [
+      { "name": "Dagger", "kind": "weapon", "ability": "dex", "dice": "1d4", "damageType": "piercing", "range": "20/60 ft", "properties": ["Finesse", "Light", "Thrown"], "mastery": "Nick" },
+      { "name": "Hand Crossbow", "kind": "weapon", "ability": "dex", "dice": "1d6", "damageType": "piercing", "range": "30/120 ft", "properties": ["Ammunition", "Light", "Loading"], "mastery": "Vex", "option": "ranged" }
+    ],
+    "spellcasting": {
+      "ability": "int",
+      "slots": [],
+      "spells": [
+        { "name": "Mending", "level": 0, "always": true, "note": "Rock Gnome lineage" },
+        { "name": "Prestidigitation", "level": 0, "always": true, "note": "Rock Gnome lineage" }
+      ],
+      "note": "Species cantrips only. Spell save DC 12, spell attack +4."
+    },
+    "equipment": [
+      { "name": "Studded Leather Armor", "equipped": true, "note": "Singed in two places" },
+      { "name": "Dagger", "equipped": true, "qty": 2 },
+      { "name": "Hand Crossbow", "option": "ranged" },
+      { "name": "Crossbow Bolts", "qty": 20 },
+      { "name": "Thieves' Tools" },
+      { "name": "Tinker's Tools" },
+      { "name": "Damper Seven key", "note": "A brass key on a leather thong" },
+      { "name": "Burglar's Pack" }
+    ],
+    "gold": 16
+  },
+  "options": [
+    {
+      "kind": "attack",
+      "id": "ranged",
+      "label": "Ranged weapon",
+      "choices": [
+        { "id": "hand-crossbow", "label": "Hand crossbow", "value": { "name": "Hand Crossbow", "kind": "weapon", "ability": "dex", "dice": "1d6", "damageType": "piercing", "range": "30/120 ft", "properties": ["Ammunition", "Light", "Loading"], "mastery": "Vex" } },
+        { "id": "shortbow", "label": "Shortbow", "value": { "name": "Shortbow", "kind": "weapon", "ability": "dex", "dice": "1d6", "damageType": "piercing", "range": "80/320 ft", "properties": ["Ammunition", "Two-Handed"], "mastery": "Vex" } }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Pocket contents",
+      "choices": [
+        { "id": "beetle", "label": "Clockwork beetle", "value": "A wind-up bronze beetle that opens and closes Damper Seven's lock" },
+        { "id": "chalk", "label": "Pipe-chalk", "value": "A nub of chalk, worn to the width of her thumb, marked with the name of every flue she has swept" },
+        { "id": "loaf", "label": "Heel of bread", "value": "The heel of a loaf, warm, wrapped in a Chancery maintenance order" }
+      ]
+    }
+  ]
+}
