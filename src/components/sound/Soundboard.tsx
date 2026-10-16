@@ -136,7 +136,7 @@ export function Soundboard({ title, sounds }: { title: string; sounds?: Sounds |
   };
 
   return (
-    <main className={s.board}>
+    <main id="main" tabIndex={-1} className={s.board}>
       <div className={s.head}>
         <p className={s.eyebrow}>Soundboard</p>
         <h1 className={s.title}>{title}</h1>

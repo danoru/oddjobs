@@ -1,0 +1,301 @@
+{
+  "id": "marrow",
+  "mech": {
+    "species": "Goliath",
+    "lineage": "Storm Giant ancestry",
+    "background": "Sailor",
+    "classes": [
+      {
+        "name": "Fighter",
+        "subclass": "Battle Master",
+        "level": 3
+      }
+    ],
+    "abilities": {
+      "str": 17,
+      "dex": 14,
+      "con": 14,
+      "int": 10,
+      "wis": 12,
+      "cha": 8
+    },
+    "saves": [
+      "str",
+      "con"
+    ],
+    "skills": [
+      "acrobatics",
+      "perception",
+      "athletics",
+      "intimidation",
+      "survival"
+    ],
+    "hp": 28,
+    "ac": {
+      "value": 17,
+      "note": "Chain mail (16) + Defense style"
+    },
+    "speed": 35,
+    "languages": [
+      "Common",
+      "Giant",
+      "Orc"
+    ],
+    "tools": [
+      "Navigator's Tools",
+      "Carpenter's Tools"
+    ],
+    "armorTraining": [
+      "Light",
+      "Medium",
+      "Heavy",
+      "Shields"
+    ],
+    "weaponTraining": [
+      "Simple",
+      "Martial"
+    ],
+    "originFeat": "Tavern Brawler",
+    "feats": [
+      "Fighting Style: Defense"
+    ],
+    "weaponMasteries": [
+      "Greataxe (Cleave)",
+      "Maul (Topple)",
+      "Pike (Push)"
+    ],
+    "features": [
+      {
+        "name": "Giant Ancestry: Storm's Thunder",
+        "source": "species",
+        "text": "Reaction: when a creature within 60 ft damages you, deal 1d8 Thunder damage to it.",
+        "uses": {
+          "max": 2,
+          "per": "long"
+        }
+      },
+      {
+        "name": "Powerful Build",
+        "source": "species",
+        "text": "You have Advantage on checks to escape being grappled and count as one size larger for carrying capacity."
+      },
+      {
+        "name": "Tavern Brawler",
+        "source": "feat",
+        "text": "Your unarmed strike does 1d4 + Str, you reroll 1s on its damage, you can push a target 5 ft on a hit during the Attack action, and you are proficient with improvised weapons."
+      },
+      {
+        "name": "Fighting Style: Defense",
+        "source": "feat",
+        "text": "+1 AC while wearing armor."
+      },
+      {
+        "name": "Second Wind",
+        "source": "class",
+        "text": "Bonus Action: regain 1d10 + 3 HP. You regain one use on a Short Rest and all on a Long Rest.",
+        "uses": {
+          "max": 2,
+          "per": "long"
+        }
+      },
+      {
+        "name": "Action Surge",
+        "source": "class",
+        "text": "Take one additional action on your turn (not Magic).",
+        "uses": {
+          "max": 1,
+          "per": "short"
+        }
+      },
+      {
+        "name": "Tactical Mind",
+        "source": "class",
+        "text": "After failing an ability check, spend a use of Second Wind to add 1d10 to it; if it still fails, the use isn't spent."
+      },
+      {
+        "name": "Weapon Mastery",
+        "source": "class",
+        "text": "You can use the mastery property of three weapon types: Greataxe, Maul, and Pike."
+      },
+      {
+        "name": "Combat Superiority",
+        "source": "subclass",
+        "text": "You have four d8 Superiority Dice, regained on a Short or Long Rest, and know three maneuvers. Maneuver save DC 13 (Str).",
+        "uses": {
+          "max": 4,
+          "per": "short"
+        }
+      },
+      {
+        "name": "Maneuver: Parry",
+        "source": "subclass",
+        "text": "Reaction when hit by a melee attack: reduce the damage by your die roll + Str modifier."
+      },
+      {
+        "name": "Maneuver: Riposte",
+        "source": "subclass",
+        "text": "Reaction when a creature misses you in melee: make a melee attack against it, adding your die to the damage."
+      },
+      {
+        "name": "Maneuver: Pushing Attack",
+        "source": "subclass",
+        "text": "When you hit with a weapon attack, add the die to damage; a Large or smaller target must make a Str save or be pushed up to 15 ft."
+      },
+      {
+        "name": "Student of War",
+        "source": "subclass",
+        "text": "You gained Carpenter's Tools and Survival proficiency."
+      }
+    ],
+    "attacks": [
+      {
+        "name": "Greataxe",
+        "kind": "weapon",
+        "ability": "str",
+        "dice": "1d12",
+        "damageType": "slashing",
+        "properties": [
+          "Heavy",
+          "Two-Handed"
+        ],
+        "mastery": "Cleave",
+        "option": "weapon"
+      },
+      {
+        "name": "Javelin",
+        "kind": "weapon",
+        "ability": "str",
+        "dice": "1d6",
+        "damageType": "piercing",
+        "range": "30/120 ft",
+        "properties": [
+          "Thrown"
+        ]
+      },
+      {
+        "name": "Unarmed Strike",
+        "kind": "weapon",
+        "ability": "str",
+        "dice": "1d4",
+        "damageType": "bludgeoning",
+        "properties": [],
+        "note": "Tavern Brawler: reroll 1s; can push the target 5 ft"
+      }
+    ],
+    "equipment": [
+      {
+        "name": "Chain Mail",
+        "equipped": true
+      },
+      {
+        "name": "Greataxe",
+        "equipped": true,
+        "note": "Salvage axe",
+        "option": "weapon"
+      },
+      {
+        "name": "Javelin",
+        "qty": 4,
+        "note": "Harpoons"
+      },
+      {
+        "name": "Dagger"
+      },
+      {
+        "name": "Rope, 50 ft",
+        "note": "Hemp"
+      },
+      {
+        "name": "Navigator's Tools"
+      },
+      {
+        "name": "Carpenter's Tools"
+      },
+      {
+        "name": "Traveler's Clothes"
+      }
+    ],
+    "gold": 24
+  },
+  "options": [
+    {
+      "kind": "attack",
+      "id": "weapon",
+      "label": "Two-handed weapon",
+      "choices": [
+        {
+          "id": "greataxe",
+          "label": "Greataxe",
+          "value": {
+            "name": "Greataxe",
+            "kind": "weapon",
+            "ability": "str",
+            "dice": "1d12",
+            "damageType": "slashing",
+            "properties": [
+              "Heavy",
+              "Two-Handed"
+            ],
+            "mastery": "Cleave"
+          }
+        },
+        {
+          "id": "maul",
+          "label": "Maul",
+          "value": {
+            "name": "Maul",
+            "kind": "weapon",
+            "ability": "str",
+            "dice": "2d6",
+            "damageType": "bludgeoning",
+            "properties": [
+              "Heavy",
+              "Two-Handed"
+            ],
+            "mastery": "Topple"
+          }
+        },
+        {
+          "id": "pike",
+          "label": "Boat pike",
+          "value": {
+            "name": "Pike",
+            "kind": "weapon",
+            "ability": "str",
+            "dice": "1d10",
+            "damageType": "piercing",
+            "range": "Reach 10 ft",
+            "properties": [
+              "Heavy",
+              "Reach",
+              "Two-Handed"
+            ],
+            "mastery": "Push"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Keepsake",
+      "choices": [
+        {
+          "id": "hatchet",
+          "label": "Boat-hatchet",
+          "value": "A notched boat-hatchet on a cord around his neck, which he won't explain"
+        },
+        {
+          "id": "whistle",
+          "label": "Bosun's whistle",
+          "value": "A brass bosun's whistle, dented, that belonged to the best of his crew"
+        },
+        {
+          "id": "knots",
+          "label": "Seven knots",
+          "value": "A loop of tarred cord with seven knots, one for each name"
+        }
+      ]
+    }
+  ]
+}

@@ -1,8 +1,21 @@
 import fs from "node:fs";
 import type { z } from "zod";
 import path from "node:path";
-import { characterSchema, oneShotSchema, type Character, type OneShot, type OneShotWithCast } from "./schema";
+import {
+  characterSchema,
+  oneShotSchema,
+  spellBookSchema,
+  variantCharacterSchema,
+  type Character,
+  type OneShot,
+  type OneShotWithCast,
+  type SpellInfo,
+  type VariantCharacter,
+} from "./schema";
 import { totalLevel } from "./derive";
+import { rulesCheck } from "./rules";
+import { withVariant } from "./variants";
+import { spellNames } from "./cards";
 
 /**
  * Content lives in git as JSON:
@@ -14,6 +27,16 @@ import { totalLevel } from "./derive";
 
 // Read only at build time (every page is SSG), so keep it out of server file tracing.
 export const CONTENT_ROOT = path.join(/*turbopackIgnore: true*/ process.cwd(), "content", "oneshots");
+/** Paraphrased spell text for the card printables. */
+export const SPELL_BOOK = path.join(/*turbopackIgnore: true*/ process.cwd(), "content", "rules", "spells.json");
+
+let book: Record<string, SpellInfo> | null = null;
+
+export function loadSpellBook(file = SPELL_BOOK): Record<string, SpellInfo> {
+  if (file !== SPELL_BOOK) return parse(spellBookSchema, file);
+  book ??= parse(spellBookSchema, file);
+  return book;
+}
 
 function readJson(file: string): unknown {
   try {
@@ -33,7 +56,7 @@ function parse<S extends z.ZodTypeAny>(schema: S, file: string): z.infer<S> {
 }
 
 /** Character ids that would collide with pages under /<oneshot>/. */
-const RESERVED_IDS = ["print", "flyer", "gm", "tv", "epilogue", "sounds"];
+const RESERVED_IDS = ["print", "flyer", "gm", "tv", "epilogue", "sounds", "cards", "tents"];
 
 /** Problems that Zod alone can't see. Returns human-readable messages. */
 export function crossCheck(os: OneShot, cast: Character[]): string[] {
@@ -51,6 +74,7 @@ export function crossCheck(os: OneShot, cast: Character[]): string[] {
     const at = `${c.id}:`;
     if (RESERVED_IDS.includes(c.id)) errs.push(`${at} id clashes with the /${c.id} page`);
     if (totalLevel(c) !== os.level) errs.push(`${at} level ${totalLevel(c)} but one-shot is level ${os.level}`);
+    else errs.push(...rulesCheck(c, os.ruleset));
     if (c.mech.saves.length !== 2) errs.push(`${at} expected 2 saving throw proficiencies`);
     for (const t of c.story.ties) {
       if (t.to === c.id) errs.push(`${at} tie to self`);
@@ -119,8 +143,41 @@ export function loadOneShot(slug: string, root = CONTENT_ROOT): OneShotWithCast 
   });
   cast.sort((a, b) => a.order - b.order);
   const errs = crossCheck(os, cast);
+
+  // Level variants: every declared level has mechanics for the whole cast, and
+  // each level passes the same checks as the base.
+  const variants = os.variants.map((v) => {
+    const vdir = path.join(dir, "variants", String(v.level));
+    const vfiles = fs.existsSync(vdir) ? fs.readdirSync(vdir).filter((f) => f.endsWith(".json")) : [];
+    const chars: VariantCharacter[] = vfiles.map((f) => {
+      const vc = parse(variantCharacterSchema, path.join(vdir, f));
+      if (`${vc.id}.json` !== f) throw new Error(`${slug}/variants/${v.level}/${f}: id "${vc.id}" doesn't match filename`);
+      return vc;
+    });
+    const shape: string[] = [];
+    if (v.level === os.level) shape.push("variant repeats the base level");
+    for (const c of cast) if (!chars.some((x) => x.id === c.id)) shape.push(`no variants/${v.level}/${c.id}.json`);
+    for (const x of chars) if (!cast.some((c) => c.id === x.id)) shape.push(`${x.id} isn't in the cast`);
+    if (shape.length === 0) {
+      const merged = withVariant({ ...os, cast, variants: [{ ...v, cast: chars }] }, v.level);
+      shape.push(...crossCheck(merged, merged.cast));
+    }
+    errs.push(...shape.map((e) => `level ${v.level}: ${e}`));
+    return { ...v, cast: chars };
+  });
+  if (new Set(os.variants.map((v) => v.level)).size !== os.variants.length) errs.push("duplicate variant levels");
+  const vroot = path.join(dir, "variants");
+  if (fs.existsSync(vroot))
+    for (const d of fs.readdirSync(vroot))
+      if (!os.variants.some((v) => String(v.level) === d)) errs.push(`variants/${d} isn't declared in oneshot.json`);
+
+  // Every spell at every level needs card text.
+  const spells = loadSpellBook();
+  for (const name of spellNames(castsAtEveryLevel({ cast, variants })))
+    if (!spells[name]) errs.push(`spell "${name}" isn't in content/rules/spells.json (the cards need its text)`);
+
   if (errs.length) throw new Error(`${slug} failed checks:\n  ${errs.join("\n  ")}`);
-  return { ...os, cast };
+  return { ...os, cast, variants };
 }
 
 export function listSlugs(root = CONTENT_ROOT): string[] {
@@ -157,4 +214,14 @@ export function publishedSlugs(root = CONTENT_ROOT): string[] {
 
 export function loadAll(root = CONTENT_ROOT): OneShotWithCast[] {
   return publishedSlugs(root).map((s) => loadOneShot(s, root));
+}
+
+function castsAtEveryLevel(os: Pick<OneShotWithCast, "cast" | "variants">) {
+  return [os.cast, ...os.variants.map((v) => v.cast.map((x) => ({ ...x, options: x.options ?? [] })))];
+}
+
+/** Just the spells a one-shot uses at any level, for its cards pages. */
+export function spellBookFor(os: OneShotWithCast): Record<string, SpellInfo> {
+  const all = loadSpellBook();
+  return Object.fromEntries(spellNames(castsAtEveryLevel(os)).map((n) => [n, all[n]]));
 }

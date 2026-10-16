@@ -13,14 +13,14 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "pdf": "tsx scripts/pdf.mts",
+    "print-check": "tsx scripts/print-check.mts",
+    "a11y-check": "tsx scripts/a11y-check.mts",
     "validate": "tsx scripts/validate.ts",
     "db:dev": "prisma dev --name tearoff --detach",
     "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy",
-    "import-draft": "tsx scripts/import-draft.ts"
+    "db:deploy": "prisma migrate deploy"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.134.0",
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/server": "^11.11.0",
@@ -39,6 +39,7 @@
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "axe-core": "4.14.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.4.1",
     "playwright": "^1.63.0",

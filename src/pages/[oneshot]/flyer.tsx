@@ -6,6 +6,7 @@ import { Box, Button, Container, Typography } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import { loadOneShot, publishedSlugs } from "@/lib/content";
 import { toPublic, type PublicOneShot } from "@/lib/public";
+import { useLevel } from "@/lib/storage";
 import { SiteHeader } from "@/components/SiteHeader";
 import f from "@/components/flyer/Flyer.module.css";
 
@@ -19,7 +20,8 @@ export const getStaticProps: GetStaticProps<{ os: PublicOneShot }> = async ({ pa
 });
 
 /** The physical version of the board: a flyer with one tear-off strip per character. */
-export default function FlyerPage({ os }: { os: PublicOneShot }) {
+export default function FlyerPage({ os: base }: { os: PublicOneShot }) {
+  const { os, level } = useLevel(base);
   const [qrs, setQrs] = useState<Record<string, string>>({});
 
   // QR targets depend on where the site is deployed, so build them in the browser.
@@ -27,7 +29,8 @@ export default function FlyerPage({ os }: { os: PublicOneShot }) {
     let alive = true;
     Promise.all(
       os.cast.map(async (c) => {
-        const url = `${window.location.origin}/${os.slug}/${c.id}`;
+        // Off the written level, the strip carries the level so the sheet opens at it.
+        const url = `${window.location.origin}/${os.slug}/${c.id}${level === base.level ? "" : `?level=${level}`}`;
         const svg = await QRCode.toString(url, { type: "svg", margin: 0, errorCorrectionLevel: "M", color: { dark: "#1b1209", light: "#0000" } });
         return [c.id, svg] as const;
       }),
@@ -35,7 +38,7 @@ export default function FlyerPage({ os }: { os: PublicOneShot }) {
     return () => {
       alive = false;
     };
-  }, [os]);
+  }, [os, level, base.level]);
 
   return (
     <>
@@ -54,7 +57,7 @@ export default function FlyerPage({ os }: { os: PublicOneShot }) {
           </Button>
         </Box>
 
-        <article className={f.flyer}>
+        <article className={f.flyer} id="main">
           <div className={f.header}>{os.posting.header}</div>
           <h1 className={f.title}>{os.title}</h1>
           <p className={f.premise}>{os.premise}</p>

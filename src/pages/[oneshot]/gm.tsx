@@ -6,7 +6,8 @@ import { Alert, Box, Button, Container, Typography } from "@mui/material";
 import { requestRole } from "@/lib/auth";
 import { loadOneShot } from "@/lib/content";
 import type { OneShotWithCast } from "@/lib/schema";
-import { useClaims } from "@/lib/storage";
+import { useClaims, useLevel } from "@/lib/storage";
+import { LevelPicker } from "@/components/board/LevelPicker";
 import { SiteHeader } from "@/components/SiteHeader";
 import { GmTablePanels } from "@/components/gm/GmTablePanels";
 import s from "@/components/board/Board.module.css";
@@ -37,7 +38,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
 
 const mono = { fontFamily: "var(--font-print)", fontSize: 16 } as const;
 
-export default function GmPage({ os }: Props) {
+export default function GmPage({ os: base }: Props) {
+  const { os, level, setLevel, levels } = useLevel(base);
+  const levelQuery = level === base.level ? "" : `&level=${level}`;
   const claims = useClaims(os.slug);
   const { table, claimedBy, loading, error, openTable, leave, release } = claims;
   const [problem, setProblem] = useState<string | null>(null);
@@ -59,7 +62,7 @@ export default function GmPage({ os }: Props) {
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={{ href: `/${os.slug}`, label: os.title }} />
 
-        <div className={s.frame}>
+        <main id="main" className={s.frame}>
           <div className={s.grid} style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))" }}>
             <div className={s.note} style={{ ["--tilt" as string]: "-0.6deg" }}>
               <span className={s.brassPin} aria-hidden="true" />
@@ -67,6 +70,7 @@ export default function GmPage({ os }: Props) {
               <h1 className={s.postingTitle} style={{ fontSize: "clamp(26px, 4vw, 38px)" }}>
                 {os.title}
               </h1>
+              <LevelPicker levels={levels} level={level} onChange={setLevel} />
               {table ? (
                 <>
                   <Typography sx={{ ...mono, mt: 1 }}>Read this out — players join with it on the job page:</Typography>
@@ -77,7 +81,8 @@ export default function GmPage({ os }: Props) {
                     {table}
                   </Typography>
                   <Typography sx={{ ...mono, fontSize: 14, color: "var(--ink-soft)" }}>
-                    Or share <Link href={`/${os.slug}?table=${table}`}>{`/${os.slug}?table=${table}`}</Link>
+                    Or share{" "}
+                    <Link href={`/${os.slug}?table=${table}${levelQuery}`}>{`/${os.slug}?table=${table}${levelQuery}`}</Link>
                   </Typography>
                   <Box sx={{ display: "flex", gap: 1, mt: 1.5, flexWrap: "wrap" }}>
                     <Button size="small" variant="outlined" onClick={open} disabled={busy} sx={{ color: "var(--ink)", borderColor: "var(--ink-soft)" }}>
@@ -108,7 +113,7 @@ export default function GmPage({ os }: Props) {
 
             <div className={s.note} style={{ ["--tilt" as string]: "0.8deg" }}>
               <span className={s.pin} aria-hidden="true" />
-              <p className={s.noteTitle}>Who&apos;s playing whom</p>
+              <h2 className={s.noteTitle}>Who&apos;s playing whom</h2>
               {!table && <Typography sx={mono}>No table open — claims will show here live.</Typography>}
               {table && loading && <Typography sx={mono}>Asking the table…</Typography>}
               {table && !loading && (
@@ -140,7 +145,7 @@ export default function GmPage({ os }: Props) {
           {os.gmNotes && (
             <div className={s.note} style={{ ["--tilt" as string]: "-0.3deg", marginTop: 32 }}>
               <span className={s.pin} aria-hidden="true" />
-              <p className={s.noteTitle}>GM notes</p>
+              <h2 className={s.noteTitle}>GM notes</h2>
               <Typography sx={{ ...mono, whiteSpace: "pre-wrap" }}>{os.gmNotes}</Typography>
             </div>
           )}
@@ -152,10 +157,10 @@ export default function GmPage({ os }: Props) {
             {os.cast.map((c, i) => (
               <div key={c.id} className={s.note} style={{ ["--tilt" as string]: `${i % 2 ? 0.7 : -0.7}deg` }}>
                 <span className={s.pin} aria-hidden="true" />
-                <p className={s.noteTitle} style={{ marginBottom: 0 }}>
+                <h3 className={s.noteTitle} style={{ marginBottom: 0 }}>
                   {c.name}
                   {c.poster.alias && <span style={{ fontSize: 15 }}> (board: {c.poster.alias})</span>}
-                </p>
+                </h3>
                 <div className={s.meta} style={{ marginBottom: 8 }}>
                   <span>{c.poster.epithet}</span>
                   <span>{c.mech.classes.map((k) => `${k.name} ${k.level}`).join(" / ")}</span>
@@ -179,13 +184,19 @@ export default function GmPage({ os }: Props) {
                     </li>
                   ))}
                 </ul>
-                <Button component={Link} href={`/${os.slug}/${c.id}`} size="small" sx={{ color: "var(--ink-soft)", mt: 1 }}>
+                <Button
+                  component={Link}
+                  href={`/${os.slug}/${c.id}`}
+                  size="small"
+                  aria-label={`Open sheet: ${c.name}`}
+                  sx={{ color: "var(--ink-soft)", mt: 1 }}
+                >
                   Open sheet
                 </Button>
               </div>
             ))}
           </div>
-        </div>
+        </main>
       </Container>
     </>
   );

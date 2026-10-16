@@ -1,0 +1,334 @@
+{
+  "id": "sister-vell",
+  "mech": {
+    "species": "Human",
+    "background": "Acolyte",
+    "classes": [
+      {
+        "name": "Cleric",
+        "subclass": "Life Domain",
+        "level": 3
+      }
+    ],
+    "abilities": {
+      "str": 13,
+      "dex": 10,
+      "con": 14,
+      "int": 8,
+      "wis": 17,
+      "cha": 13
+    },
+    "saves": [
+      "wis",
+      "cha"
+    ],
+    "skills": [
+      "insight",
+      "religion",
+      "medicine",
+      "persuasion",
+      "perception"
+    ],
+    "hp": 24,
+    "ac": {
+      "value": 18,
+      "note": "Chain mail + shield"
+    },
+    "speed": 30,
+    "languages": [
+      "Common",
+      "Primordial",
+      "Celestial"
+    ],
+    "tools": [
+      "Calligrapher's Supplies"
+    ],
+    "armorTraining": [
+      "Light",
+      "Medium",
+      "Heavy",
+      "Shields"
+    ],
+    "weaponTraining": [
+      "Simple",
+      "Martial"
+    ],
+    "originFeat": "Magic Initiate (Cleric)",
+    "feats": [
+      "Healer (Human Versatile)"
+    ],
+    "features": [
+      {
+        "name": "Resourceful",
+        "source": "species",
+        "text": "You gain Heroic Inspiration whenever you finish a Long Rest."
+      },
+      {
+        "name": "Divine Order: Protector",
+        "source": "class",
+        "text": "Trained for battle: you have Martial weapon and Heavy armor training."
+      },
+      {
+        "name": "Channel Divinity",
+        "source": "class",
+        "text": "Two uses; regain one on a Short Rest and all on a Long Rest. Options: Divine Spark, Turn Undead, Preserve Life.",
+        "uses": {
+          "max": 2,
+          "per": "long"
+        }
+      },
+      {
+        "name": "Divine Spark",
+        "source": "class",
+        "text": "Magic action: point your holy symbol at a creature within 30 ft. Roll 1d8 + 3 and either heal it that much or deal that much Necrotic or Radiant damage (Con save for half)."
+      },
+      {
+        "name": "Turn Undead",
+        "source": "class",
+        "text": "Magic action: each Undead of your choice within 30 ft makes a Wis save against your spell DC or is Frightened and Incapacitated for 1 minute (ends if it takes damage)."
+      },
+      {
+        "name": "Disciple of Life",
+        "source": "subclass",
+        "text": "When a spell you cast with a slot restores HP, the target regains extra HP equal to 2 + the slot level."
+      },
+      {
+        "name": "Preserve Life",
+        "source": "subclass",
+        "text": "Channel Divinity: restore up to 15 HP, divided among creatures within 30 ft who are Bloodied (none can be raised above half their HP max)."
+      },
+      {
+        "name": "Healer: Battle Medic",
+        "source": "feat",
+        "text": "Utilize action with a Healer's Kit: a creature within reach can spend one Hit Die; it regains that roll + 2 HP. You also reroll any 1s on healing dice."
+      },
+      {
+        "name": "Magic Initiate",
+        "source": "feat",
+        "text": "Light and Thaumaturgy cantrips; cast Sanctuary once per Long Rest without a slot.",
+        "uses": {
+          "max": 1,
+          "per": "long"
+        }
+      }
+    ],
+    "attacks": [
+      {
+        "name": "Warhammer (Matins)",
+        "kind": "weapon",
+        "ability": "str",
+        "dice": "1d8",
+        "damageType": "bludgeoning",
+        "properties": [
+          "Versatile (1d10)"
+        ]
+      },
+      {
+        "name": "Toll the Dead",
+        "kind": "spell",
+        "ability": "wis",
+        "save": "wis",
+        "dice": "1d8",
+        "damageType": "necrotic",
+        "addMod": false,
+        "range": "60 ft",
+        "note": "1d12 if the target is missing any HP",
+        "option": "bell-cantrip"
+      },
+      {
+        "name": "Sacred Flame",
+        "kind": "spell",
+        "ability": "wis",
+        "save": "dex",
+        "dice": "1d8",
+        "damageType": "radiant",
+        "addMod": false,
+        "range": "60 ft",
+        "note": "No benefit from cover"
+      }
+    ],
+    "spellcasting": {
+      "ability": "wis",
+      "slots": [
+        4,
+        2
+      ],
+      "spells": [
+        {
+          "name": "Guidance",
+          "level": 0
+        },
+        {
+          "name": "Sacred Flame",
+          "level": 0
+        },
+        {
+          "name": "Toll the Dead",
+          "level": 0,
+          "option": "bell-cantrip"
+        },
+        {
+          "name": "Light",
+          "level": 0,
+          "note": "Magic Initiate"
+        },
+        {
+          "name": "Thaumaturgy",
+          "level": 0,
+          "note": "Magic Initiate"
+        },
+        {
+          "name": "Bless",
+          "level": 1,
+          "always": true
+        },
+        {
+          "name": "Cure Wounds",
+          "level": 1,
+          "always": true
+        },
+        {
+          "name": "Sanctuary",
+          "level": 1,
+          "always": true,
+          "note": "Magic Initiate; 1/long rest without a slot"
+        },
+        {
+          "name": "Healing Word",
+          "level": 1
+        },
+        {
+          "name": "Guiding Bolt",
+          "level": 1
+        },
+        {
+          "name": "Shield of Faith",
+          "level": 1
+        },
+        {
+          "name": "Command",
+          "level": 1
+        },
+        {
+          "name": "Protection from Evil and Good",
+          "level": 1
+        },
+        {
+          "name": "Aid",
+          "level": 2,
+          "always": true
+        },
+        {
+          "name": "Lesser Restoration",
+          "level": 2,
+          "always": true
+        },
+        {
+          "name": "Spiritual Weapon",
+          "level": 2
+        }
+      ],
+      "note": "Prepares 6 cleric spells after a Long Rest; domain spells are always prepared."
+    },
+    "equipment": [
+      {
+        "name": "Chain Mail",
+        "equipped": true
+      },
+      {
+        "name": "Shield",
+        "equipped": true,
+        "note": "Painted with a bell"
+      },
+      {
+        "name": "Warhammer",
+        "equipped": true
+      },
+      {
+        "name": "Holy Symbol",
+        "note": "Bell-shaped amulet"
+      },
+      {
+        "name": "Healer's Kit",
+        "note": "10 uses"
+      },
+      {
+        "name": "Priest's Pack"
+      },
+      {
+        "name": "Bell-rope, 50 ft",
+        "note": "Hemp, tarred"
+      }
+    ],
+    "gold": 15
+  },
+  "options": [
+    {
+      "kind": "spell",
+      "id": "bell-cantrip",
+      "label": "Signature cantrip",
+      "choices": [
+        {
+          "id": "toll",
+          "label": "Toll the Dead",
+          "value": {
+            "name": "Toll the Dead",
+            "level": 0
+          },
+          "attack": {
+            "name": "Toll the Dead",
+            "kind": "spell",
+            "ability": "wis",
+            "save": "wis",
+            "dice": "1d8",
+            "damageType": "necrotic",
+            "addMod": false,
+            "range": "60 ft",
+            "note": "1d12 if the target is missing any HP"
+          }
+        },
+        {
+          "id": "word",
+          "label": "Word of Radiance",
+          "value": {
+            "name": "Word of Radiance",
+            "level": 0
+          },
+          "attack": {
+            "name": "Word of Radiance",
+            "kind": "spell",
+            "ability": "wis",
+            "save": "con",
+            "dice": "1d6",
+            "damageType": "radiant",
+            "addMod": false,
+            "range": "5-ft emanation",
+            "note": "Each creature of your choice you can see within 5 ft"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "trinket",
+      "id": "trinket",
+      "label": "Keepsake",
+      "choices": [
+        {
+          "id": "clapper",
+          "label": "Clapper-tongue",
+          "value": "A clapper-tongue from the bell's first casting, worn smooth"
+        },
+        {
+          "id": "letter",
+          "label": "Unsent letter",
+          "value": "An unsent letter to a sister in a far-off convent"
+        },
+        {
+          "id": "shell",
+          "label": "Rook's shell",
+          "value": "A cockle shell nine-year-old Rook gave her as thanks"
+        }
+      ]
+    }
+  ]
+}

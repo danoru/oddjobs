@@ -104,5 +104,6 @@
       "text": "You have carried this scrap since the black night in the boat and never read it by lamplight. Read it now. It is not a hymn. It is a lullaby, sung to a sleeper by the one who owns her, and the last verse is the only one that answers back. 'Sleep, you who counted the keel, let the rope go slack and kneel. One shall stay and one shall sing; neither is the sea's to bring.' It works in whoever's voice sings it, and it costs them the same. Choose the voice well."
     }
   ],
-  "content": { "sources": ["PHB 2024"], "warnings": ["undead", "drowning"] }
+  "content": { "sources": ["PHB 2024"], "warnings": ["undead", "drowning"] },
+  "variants": [{ "level": 3, "note": "Greener hands: a year or two before they were any good at this." }]
 }

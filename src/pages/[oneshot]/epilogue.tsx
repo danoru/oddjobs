@@ -58,6 +58,8 @@ export default function EpiloguePage({ os }: { os: PublicOneShot }) {
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={{ href: `/${os.slug}`, label: os.title }} />
+        {/* Where the header's skip link lands. */}
+        <div id="main" tabIndex={-1} />
         <Box
           sx={{
             display: "grid",

@@ -61,6 +61,7 @@
 
 .sectionTitle {
   composes: label;
+  font-weight: normal;
   font-size: 12.5px;
   color: var(--ink);
   border-bottom: 1px solid var(--ink);
@@ -329,6 +330,18 @@
   }
 }
 
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 @media print {
   .sheet {
     font-size: 8.9pt;
@@ -379,5 +392,112 @@
   .ability,
   .vital {
     background: none;
+  }
+}
+
+/* ---- Reading modes (src/lib/reading.ts), set per viewer ---------------------
+   They sit on .sheet and combine freely. Colours and fonts are swapped through
+   the theme variables, so every rule above follows without being repeated. */
+
+/* Large print: the whole sheet scaled up and reflowed. On paper each face
+   then runs to two pages, which is the price of the bigger type. */
+.sheet[data-large] .page {
+  zoom: 1.35;
+}
+
+@media print {
+  .sheet[data-large] .page {
+    zoom: 1.3;
+  }
+  /* Let a face break between sections rather than mid-feature. */
+  .sheet[data-large] .cols,
+  .sheet[data-large] .storyGrid {
+    display: block;
+  }
+  .sheet[data-large] .features {
+    columns: 1;
+  }
+}
+
+.sheet[data-contrast] {
+  --ink: #000;
+  --ink-soft: #1d1d1d;
+  --wax: #000;
+  --parchment: #fff;
+  color: #000;
+}
+
+.sheet[data-contrast] .page {
+  background: #fff;
+  box-shadow: 0 0 0 3px #000;
+}
+
+.sheet[data-contrast] .ability,
+.sheet[data-contrast] .vital {
+  background: #fff;
+  border-width: 2.5px;
+}
+
+.sheet[data-contrast] .sectionTitle {
+  border-bottom-width: 2px;
+}
+
+.sheet[data-contrast] .table td {
+  border-bottom: 1px solid #000;
+}
+
+.sheet[data-contrast] .muted,
+.sheet[data-contrast] .vitalNote,
+.sheet[data-contrast] .label {
+  color: #000;
+}
+
+.sheet[data-contrast] .secret {
+  border: 3px dashed #000;
+}
+
+.sheet[data-contrast] .sealDisc {
+  background: #000;
+  color: #fff;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 3px #000;
+}
+
+.sheet[data-dyslexia] {
+  --font-print: var(--font-legible);
+  --font-sheet: var(--font-legible);
+  --font-label: var(--font-legible);
+  --font-poster: var(--font-legible);
+  letter-spacing: 0.02em;
+  word-spacing: 0.12em;
+  line-height: 1.55;
+}
+
+.sheet[data-dyslexia] * {
+  font-style: normal !important;
+}
+
+.sheet[data-dyslexia] .label,
+.sheet[data-dyslexia] .table th {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 12.5px;
+}
+
+.sheet[data-dyslexia] .name {
+  font-weight: 700;
+}
+
+@media print {
+  /* Still roomier than the plain sheet, but each face keeps to one page. */
+  .sheet[data-dyslexia] {
+    font-size: 8.6pt;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    word-spacing: 0.06em;
+  }
+  .sheet[data-dyslexia] .label,
+  .sheet[data-dyslexia] .table th {
+    font-size: 10.5px;
   }
 }

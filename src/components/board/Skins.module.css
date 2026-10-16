@@ -1,0 +1,653 @@
+/*
+ * Skins for a one-shot's job page and posters (oneshot.json "skin").
+ * The notice board (Board.module.css) is the base; a skin restyles it through
+ * the data-part hooks on each element, under .skinned[data-skin=…], which
+ * outranks the base classes without !important. Colours that the page's MUI
+ * bits read (--ink, --ink-soft) are re-pointed per skin where the paper is dark.
+ *
+ *   dossier  — noir/horror: case files paper-clipped on a green desk blotter.
+ *   playbill — intrigue: a theatre bill and its company on red velvet.
+ *   tarot    — fey/cosmic: a spread of gilt cards on a star cloth.
+ */
+
+.skinned {
+  /* hook for the selectors below */
+}
+
+/* ======================================================================== */
+/* DOSSIER                                                                  */
+/* ======================================================================== */
+
+.skinned[data-skin="dossier"][data-part="frame"] {
+  border-color: #2e2a22;
+  outline-color: #15130f;
+  box-shadow:
+    inset 0 0 0 2px #4a4334,
+    inset 0 0 80px rgba(0, 0, 0, 0.55),
+    0 24px 50px rgba(0, 0, 0, 0.55);
+  background-color: #2c4636;
+  background-image:
+    radial-gradient(ellipse at 18% 8%, rgba(255, 240, 200, 0.18), transparent 45%),
+    radial-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 1.4px),
+    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1.4px);
+  background-size: auto, 5px 5px, 9px 9px;
+  background-position: 0 0, 0 0, 2px 3px;
+}
+
+.skinned[data-skin="dossier"] [data-part="posting"] {
+  margin-top: 26px;
+  background-color: #dcc28a;
+  background-image:
+    radial-gradient(ellipse at 15% 10%, rgba(255, 255, 255, 0.35), transparent 60%),
+    linear-gradient(180deg, rgba(120, 80, 20, 0.08), transparent 30%);
+  border-radius: 0 3px 3px 3px;
+  font-family: var(--font-typewriter);
+}
+
+/* The folder's tab, sticking up from the top-left corner. */
+.skinned[data-skin="dossier"] [data-part="posting"]::before {
+  content: "CASE FILE";
+  position: absolute;
+  left: 0;
+  top: -26px;
+  height: 26px;
+  padding: 4px 22px 0 14px;
+  background: #dcc28a;
+  border-radius: 6px 14px 0 0;
+  font-family: var(--font-typewriter);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--ink-soft);
+}
+
+.skinned[data-skin="dossier"] [data-part="posting"]::after {
+  content: "CONFIDENTIAL";
+  position: absolute;
+  right: 22px;
+  top: 52px;
+  transform: rotate(-9deg);
+  border: 3px solid rgba(158, 47, 34, 0.75);
+  color: rgba(158, 47, 34, 0.75);
+  padding: 2px 10px;
+  font-family: var(--font-typewriter);
+  font-size: 22px;
+  letter-spacing: 0.18em;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.skinned[data-skin="dossier"] [data-part="postingHeader"] {
+  font-family: var(--font-typewriter);
+  text-align: left;
+  letter-spacing: 0.12em;
+  border-bottom: 1px solid rgba(43, 29, 14, 0.5);
+}
+
+.skinned[data-skin="dossier"] [data-part="postingTitle"] {
+  font-family: var(--font-typewriter);
+  text-transform: uppercase;
+  text-align: left;
+  letter-spacing: 0.04em;
+}
+
+.skinned[data-skin="dossier"] [data-part="postingPitch"] {
+  font-family: var(--font-typewriter);
+  font-size: 16px !important;
+  line-height: 1.55;
+}
+
+.skinned[data-skin="dossier"] [data-part="meta"],
+.skinned[data-skin="dossier"] [data-part="reward"] {
+  font-family: var(--font-typewriter);
+  font-style: normal;
+}
+
+.skinned[data-skin="dossier"] [data-part="rulesStamp"] {
+  font-family: var(--font-typewriter);
+  border-radius: 0;
+  border-width: 3px;
+  color: var(--wax);
+  mix-blend-mode: multiply;
+}
+
+/* Pins become paper clips. */
+.skinned[data-skin="dossier"] [data-part="pin"] {
+  top: -14px;
+  left: 26px;
+  margin: 0;
+  width: 14px;
+  height: 46px;
+  border-radius: 7px;
+  border: 2.5px solid #a7adb3;
+  background: none;
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.35);
+  transform: rotate(-6deg);
+}
+
+.skinned[data-skin="dossier"] [data-part="pin"]::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 6px;
+  bottom: 10px;
+  border: 2px solid #c3c8cd;
+  border-radius: 5px;
+}
+
+.skinned[data-skin="dossier"] [data-part="poster"],
+.skinned[data-skin="dossier"] [data-part="note"] {
+  background-color: #f3eedf;
+  background-image:
+    linear-gradient(180deg, transparent 0 46px, rgba(158, 47, 34, 0.45) 46px 47px, transparent 47px),
+    repeating-linear-gradient(180deg, transparent 0 23px, rgba(60, 90, 140, 0.16) 23px 24px);
+  background-position: 0 0, 0 47px;
+  text-align: left;
+  border-radius: 2px;
+}
+
+.skinned[data-skin="dossier"] [data-part="poster"] {
+  padding-top: 18px;
+}
+
+/* WANTED becomes a rubber stamp. */
+.skinned[data-skin="dossier"] [data-part="posterHeader"] {
+  display: inline-block;
+  margin-left: 36px;
+  font-family: var(--font-typewriter);
+  font-size: 22px;
+  letter-spacing: 0.16em;
+  color: var(--wax);
+  border: 3px solid currentColor;
+  border-bottom: 3px solid currentColor;
+  padding: 2px 8px 0;
+  transform: rotate(-5deg);
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+}
+
+/* The mugshot: a white-bordered photo, clipped on at an angle. */
+.skinned[data-skin="dossier"] [data-part="engraving"] {
+  margin: 14px 0 10px auto;
+  width: 104px;
+  height: 104px;
+  border: 6px solid #fdfbf5;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  transform: rotate(2.5deg);
+  background: #e7e1d1;
+}
+
+.skinned[data-skin="dossier"] [data-part="posterName"] {
+  font-family: var(--font-typewriter);
+  font-size: 19px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.skinned[data-skin="dossier"] [data-part="posterEpithet"],
+.skinned[data-skin="dossier"] [data-part="posterTag"],
+.skinned[data-skin="dossier"] [data-part="posterReward"] {
+  font-family: var(--font-typewriter);
+  font-style: normal;
+  font-size: 14px;
+}
+
+.skinned[data-skin="dossier"] [data-part="posterHook"] {
+  font-family: var(--font-typewriter);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 8px 0;
+}
+
+.skinned[data-skin="dossier"] [data-part="strip"],
+.skinned[data-skin="dossier"] [data-part="unclaim"],
+.skinned[data-skin="dossier"] [data-part="heldBy"] {
+  font-family: var(--font-typewriter);
+  letter-spacing: 0.1em;
+}
+
+.skinned[data-skin="dossier"] [data-part="coreTag"] {
+  font-family: var(--font-typewriter);
+  background: #9e2f22;
+  color: #fff7ea;
+  left: auto;
+  right: -8px;
+  transform: rotate(6deg);
+}
+
+.skinned[data-skin="dossier"] [data-part="claimedStamp"] {
+  font-family: var(--font-typewriter);
+  border-radius: 0;
+  letter-spacing: 0.2em;
+}
+
+.skinned[data-skin="dossier"] [data-part="noteTitle"] {
+  font-family: var(--font-typewriter);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 19px;
+  line-height: 1.25;
+  min-height: 46px;
+  box-sizing: border-box;
+  margin-top: -12px;
+  padding-top: 14px;
+  margin-bottom: 12px;
+}
+
+/* ======================================================================== */
+/* PLAYBILL                                                                 */
+/* ======================================================================== */
+
+.skinned[data-skin="playbill"][data-part="frame"] {
+  border-color: #8a6420;
+  outline-color: #3a2606;
+  box-shadow:
+    inset 0 0 0 2px #e2bd63,
+    inset 0 0 0 6px #6b4a12,
+    inset 0 0 90px rgba(0, 0, 0, 0.6),
+    0 24px 50px rgba(0, 0, 0, 0.55);
+  background-color: #5c0f16;
+  background-image:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 18%, transparent 82%, rgba(0, 0, 0, 0.5)),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.32) 0,
+      rgba(255, 120, 120, 0.06) 22px,
+      rgba(0, 0, 0, 0.32) 44px
+    );
+}
+
+.skinned[data-skin="playbill"] [data-part="posting"],
+.skinned[data-skin="playbill"] [data-part="poster"],
+.skinned[data-skin="playbill"] [data-part="note"] {
+  background-color: #f6eedb;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.6), transparent 60%),
+    radial-gradient(ellipse at 50% 100%, rgba(150, 100, 40, 0.14), transparent 55%);
+  box-shadow:
+    inset 0 0 0 7px #f6eedb,
+    inset 0 0 0 8px var(--ink),
+    inset 0 0 0 11px #f6eedb,
+    inset 0 0 0 12px var(--ink),
+    0 10px 22px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.skinned[data-skin="playbill"] [data-part="posting"] {
+  padding: 40px clamp(20px, 5vw, 56px) 28px;
+}
+
+.skinned[data-skin="playbill"] [data-part="postingHeader"] {
+  font-family: var(--font-playbill-text);
+  font-variant: small-caps;
+  font-size: 16px;
+  letter-spacing: 0.24em;
+  border: 0;
+}
+
+.skinned[data-skin="playbill"] [data-part="postingHeader"]::before,
+.skinned[data-skin="playbill"] [data-part="postingHeader"]::after {
+  content: " ❦ ";
+  color: var(--wax);
+}
+
+.skinned[data-skin="playbill"] [data-part="postingTitle"] {
+  font-family: var(--font-playbill);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  border-top: 3px double var(--ink);
+  border-bottom: 3px double var(--ink);
+  padding: 10px 0;
+}
+
+.skinned[data-skin="playbill"] [data-part="postingPitch"] {
+  font-family: var(--font-playbill-text);
+  font-style: italic;
+  font-size: 18px !important;
+  max-width: 46em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.skinned[data-skin="playbill"] [data-part="meta"] {
+  justify-content: center;
+  font-family: var(--font-playbill-text);
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+}
+
+.skinned[data-skin="playbill"] [data-part="meta"] > span + span::before {
+  content: "✦ ";
+  color: var(--wax);
+}
+
+.skinned[data-skin="playbill"] [data-part="reward"] {
+  font-family: var(--font-playbill-text);
+}
+
+.skinned[data-skin="playbill"] [data-part="levels"] {
+  justify-content: center;
+}
+
+.skinned[data-skin="playbill"] [data-part="rulesStamp"] {
+  font-family: var(--font-playbill-text);
+  font-variant: small-caps;
+  border-radius: 50%;
+  padding: 10px 6px;
+  top: auto;
+  bottom: 26px;
+  right: 26px;
+  line-height: 1;
+}
+
+/* Gilt tacks instead of red pins. */
+.skinned[data-skin="playbill"] [data-part="pin"] {
+  background: radial-gradient(circle at 35% 30%, #fff4cf, #d9ad4f 45%, #6b4a12);
+  top: 16px;
+}
+
+.skinned[data-skin="playbill"] [data-part="poster"] {
+  padding: 34px 20px 0;
+}
+
+.skinned[data-skin="playbill"] [data-part="posterHeader"] {
+  font-family: var(--font-playbill-text);
+  font-variant: small-caps;
+  font-size: 15px;
+  letter-spacing: 0.3em;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 4px;
+}
+
+.skinned[data-skin="playbill"] [data-part="posterHeader"]::before,
+.skinned[data-skin="playbill"] [data-part="posterHeader"]::after {
+  content: " ★ ";
+  color: var(--wax);
+  letter-spacing: 0;
+}
+
+/* An oval cameo frame. */
+.skinned[data-skin="playbill"] [data-part="engraving"] {
+  width: 104px;
+  height: 128px;
+  border-radius: 50%;
+  border: 0;
+  box-shadow:
+    0 0 0 2px var(--ink),
+    0 0 0 5px #f6eedb,
+    0 0 0 7px #b8892e;
+  margin: 18px auto 14px;
+}
+
+.skinned[data-skin="playbill"] [data-part="posterName"] {
+  font-family: var(--font-playbill);
+  font-size: 26px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.skinned[data-skin="playbill"] [data-part="posterEpithet"] {
+  font-family: var(--font-playbill-text);
+  font-size: 17px;
+  margin-top: 4px;
+}
+
+.skinned[data-skin="playbill"] [data-part="posterHook"] {
+  font-family: var(--font-playbill-text);
+  font-style: italic;
+  font-size: 15px;
+}
+
+.skinned[data-skin="playbill"] [data-part="posterTag"],
+.skinned[data-skin="playbill"] [data-part="posterReward"] {
+  font-family: var(--font-playbill-text);
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+}
+
+.skinned[data-skin="playbill"] [data-part="strip"],
+.skinned[data-skin="playbill"] [data-part="unclaim"],
+.skinned[data-skin="playbill"] [data-part="heldBy"] {
+  font-family: var(--font-playbill-text);
+  font-variant: small-caps;
+  letter-spacing: 0.16em;
+  margin-left: -20px;
+  margin-right: -20px;
+}
+
+.skinned[data-skin="playbill"] [data-part="unclaim"],
+.skinned[data-skin="playbill"] [data-part="heldBy"] {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.skinned[data-skin="playbill"] [data-part="coreTag"] {
+  font-family: var(--font-playbill-text);
+  font-variant: small-caps;
+  background: var(--wax);
+  color: #f9e7b5;
+}
+
+/* CAST runs across the bill like a SOLD OUT strip. */
+.skinned[data-skin="playbill"] [data-part="claimedStamp"] {
+  font-family: var(--font-playbill);
+  background: var(--wax);
+  color: #f9e7b5;
+  border: 2px solid #d9ad4f;
+  mix-blend-mode: normal;
+  padding: 4px 34px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.skinned[data-skin="playbill"] [data-part="noteTitle"] {
+  font-family: var(--font-playbill);
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+.skinned[data-skin="playbill"] [data-part="note"] {
+  text-align: left;
+  padding: 34px 26px 22px;
+}
+
+/* ======================================================================== */
+/* TAROT                                                                    */
+/* ======================================================================== */
+
+.skinned[data-skin="tarot"][data-part="frame"] {
+  border-color: #2a2350;
+  outline-color: #0b0920;
+  box-shadow:
+    inset 0 0 0 2px #c9a24a,
+    inset 0 0 100px rgba(0, 0, 0, 0.6),
+    0 24px 50px rgba(0, 0, 0, 0.55);
+  background-color: #151a3b;
+  background-image:
+    radial-gradient(ellipse at 50% 40%, rgba(120, 100, 200, 0.22), transparent 65%),
+    radial-gradient(rgba(255, 245, 210, 0.85) 0.6px, transparent 1.2px),
+    radial-gradient(rgba(255, 245, 210, 0.5) 0.5px, transparent 1px),
+    radial-gradient(rgba(201, 162, 74, 0.6) 0.8px, transparent 1.4px);
+  background-size: auto, 97px 89px, 41px 47px, 151px 163px;
+  background-position: 0 0, 13px 7px, 29px 31px, 71px 53px;
+}
+
+.skinned[data-skin="tarot"] [data-part="posting"],
+.skinned[data-skin="tarot"] [data-part="poster"],
+.skinned[data-skin="tarot"] [data-part="note"] {
+  --ink: #f1e6c6;
+  --ink-soft: #cdbb8c;
+  color: var(--ink);
+  background-color: #1f2552;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(201, 162, 74, 0.22), transparent 55%),
+    linear-gradient(180deg, #232a5c, #181d45);
+  box-shadow:
+    inset 0 0 0 6px #1f2552,
+    inset 0 0 0 7px #c9a24a,
+    inset 0 0 0 9px #1f2552,
+    inset 0 0 0 10px rgba(201, 162, 74, 0.6),
+    0 10px 24px rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+}
+
+.skinned[data-skin="tarot"] [data-part="pin"] {
+  display: none;
+}
+
+.skinned[data-skin="tarot"] [data-part="posting"] {
+  padding: 34px clamp(20px, 5vw, 48px) 26px;
+  text-align: center;
+}
+
+.skinned[data-skin="tarot"] [data-part="postingHeader"],
+.skinned[data-skin="tarot"] [data-part="meta"] {
+  font-family: var(--font-tarot);
+  letter-spacing: 0.2em;
+  justify-content: center;
+  border-color: rgba(201, 162, 74, 0.5);
+}
+
+.skinned[data-skin="tarot"] [data-part="postingTitle"],
+.skinned[data-skin="tarot"] [data-part="noteTitle"] {
+  font-family: var(--font-tarot-display);
+  color: #e3bf6a;
+  letter-spacing: 0.04em;
+}
+
+.skinned[data-skin="tarot"] [data-part="rulesStamp"] {
+  font-family: var(--font-tarot);
+  color: #e3bf6a;
+}
+
+.skinned[data-skin="tarot"] [data-part="levels"] {
+  justify-content: center;
+}
+
+/* A tall gilt card: number on top, arched picture, title banner. */
+.skinned[data-skin="tarot"] [data-part="poster"] {
+  padding: 22px 18px 0;
+  min-height: 420px;
+}
+
+.skinned[data-skin="tarot"] [data-part="face"] {
+  display: flex;
+  flex-direction: column;
+}
+
+.skinned[data-skin="tarot"] [data-part="numeral"] {
+  order: -3;
+  color: #e3bf6a;
+  margin-bottom: 4px;
+}
+
+/* The poster word stays for screen readers but the card doesn't show it. */
+.skinned[data-skin="tarot"] [data-part="posterHeader"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+}
+
+.skinned[data-skin="tarot"] [data-part="engraving"] {
+  order: -2;
+  width: 128px;
+  height: 150px;
+  border: 2px solid #c9a24a;
+  border-radius: 64px 64px 6px 6px;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(227, 191, 106, 0.35), transparent 60%),
+    #2a3170;
+  color: #e3bf6a;
+  box-shadow: 0 0 0 4px #1f2552, 0 0 0 5px rgba(201, 162, 74, 0.5);
+}
+
+.skinned[data-skin="tarot"] [data-part="posterEpithet"] {
+  order: -1;
+  font-family: var(--font-tarot-display);
+  font-style: normal;
+  font-size: 19px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #e3bf6a;
+  border-top: 1px solid rgba(201, 162, 74, 0.6);
+  border-bottom: 1px solid rgba(201, 162, 74, 0.6);
+  padding: 4px 0;
+  margin: 4px 0 6px;
+}
+
+.skinned[data-skin="tarot"] [data-part="posterName"] {
+  font-family: var(--font-tarot);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+}
+
+.skinned[data-skin="tarot"] [data-part="posterHook"] {
+  font-size: 14.5px;
+  font-style: italic;
+}
+
+.skinned[data-skin="tarot"] [data-part="posterTag"],
+.skinned[data-skin="tarot"] [data-part="posterReward"],
+.skinned[data-skin="tarot"] [data-part="strip"],
+.skinned[data-skin="tarot"] [data-part="unclaim"],
+.skinned[data-skin="tarot"] [data-part="heldBy"] {
+  font-family: var(--font-tarot);
+  letter-spacing: 0.12em;
+}
+
+.skinned[data-skin="tarot"] [data-part="strip"] {
+  border-top-color: rgba(201, 162, 74, 0.6);
+  margin: 0 -18px;
+  border-radius: 0 0 12px 12px;
+}
+
+.skinned[data-skin="tarot"] [data-part="strip"]:hover,
+.skinned[data-skin="tarot"] [data-part="strip"]:focus-visible {
+  background: rgba(227, 191, 106, 0.12);
+  color: #e3bf6a;
+}
+
+.skinned[data-skin="tarot"] [data-part="coreTag"] {
+  font-family: var(--font-tarot);
+  background: #c9a24a;
+  color: #1f2552;
+}
+
+.skinned[data-skin="tarot"] [data-part="claimedStamp"] {
+  font-family: var(--font-tarot-display);
+  color: #e3bf6a;
+  border-color: #e3bf6a;
+  border-radius: 50%;
+  background: rgba(31, 37, 82, 0.85);
+  mix-blend-mode: normal;
+  padding: 18px 16px;
+  transform: translate(-50%, -50%) rotate(-10deg);
+}
+
+.skinned[data-skin="tarot"] [data-part="posting"] a {
+  color: #e3bf6a;
+}
+
+/* The yarn board's cards and tags stay parchment, so they keep dark ink. */
+.skinned[data-skin="tarot"] [data-part="yarnBoard"] {
+  --ink: #2b1d0e;
+  --ink-soft: #5b4426;
+  color: var(--ink);
+}
+
+/* Narrow folders: the CONFIDENTIAL stamp goes at the foot of the folder, not over the header. */
+@media screen and (max-width: 600px) {
+  .skinned[data-skin="dossier"] [data-part="posting"]::after {
+    position: static;
+    display: block;
+    width: fit-content;
+    margin: 16px 0 0 auto;
+    font-size: 17px;
+  }
+}

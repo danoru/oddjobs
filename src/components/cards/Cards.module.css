@@ -1,0 +1,317 @@
+/* Card printables: 2.5 × 3.4 in cards (sleeve-friendly), nine to a Letter or
+   A4 page with crop marks, or four bigger ones in large print. The page that
+   shows them sets @page margins to 0.25 in so three rows fit Letter. */
+
+.root {
+  --k: 1;
+  --cw: 63.5mm;
+  --ch: 86.4mm;
+  --crop: 3mm;
+  --spell: #7a2a1f;
+  --item: #6b4a12;
+  --feature: #284a57;
+  color: var(--ink);
+}
+
+.root[data-large] {
+  --k: 1.42;
+  --cw: 90.2mm;
+  --ch: 122.7mm;
+}
+
+.root[data-contrast] {
+  --ink: #000;
+  --ink-soft: #000;
+  --spell: #000;
+  --item: #000;
+  --feature: #000;
+}
+
+.root[data-dyslexia] {
+  --font-print: var(--font-legible);
+  --font-sheet: var(--font-legible);
+  --font-label: var(--font-legible);
+}
+
+.root[data-dyslexia] * {
+  font-style: normal !important;
+  text-transform: none !important;
+}
+
+.group + .group {
+  margin-top: 28px;
+}
+
+.page {
+  position: relative;
+  box-sizing: content-box;
+  width: calc(3 * var(--cw));
+  padding: var(--crop);
+  margin: 0 auto 28px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+}
+
+.page[data-size="large"] {
+  width: calc(2 * var(--cw));
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, var(--cw));
+  grid-auto-rows: var(--ch);
+}
+
+.page[data-size="large"] .grid {
+  grid-template-columns: repeat(2, var(--cw));
+}
+
+.markV,
+.markH {
+  position: absolute;
+  background: #000;
+}
+
+.markV {
+  width: 0.25mm;
+  height: calc(var(--crop) - 0.6mm);
+  margin-left: -0.125mm;
+}
+
+.markH {
+  height: 0.25mm;
+  width: calc(var(--crop) - 0.6mm);
+  margin-top: -0.125mm;
+}
+
+/* ---- One card ------------------------------------------------------------- */
+
+.card {
+  --accent: var(--feature);
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: calc(3.2mm * var(--k)) calc(3.4mm * var(--k)) calc(2.6mm * var(--k));
+  background-color: #f6ecd2;
+  background-image:
+    radial-gradient(ellipse at 15% 5%, rgba(255, 255, 255, 0.7), transparent 55%),
+    radial-gradient(ellipse at 90% 100%, rgba(150, 100, 40, 0.2), transparent 55%);
+  /* Inner double rule, plus a dotted cut guide on the card's own edge. */
+  box-shadow:
+    inset 0 0 0 calc(1.2mm * var(--k)) #f6ecd2,
+    inset 0 0 0 calc(1.45mm * var(--k)) var(--accent),
+    inset 0 0 0 calc(1.85mm * var(--k)) #f6ecd2,
+    inset 0 0 0 calc(1.95mm * var(--k)) var(--accent);
+  outline: 0.2mm dashed rgba(0, 0, 0, 0.25);
+  outline-offset: -0.1mm;
+  font-family: var(--font-sheet);
+  font-size: calc(9.4pt * var(--k));
+  line-height: 1.26;
+}
+
+.card[data-kind="spell"] {
+  --accent: var(--spell);
+}
+
+.card[data-kind="item"] {
+  --accent: var(--item);
+}
+
+.card[data-fit="snug"] {
+  font-size: calc(8.3pt * var(--k));
+  line-height: 1.2;
+}
+
+.card[data-fit="tight"] {
+  font-size: calc(7.3pt * var(--k));
+  line-height: 1.17;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: calc(1.4mm * var(--k));
+  padding: calc(1mm * var(--k)) calc(1.6mm * var(--k));
+  margin: 0 0 calc(1mm * var(--k));
+  background: var(--accent);
+  color: #f8ecd0;
+}
+
+.mark {
+  flex: none;
+  width: calc(3.6mm * var(--k));
+  height: calc(3.6mm * var(--k));
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-print);
+  font-weight: 400;
+  font-size: calc(13pt * var(--k));
+  line-height: 1.05;
+}
+
+.kicker {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: calc(8pt * var(--k));
+  color: var(--ink-soft);
+  border-bottom: 0.3mm solid var(--accent);
+  padding-bottom: calc(0.6mm * var(--k));
+  margin-bottom: calc(1.2mm * var(--k));
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(0.8mm * var(--k)) calc(1.4mm * var(--k));
+  margin: 0 0 calc(1.4mm * var(--k));
+}
+
+.stat {
+  border: 0.25mm solid rgba(43, 29, 14, 0.45);
+  padding: calc(0.4mm * var(--k)) calc(1mm * var(--k));
+  min-width: 0;
+}
+
+.stat dt {
+  font-family: var(--font-label);
+  font-size: calc(6pt * var(--k));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.stat dd {
+  margin: 0;
+  font-size: calc(8pt * var(--k));
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.card[data-fit="tight"] .stat dd {
+  font-size: calc(6.6pt * var(--k));
+}
+
+.text {
+  margin: 0 0 calc(1mm * var(--k));
+}
+
+.more {
+  margin: 0;
+  font-size: 0.92em;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.boxes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(1mm * var(--k));
+  margin-top: auto;
+  padding-top: calc(1mm * var(--k));
+  font-family: var(--font-label);
+  font-size: calc(7pt * var(--k));
+  color: var(--ink-soft);
+}
+
+.boxRow {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: calc(0.7mm * var(--k));
+}
+
+.box {
+  width: calc(2.6mm * var(--k));
+  height: calc(2.6mm * var(--k));
+  border: 0.3mm solid var(--ink);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.owner {
+  margin-top: auto;
+  padding-top: calc(1mm * var(--k));
+  font-family: var(--font-label);
+  font-size: calc(6.4pt * var(--k));
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.boxes + .owner {
+  margin-top: 0;
+}
+
+.root[data-contrast] .card {
+  background: #fff;
+  box-shadow:
+    inset 0 0 0 calc(1.2mm * var(--k)) #fff,
+    inset 0 0 0 calc(1.6mm * var(--k)) #000;
+}
+
+.root[data-contrast] .head {
+  background: #000;
+  color: #fff;
+}
+
+.root[data-contrast] .stat {
+  border-color: #000;
+}
+
+/* ---- Screen: phones get a plain list of cards, no paper sheet ------------- */
+
+@media screen and (max-width: 820px) {
+  .page,
+  .page[data-size="large"] {
+    width: auto;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .grid,
+  .page[data-size="large"] .grid {
+    grid-template-columns: repeat(auto-fill, var(--cw));
+    justify-content: center;
+    gap: 12px;
+  }
+  .markV,
+  .markH {
+    display: none;
+  }
+}
+
+/* A named page outranks the global @page, so only card pages get slim margins. */
+@page cards {
+  margin: 0.25in;
+}
+
+@media print {
+  /* The whole document takes the named page; naming only .page would start a blank page before it. */
+  :global(body):has(.root) {
+    page: cards;
+  }
+  .page {
+    margin: 0 auto;
+    box-shadow: none;
+    break-after: page;
+    break-inside: avoid;
+  }
+  .group:last-child .page:last-child {
+    break-after: auto;
+  }
+  .group + .group {
+    margin-top: 0;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}

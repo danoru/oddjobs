@@ -8,7 +8,7 @@ import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import { loadOneShot, publishedSlugs } from "@/lib/content";
 import { toPublic, type PublicOneShot } from "@/lib/public";
-import { useClaims } from "@/lib/storage";
+import { useClaims, useLevel } from "@/lib/storage";
 import { playRip } from "@/lib/rip";
 import { PosterIcon } from "@/components/PosterIcon";
 import { tiltFor } from "@/components/board/Poster";
@@ -30,12 +30,13 @@ export const getStaticProps: GetStaticProps<{ os: PublicOneShot }> = async ({ pa
  */
 export default function TvPage({ os }: { os: PublicOneShot }) {
   const { table, claimedBy, error } = useClaims(os.slug);
+  const { level } = useLevel(os);
   const [qr, setQr] = useState("");
   const [sound, setSound] = useState(false);
   const [torn, setTorn] = useState<string[]>([]);
   const seen = useRef<Set<string> | null>(null);
 
-  const joinUrl = table && typeof window !== "undefined" ? `${window.location.origin}/${os.slug}?table=${table}` : "";
+  const joinUrl = table && typeof window !== "undefined" ? `${window.location.origin}/${os.slug}?table=${table}${level === os.level ? "" : `&level=${level}`}` : "";
 
   useEffect(() => {
     if (!joinUrl) return;
@@ -80,7 +81,7 @@ export default function TvPage({ os }: { os: PublicOneShot }) {
       <Head>
         <title>{`${os.title} · the board`}</title>
       </Head>
-      <main className={s.screen}>
+      <main id="main" className={s.screen}>
         <div className={s.top}>
           <div>
             <h1 className={s.title}>{os.title}</h1>

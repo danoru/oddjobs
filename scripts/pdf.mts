@@ -4,7 +4,8 @@
  * vercel-build. Run it against a dev or prod server, then commit the output.
  *
  *   pnpm dev                       (in another terminal)
- *   pnpm pdf                       — every one-shot: <slug>-sheets.pdf and <slug>-flyer.pdf
+ *   pnpm pdf                       — every one-shot: <slug>-sheets, -cards, -tents and -flyer PDFs,
+ *                                    plus <slug>-l<N>-… for each level variant
  *   pnpm pdf the-drowned-bell      — just one
  *   pnpm pdf --a4                  — A4 instead of US Letter
  *   BASE_URL=http://localhost:3000 pnpm pdf
@@ -15,7 +16,8 @@
 import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
-import { publishedSlugs } from "../src/lib/content";
+import { loadOneShot, publishedSlugs } from "../src/lib/content";
+import { levelsOf } from "../src/lib/variants";
 
 const ROOT = path.join(import.meta.dirname, "..");
 const OUT = path.join(ROOT, "public", "pdf");
@@ -43,19 +45,27 @@ fs.mkdirSync(OUT, { recursive: true });
 const page = await context.newPage();
 let failed = false;
 for (const slug of targets) {
-  for (const [kind, route] of [
-    ["sheets", "print"],
-    ["flyer", "flyer"],
-  ] as const) {
-    const file = path.join(OUT, `${slug}-${kind}${a4 ? "-a4" : ""}.pdf`);
-    try {
-      await page.goto(`${BASE}/${slug}/${route}`, { waitUntil: "networkidle" });
-      await page.evaluate(() => document.fonts.ready);
-      await page.pdf({ path: file, format: a4 ? "A4" : "Letter", printBackground: true, margin: { top: "0.45in", bottom: "0.45in", left: "0.45in", right: "0.45in" } });
-      console.log(`ok   ${path.relative(ROOT, file)}`);
-    } catch (e) {
-      failed = true;
-      console.error(`FAIL ${slug}/${route}: ${(e as Error).message}`);
+  const base = loadOneShot(slug);
+  for (const { level } of levelsOf(base)) {
+    // The page reads its level from ?level= (and remembers it), like a GM's link.
+    const tag = level === base.level ? "" : `-l${level}`;
+    for (const [kind, route] of [
+      ["sheets", "print"],
+      ["cards", "cards"],
+      ["tents", "tents"],
+      ["flyer", "flyer"],
+    ] as const) {
+      const file = path.join(OUT, `${slug}${tag}-${kind}${a4 ? "-a4" : ""}.pdf`);
+      try {
+        await page.goto(`${BASE}/${slug}/${route}?level=${level}`, { waitUntil: "networkidle" });
+        await page.evaluate(() => document.fonts.ready);
+        // Margins come from the pages' own @page rules (0.45in for sheets, 0.25in for cards).
+        await page.pdf({ path: file, format: a4 ? "A4" : "Letter", printBackground: true });
+        console.log(`ok   ${path.relative(ROOT, file)}`);
+      } catch (e) {
+        failed = true;
+        console.error(`FAIL ${slug}/${route}: ${(e as Error).message}`);
+      }
     }
   }
 }

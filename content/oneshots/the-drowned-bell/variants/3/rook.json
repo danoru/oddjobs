@@ -1,0 +1,195 @@
+{
+  "id": "rook",
+  "mech": {
+    "species": "Orc",
+    "background": "Criminal",
+    "classes": [
+      {
+        "name": "Rogue",
+        "subclass": "Thief",
+        "level": 3
+      }
+    ],
+    "abilities": {
+      "str": 8,
+      "dex": 17,
+      "con": 15,
+      "int": 12,
+      "wis": 13,
+      "cha": 10
+    },
+    "saves": [
+      "dex",
+      "int"
+    ],
+    "skills": [
+      "sleightOfHand",
+      "stealth",
+      "acrobatics",
+      "deception",
+      "perception",
+      "investigation"
+    ],
+    "expertise": [
+      "stealth",
+      "perception"
+    ],
+    "hp": 24,
+    "ac": {
+      "value": 16,
+      "note": "Studded leather"
+    },
+    "speed": 30,
+    "initiativeBonus": 2,
+    "senses": [
+      "Darkvision 120 ft"
+    ],
+    "languages": [
+      "Common",
+      "Orc",
+      "Halfling",
+      "Dwarvish",
+      "Thieves' Cant"
+    ],
+    "tools": [
+      "Thieves' Tools"
+    ],
+    "armorTraining": [
+      "Light"
+    ],
+    "weaponTraining": [
+      "Simple",
+      "Martial (Finesse or Light)"
+    ],
+    "originFeat": "Alert",
+    "feats": [],
+    "weaponMasteries": [
+      "Shortsword (Vex)",
+      "Dagger (Nick)"
+    ],
+    "features": [
+      {
+        "name": "Adrenaline Rush",
+        "source": "species",
+        "text": "Bonus Action: take the Dash action and gain 2 Temporary HP.",
+        "uses": {
+          "max": 2,
+          "per": "short"
+        }
+      },
+      {
+        "name": "Relentless Endurance",
+        "source": "species",
+        "text": "When reduced to 0 HP but not killed outright, drop to 1 HP instead.",
+        "uses": {
+          "max": 1,
+          "per": "long"
+        }
+      },
+      {
+        "name": "Alert",
+        "source": "feat",
+        "text": "Add your Proficiency Bonus to Initiative. After rolling Initiative you can swap your result with a willing ally's."
+      },
+      {
+        "name": "Sneak Attack (2d6)",
+        "source": "class",
+        "text": "Once per turn, deal an extra 2d6 damage with a Finesse or Ranged weapon if you have Advantage, or an ally is within 5 ft of the target and you don't have Disadvantage."
+      },
+      {
+        "name": "Cunning Action",
+        "source": "class",
+        "text": "Bonus Action: Dash, Disengage, or Hide."
+      },
+      {
+        "name": "Steady Aim",
+        "source": "class",
+        "text": "Bonus Action: give yourself Advantage on your next attack this turn, if you haven't moved. Your Speed is 0 until the end of the turn."
+      },
+      {
+        "name": "Fast Hands",
+        "source": "subclass",
+        "text": "Bonus Action: Sleight of Hand check, use Thieves' Tools to disarm a trap or pick a lock, or take the Utilize action."
+      },
+      {
+        "name": "Second-Story Work",
+        "source": "subclass",
+        "text": "You have a Climb Speed equal to your Speed, and you can use Dexterity instead of Strength to determine your jump distance."
+      }
+    ],
+    "attacks": [
+      {
+        "name": "Shortsword",
+        "kind": "weapon",
+        "ability": "dex",
+        "dice": "1d6",
+        "damageType": "piercing",
+        "properties": [
+          "Finesse",
+          "Light"
+        ],
+        "mastery": "Vex"
+      },
+      {
+        "name": "Dagger",
+        "kind": "weapon",
+        "ability": "dex",
+        "dice": "1d4",
+        "damageType": "piercing",
+        "range": "20/60 ft",
+        "properties": [
+          "Finesse",
+          "Light",
+          "Thrown"
+        ],
+        "mastery": "Nick"
+      },
+      {
+        "name": "Shortbow",
+        "kind": "weapon",
+        "ability": "dex",
+        "dice": "1d6",
+        "damageType": "piercing",
+        "range": "80/320 ft",
+        "properties": [
+          "Ammunition",
+          "Two-Handed"
+        ],
+        "option": "ranged"
+      }
+    ],
+    "equipment": [
+      {
+        "name": "Studded Leather Armor",
+        "equipped": true,
+        "note": "Lifted from a customs officer"
+      },
+      {
+        "name": "Shortsword",
+        "equipped": true
+      },
+      {
+        "name": "Dagger",
+        "qty": 2
+      },
+      {
+        "name": "Shortbow",
+        "option": "ranged"
+      },
+      {
+        "name": "Arrows",
+        "qty": 20
+      },
+      {
+        "name": "Thieves' Tools"
+      },
+      {
+        "name": "Grappling Hook"
+      },
+      {
+        "name": "Burglar's Pack"
+      }
+    ],
+    "gold": 22
+  }
+}

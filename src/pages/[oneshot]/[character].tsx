@@ -8,18 +8,23 @@ import TuneIcon from "@mui/icons-material/Tune";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import ContentCutIcon from "@mui/icons-material/ContentCut";
+import StyleIcon from "@mui/icons-material/Style";
+import BadgeIcon from "@mui/icons-material/Badge";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { loadOneShot, publishedSlugs } from "@/lib/content";
 import { toPublic, type PublicOneShot } from "@/lib/public";
 import { applyTweaks, hasTweaks } from "@/lib/customize";
-import { useClaims, useTweaks } from "@/lib/storage";
+import { useClaims, useLevel, useReading, useTweaks } from "@/lib/storage";
+import { readingAttrs } from "@/lib/reading";
+import { downloadToken } from "@/lib/token";
 import { playRip } from "@/lib/rip";
 import { SiteHeader } from "@/components/SiteHeader";
-import { PosterIcon } from "@/components/PosterIcon";
+import { Poster } from "@/components/board/Poster";
 import { SheetBack, SheetFront } from "@/components/sheet/Sheet";
 import { PlayerExtras } from "@/components/table/PlayerExtras";
 import { CustomizeDrawer } from "@/components/sheet/CustomizeDrawer";
 import { FoundryDialog, RecipeDialog } from "@/components/sheet/ExportDialogs";
-import b from "@/components/board/Board.module.css";
+import k from "@/components/board/Skins.module.css";
 import sheet from "@/components/sheet/Sheet.module.css";
 
 type Props = { os: PublicOneShot; id: string };
@@ -35,7 +40,9 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => ({
   props: { os: toPublic(loadOneShot(String(params!.oneshot))), id: String(params!.character) },
 });
 
-export default function CharacterPage({ os, id }: Props) {
+export default function CharacterPage({ os: base, id }: Props) {
+  const { os, level } = useLevel(base);
+  const { reading } = useReading();
   const stock = os.cast.find((c) => c.id === id)!;
   const { tweaks, setTweaks } = useTweaks(os.slug, id);
   const { claimedBy, toggle, table, player, error } = useClaims(os.slug);
@@ -53,7 +60,7 @@ export default function CharacterPage({ os, id }: Props) {
         <title>{`${c.name} · ${os.title} · Tear-Off`}</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
-        <SiteHeader back={{ href: `/${os.slug}`, label: os.title }} />
+        <SiteHeader back={{ href: `/${os.slug}`, label: os.title }} reading />
         <Box
           sx={{
             display: "grid",
@@ -62,27 +69,9 @@ export default function CharacterPage({ os, id }: Props) {
             alignItems: "start",
           }}
         >
-          <Box className="no-print" sx={{ position: { md: "sticky" }, top: 16 }}>
-            <div className={b.poster} style={{ ["--tilt" as string]: "-1.2deg", paddingBottom: 14 }}>
-              <span className={b.pin} aria-hidden="true" />
-              <div className={b.posterHeader}>{c.poster.header}</div>
-              <div className={b.engraving}>
-                {c.portrait ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={c.portrait} alt="" />
-                ) : (
-                  <PosterIcon icon={c.poster.icon} size={72} />
-                )}
-              </div>
-              <div className={b.posterName}>{c.name}</div>
-              <div className={b.posterEpithet}>{c.poster.epithet}</div>
-              <p className={b.posterHook}>{c.poster.hook}</p>
-              {claim && (
-                <span className={b.claimedStamp}>
-                  CLAIMED
-                  {claim.name && <span className={b.stampName}>{claim.mine ? "by you" : claim.name}</span>}
-                </span>
-              )}
+          <Box component="aside" aria-label="Poster and actions" className="no-print" sx={{ position: { md: "sticky" }, top: 16 }}>
+            <div className={k.skinned} data-skin={os.skin}>
+              <Poster slug={os.slug} character={c} claim={claim} skin={os.skin} linked={false} revealName tilt={-1.2} />
             </div>
 
             {(table || claim?.name) && (
@@ -131,6 +120,15 @@ export default function CharacterPage({ os, id }: Props) {
               <Button variant="outlined" startIcon={<FileDownloadIcon />} onClick={() => setPanel("foundry")}>
                 Foundry actor (beta)
               </Button>
+              <Button variant="outlined" startIcon={<StyleIcon />} component={Link} href={`/${os.slug}/${id}/cards`}>
+                Spell &amp; item cards
+              </Button>
+              <Button variant="outlined" startIcon={<BadgeIcon />} component={Link} href={`/${os.slug}/${id}/tent`}>
+                Name tent
+              </Button>
+              <Button variant="outlined" startIcon={<AccountCircleIcon />} onClick={() => void downloadToken(os.slug, c)}>
+                Token PNG
+              </Button>
               {claim?.mine && (
                 <Button size="small" sx={{ color: "text.secondary" }} onClick={() => toggle(id)}>
                   Pin the poster back up
@@ -138,18 +136,18 @@ export default function CharacterPage({ os, id }: Props) {
               )}
             </Stack>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-              Printing works on Letter or A4: pick the paper size in your print dialog.
+              Level {level}. Printing works on Letter or A4: pick the paper size in your print dialog.
             </Typography>
           </Box>
 
-          <main className={sheet.sheet}>
+          <main id="main" tabIndex={-1} className={sheet.sheet} {...readingAttrs(reading)}>
             {table && player && claim?.mine && (
               <div style={{ marginBottom: 24 }}>
                 <PlayerExtras code={table} playerId={player.id} characterId={id} flashback={stock.flashback} />
               </div>
             )}
-            <SheetFront c={c} ruleset={os.ruleset} oneshotTitle={os.title} />
-            <SheetBack c={c} oneshotTitle={os.title} names={names} sealedSecret />
+            <SheetFront c={c} ruleset={os.ruleset} oneshotTitle={os.title} titleAs="h1" />
+            <SheetBack c={c} oneshotTitle={os.title} names={names} sealedSecret sectionAs="h2" />
           </main>
         </Box>
       </Container>

@@ -23,6 +23,12 @@ export const theme = createTheme({
   },
   components: {
     MuiButton: { defaultProps: { disableElevation: true } },
+    // A ring you can see from across the table when tabbing, on dark wood or parchment.
+    MuiButtonBase: {
+      styleOverrides: {
+        root: { "&.Mui-focusVisible": { outline: "3px solid #d2a85a", outlineOffset: 2, boxShadow: "0 0 0 5px #1c140e" } },
+      },
+    },
     MuiPaper: { styleOverrides: { root: { backgroundImage: "none" } } },
   },
 });

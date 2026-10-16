@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { decodeTweaks, emptyTweaks, tweaksSchema, type Tweaks } from "./customize";
+import type { Character } from "./schema";
+import { parseReading, type Reading, type ReadingMode } from "./reading";
+import { levelsOf, pickLevel, withVariant, type HasLevels } from "./variants";
 import {
   normalizeCode,
   PLAYER_HEADER,
@@ -67,7 +70,9 @@ function parseJson(raw: string | null): unknown {
 const claimsKey = (slug: string) => `tearoff:claims:${slug}`;
 const tableKey = (slug: string) => `tearoff:table:${slug}`;
 const tweaksKey = (slug: string, id: string) => `tearoff:tweaks:${slug}/${id}`;
+const levelKey = (slug: string) => `tearoff:level:${slug}`;
 const PLAYER_KEY = "tearoff:player";
+const READING_KEY = "tearoff:reading";
 
 /** Posters torn off in this browser only — the fallback when there's no table. */
 function useLocalClaims(slug: string) {
@@ -304,4 +309,35 @@ export function useTweaks(slug: string, id: string) {
   const setTweaks = useCallback((t: Tweaks) => write(tweaksKey(slug, id), t), [slug, id]);
 
   return { tweaks, setTweaks };
+}
+
+/**
+ * The level this browser plays a one-shot at. A `?level=N` in the URL (the GM's
+ * join link carries one) is saved for next time. Returns the one-shot with the
+ * cast's mechanics at that level, so every sheet, card and export follows it.
+ */
+export function useLevel<C extends Pick<Character, "id" | "mech" | "options">, T extends HasLevels<C> & { slug: string }>(
+  os: T,
+) {
+  const slug = os.slug;
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.search).get("level");
+    if (wanted && pickLevel(os, wanted) === Number(wanted)) write(levelKey(slug), Number(wanted));
+  }, [os, slug]);
+
+  const level = pickLevel(os, parseJson(useStored(levelKey(slug))));
+  const at = useMemo(() => withVariant(os, level), [os, level]);
+  const setLevel = useCallback((n: number) => write(levelKey(slug), n === os.level ? null : n), [slug, os.level]);
+  return { os: at, level, setLevel, levels: levelsOf(os) };
+}
+
+/** This viewer's reading modes (large print, high contrast, dyslexia-friendly), for every sheet and printable. */
+export function useReading() {
+  const raw = useStored(READING_KEY);
+  const reading = useMemo(() => parseReading(parseJson(raw)), [raw]);
+  const setMode = useCallback(
+    (mode: ReadingMode, on: boolean) => write(READING_KEY, { ...reading, [mode]: on } satisfies Reading),
+    [reading],
+  );
+  return { reading, setMode };
 }

@@ -23,7 +23,7 @@ export function YarnBoard({
 
   return (
     <>
-      <div className={s.board} role="img" aria-label="Who knows whom: a board of characters joined by red string">
+      <div className={s.board} data-part="yarnBoard" role="img" aria-label="Who knows whom: a board of characters joined by red string">
         <svg className={s.svg} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           {strings.map((st) => {
             const a = pos[st.from];

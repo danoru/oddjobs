@@ -5,7 +5,7 @@ import s from "./Sheet.module.css";
 
 function Boxes({ n }: { n: number }) {
   return (
-    <span className={s.uses} aria-label={`${n} uses`}>
+    <span className={s.uses} role="img" aria-label={`${n} ${n === 1 ? "use" : "uses"} to tick off`}>
       {Array.from({ length: n }, (_, i) => (
         <span key={i} className={s.box} />
       ))}
@@ -16,16 +16,28 @@ function Boxes({ n }: { n: number }) {
 const PER: Record<string, string> = { short: "short rest", long: "long rest", day: "day", turn: "turn" };
 
 /** Front: what you roll. */
-export function SheetFront({ c, ruleset, oneshotTitle }: { c: Character; ruleset: Ruleset; oneshotTitle: string }) {
+export function SheetFront({
+  c,
+  ruleset,
+  oneshotTitle,
+  titleAs: Title = "h2",
+}: {
+  c: Character;
+  ruleset: Ruleset;
+  oneshotTitle: string;
+  /** The page's own heading on a single sheet; h2 when a page holds several. */
+  titleAs?: "h1" | "h2";
+}) {
   const d = derive(c);
   const m = c.mech;
+  const Section = Title === "h1" ? "h2" : "h3";
   const speciesLabel = ruleset === "2014" ? "Race" : "Species";
 
   return (
     <section className={s.page}>
       <header className={s.head}>
         <div>
-          <h2 className={s.name}>{c.name}</h2>
+          <Title className={s.name}>{c.name}</Title>
           <div className={s.epithet}>
             {c.poster.epithet} · {c.story.pronouns}
           </div>
@@ -95,33 +107,37 @@ export function SheetFront({ c, ruleset, oneshotTitle }: { c: Character; ruleset
 
       <div className={s.cols}>
         <div>
-          <div className={s.sectionTitle}>Saving throws</div>
+          <Section className={s.sectionTitle}>Saving throws</Section>
           <ul className={s.list}>
             {ABILITIES.map((a) => (
               <li key={a}>
-                <span className={d.saves[a].proficient ? s.dotOn : s.dot} />
+                <span className={d.saves[a].proficient ? s.dotOn : s.dot} aria-hidden="true" />
                 <span className={s.bonus}>{signed(d.saves[a].total)}</span>
                 {ABILITY_NAMES[a]}
+                {d.saves[a].proficient && <span className={s.srOnly}> (proficient)</span>}
               </li>
             ))}
           </ul>
-          <div className={s.sectionTitle}>Skills</div>
+          <Section className={s.sectionTitle}>Skills</Section>
           <ul className={s.list}>
             {(Object.keys(SKILLS) as Skill[]).map((k) => {
               const sk = d.skills[k];
               return (
                 <li key={k}>
-                  <span className={sk.expertise ? s.dotX : sk.proficient ? s.dotOn : s.dot} />
+                  <span className={sk.expertise ? s.dotX : sk.proficient ? s.dotOn : s.dot} aria-hidden="true" />
                   <span className={s.bonus}>{signed(sk.total)}</span>
                   {SKILL_NAMES[k]} <span className={s.muted}>{sk.ability}</span>
+                  {(sk.expertise || sk.proficient) && (
+                    <span className={s.srOnly}> ({sk.expertise ? "expertise" : "proficient"})</span>
+                  )}
                 </li>
               );
             })}
           </ul>
-          <div className={s.muted} style={{ marginTop: 4 }}>
+          <div className={s.muted} style={{ marginTop: 4 }} aria-hidden="true">
             ● proficient · ◉ expertise{m.jackOfAllTrades ? " · Jack of All Trades applied" : ""}
           </div>
-          <div className={s.sectionTitle}>Training</div>
+          <Section className={s.sectionTitle}>Training</Section>
           <div>
             {m.armorTraining.length > 0 && <div>Armor: {m.armorTraining.join(", ")}</div>}
             {m.weaponTraining.length > 0 && <div>Weapons: {m.weaponTraining.join(", ")}</div>}
@@ -134,7 +150,7 @@ export function SheetFront({ c, ruleset, oneshotTitle }: { c: Character; ruleset
         <div>
           {d.attacks.length > 0 && (
             <>
-              <div className={s.sectionTitle}>Attacks &amp; cantrips</div>
+              <Section className={s.sectionTitle}>Attacks &amp; cantrips</Section>
               <table className={s.table}>
                 <thead>
                   <tr>
@@ -166,7 +182,7 @@ export function SheetFront({ c, ruleset, oneshotTitle }: { c: Character; ruleset
             </>
           )}
 
-          <div className={s.sectionTitle}>Features &amp; traits</div>
+          <Section className={s.sectionTitle}>Features &amp; traits</Section>
           <div className={s.features}>
             {m.originFeat && (
               <p className={s.feature}>
@@ -212,12 +228,15 @@ export function SheetBack({
   oneshotTitle,
   names,
   sealedSecret = false,
+  sectionAs: Section = "h3",
 }: {
   c: Character;
   oneshotTitle: string;
   /** id → display name for ties. */
   names: Record<string, string>;
   sealedSecret?: boolean;
+  /** h2 when the front's name is the page's h1. */
+  sectionAs?: "h2" | "h3";
 }) {
   const d = derive(c);
   const m = c.mech;
@@ -230,9 +249,9 @@ export function SheetBack({
     <section className={s.page}>
       {sc && d.spell && (
         <>
-          <div className={s.sectionTitle} style={{ marginTop: 0 }}>
+          <Section className={s.sectionTitle} style={{ marginTop: 0 }}>
             Spellcasting · {ABILITY_NAMES[sc.ability]} · save DC {d.spell.dc} · attack {signed(d.spell.attack)}
-          </div>
+          </Section>
           {sc.note && <p className={s.muted} style={{ margin: "0 0 6px" }}>{sc.note}</p>}
           <div className={s.features}>
             {[...byLevel.entries()]
@@ -253,7 +272,12 @@ export function SheetBack({
                       <span key={sp.name}>
                         {i > 0 && ", "}
                         {sp.name}
-                        {sp.always && <sup title="always prepared">◆</sup>}
+                        {sp.always && (
+                          <sup title="always prepared">
+                            <span aria-hidden="true">◆</span>
+                            <span className={s.srOnly}> (always prepared)</span>
+                          </sup>
+                        )}
                         {sp.note && <span className={s.muted}> ({sp.note})</span>}
                       </span>
                     ))}
@@ -266,13 +290,15 @@ export function SheetBack({
               </div>
             )}
           </div>
-          <div className={s.muted}>◆ always prepared</div>
+          <div className={s.muted} aria-hidden="true">
+            ◆ always prepared
+          </div>
         </>
       )}
 
       <div className={s.storyGrid}>
         <div className={s.story}>
-          <div className={s.sectionTitle}>Who you are</div>
+          <Section className={s.sectionTitle}>Who you are</Section>
           {c.story.intro && <p className={s.quote}>{c.story.intro}</p>}
           <p>{c.story.concept}</p>
           <p>
@@ -281,7 +307,7 @@ export function SheetBack({
           <p>
             <b>You want:</b> {c.story.goal}
           </p>
-          <div className={s.sectionTitle}>Ties</div>
+          <Section className={s.sectionTitle}>Ties</Section>
           {c.story.ties.map((t) => (
             <p key={t.to}>
               <b>{names[t.to] ?? t.to}:</b> {t.text}
@@ -291,16 +317,27 @@ export function SheetBack({
             <div className={s.label} style={{ color: "var(--wax)" }}>
               Your secret — for your eyes
             </div>
-            <p className={open ? undefined : s.sealed}>{c.story.secret}</p>
+            <p className={open ? undefined : s.sealed} aria-hidden={open ? undefined : true} id={`secret-${c.id}`}>
+              {c.story.secret}
+            </p>
             {!open && (
-              <button type="button" className={`${s.seal} no-print`} onClick={() => setOpen(true)}>
-                <span className={s.sealDisc}>break seal</span>
+              <button
+                type="button"
+                className={`${s.seal} no-print`}
+                onClick={() => setOpen(true)}
+                aria-label="break seal: read your secret"
+                aria-controls={`secret-${c.id}`}
+                aria-expanded={false}
+              >
+                <span className={s.sealDisc} aria-hidden="true">
+                  break seal
+                </span>
               </button>
             )}
           </div>
         </div>
         <div className={s.story}>
-          <div className={s.sectionTitle}>Look &amp; voice</div>
+          <Section className={s.sectionTitle}>Look &amp; voice</Section>
           <p>
             {c.story.appearance}
             {c.story.age ? ` Age ${c.story.age}.` : ""}
@@ -318,7 +355,7 @@ export function SheetBack({
               <b>Trinket:</b> {c.story.trinket}
             </p>
           )}
-          <div className={s.sectionTitle}>Equipment</div>
+          <Section className={s.sectionTitle}>Equipment</Section>
           <ul className={s.list}>
             {m.equipment.map((e) => (
               <li key={e.name + (e.note ?? "")}>

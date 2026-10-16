@@ -25,26 +25,28 @@ Without a database the site still works: claims just stay in each browser, as in
 | Script | What it does |
 |---|---|
 | `pnpm validate [slug]` | Parse and cross-check content; prints each character's key numbers |
-| `pnpm test` | Rules math, customization, exporters, auth roles, table codes, `gmNotes` stays off player pages |
+| `pnpm test` | Rules math (HP, slots, pact magic), level variants, cards, tokens, reading modes, customization, exporters, auth roles, table codes, `gmNotes` stays off player pages |
 | `pnpm build` | `prisma generate`, validate, then `next build` (fails on any broken one-shot) |
 | `pnpm db:dev` | Start a local Postgres server in the background (`prisma dev --name tearoff --detach`); stop it with `pnpm exec prisma dev stop tearoff` |
 | `pnpm db:migrate` | `prisma migrate dev`: make a new migration after editing `prisma/schema.prisma` |
 | `pnpm db:deploy` | Apply migrations to `DIRECT_URL` |
-| `pnpm import-draft <file>.draft.json [--force]` | Write a cast drafted on `/draft` into `content/oneshots/`, then validate it |
-| `pnpm pdf [slug] [--a4]` | **Local only.** Render `public/pdf/<slug>-sheets.pdf` and `-flyer.pdf` from a running server with Playwright. Never runs on Vercel. |
+| `pnpm pdf [slug] [--a4]` | **Local only.** Render `public/pdf/<slug>-sheets`, `-cards`, `-tents` and `-flyer` PDFs (and `<slug>-l<N>-…` for each level variant) from a running server with Playwright. Never runs on Vercel. |
+| `pnpm a11y-check [route…]` | **Local only.** Run axe-core over the main pages (signed in as GM) and Tab through each, checking every focus stop shows a ring. Exits 1 on any problem. |
+| `pnpm print-check [slug]` | **Local only.** Render every printable at every level, on Letter and A4, in each reading mode, count the PDF pages and look for card text that overflows. Exits 1 if anything doesn't fit. |
 
 ## Pages
 
 - `/` — the board: one posting per one-shot, filter by ruleset and table size.
-- `/<oneshot>` — premise, the cast as posters (tear to claim), who-knows-whom, party role coverage. A note on top joins a table by code; `/<oneshot>?table=CODE` fills the code in.
+- `/<oneshot>` — premise, the cast as posters (tear to claim), who-knows-whom, party role coverage. A note on top joins a table by code; `/<oneshot>?table=CODE` fills the code in. If the one-shot has level variants, wax stamps on the posting pick the level. The page wears the one-shot's skin.
 - `/<oneshot>/<character>` — the two-page sheet, plus Print, Customize, D&D Beyond recipe and Foundry export.
 - `/<oneshot>/print` — every sheet, ready to print.
+- `/<oneshot>/cards` and `/<oneshot>/<character>/cards` — spell, item and feature cards, nine to a page with crop marks.
+- `/<oneshot>/tents` and `/<oneshot>/<character>/tent` — folded name tents, two to a page, plus round token PNGs to download.
 - `/<oneshot>/flyer` — a physical tear-off flyer: one strip per character with a QR code to their sheet.
 - `/<oneshot>/gm` — **GM password only.** Open a table and read out its code, watch claims live (and pin any poster back up), plus the `gmNotes`, every character's secret and the full private tie texts. Also: *What changes tonight*, sealed letters to deliver, and the session-zero recap.
 - `/<oneshot>/tv` — the board for the TV: big posters, the table code and a join QR. Posters rip off live as players claim them on their phones.
 - `/<oneshot>/sounds` — the GM's soundboard: ambience beds that crossfade and one-shot stingers, all synthesised in the browser (no audio files).
 - `/<oneshot>/epilogue` — the morning after: give each character a fate and one line, print a broadsheet front page, and save survivors to the shared world.
-- `/draft` — **GM password only.** A cast from a pitch: Claude drafts the one-shot and its cast, the site's validator checks it, and you download it for `pnpm import-draft`.
 
 ## Table play
 
@@ -54,6 +56,16 @@ Without a database the site still works: claims just stay in each browser, as in
 - **Session zero.** Each character has a `flashback` question. After claiming, the player answers it on their sheet, and the GM page collects the answers as a "previously on…" recap (`/api/tables/<code>/flashbacks`, `Flashback` in Prisma).
 - **Woodcut portraits.** In Customize, upload any photo and it's turned into an ink-on-parchment engraving in the browser (`src/lib/woodcut.ts`). It's stored with the tweaks on that device and isn't included in share links.
 - **The shared world.** The epilogue page downloads survivor records. Put the file in `content/legacy/` and survivors appear on the home board and as "also seen in town" cameos on other one-shots (`src/lib/legacy.ts`).
+
+## Printables, levels, skins and reading modes
+
+- **Cards.** Every spell, weapon, kept item (not plain packs) and feature gets a 2.5 × 3.4 in card, sleeve-sized, nine to a Letter or A4 page with crop marks. Each character starts on a fresh page so their stack can be handed over. Spell cards carry the casting time, range, components, duration and a paraphrased effect from `content/rules/spells.json`, plus the character's own attack line and DC. Weapon cards explain each property and 2024 mastery; ammunition and limited-use features get tick-boxes. The cards page sets its own 0.25 in margins with a named `@page`, so print at 100%.
+- **Name tents.** Half a page each, folded along the middle. The top half prints upside down so that, stood up, the name and epithet face the table and AC, HP, initiative, saves and the top attacks face the player. A mystery character's tent and token show the board's alias.
+- **Tokens.** `src/lib/token.ts` draws a 512 px round token in the browser: the woodcut portrait from Customize (or the poster icon on engraved hatching) inside a parchment ring with the name along the bottom. Download it from the sheet or the tents page and drop it into Foundry or Owlbear Rodeo. A linked portrait from a host that blocks canvas use falls back to the icon.
+- **Level variants.** A one-shot can declare `variants` at other levels (The Drowned Bell plays at 3 or 5). Story, posters and ties are shared; each level has its own mechanics in `variants/<level>/<id>.json`. The level is picked on the job page or the GM page and remembered per browser (`tearoff:level:<slug>`). A `?level=N` in any link sets it, and the GM's join link, the TV's QR code and the flyer's QR codes carry it. Sheets, cards, tents, tokens, the D&D Beyond recipe and the Foundry export all use the chosen level. The Foundry table-sync API still serves the base level.
+- **Skins.** `skin` in `oneshot.json` dresses the job page and its posters: `noticeboard` (the default cork board), `dossier` (case files paper-clipped on a desk blotter), `playbill` (a theatre bill and its company on red velvet) or `tarot` (gilt cards on a star cloth). The home page always stays the notice board. Preview any skin with `?skin=tarot` on a job page. The styles are in `src/components/board/Skins.module.css`, and the words each skin uses ("SIGN OUT THIS FILE", "TAKE THE PART"…) are in `src/lib/skins.ts`.
+- **Reading modes.** The *Reading* button in the header of sheet pages toggles large print, high contrast and dyslexia-friendly type (Atkinson Hyperlegible, no italics, looser spacing). They combine and are remembered on the device (`tearoff:reading`), and apply to the sheet, print view, cards and tents. In large print each printed sheet face runs to two pages and cards print four to a page. High contrast and dyslexia mode keep each face on one page (`pnpm print-check` checks this).
+- **Keyboard and screen readers.** Every page has a skip link, landmarks and a heading outline, and focus shows as a brass ring. Proficiency dots, use boxes and "always prepared" marks have text for screen readers, the level picker is a radio group (arrow keys), and the sealed secret is hidden from screen readers too until the seal is broken. `pnpm a11y-check` runs axe-core and a Tab walk over the board, job pages, a sheet, cards, tents and the GM page; it reports no violations and a visible ring at every focus stop.
 
 ## Tables (shared claims)
 
@@ -76,7 +88,13 @@ content/oneshots/<slug>/oneshot.json
 content/oneshots/<slug>/characters/<id>.json   # filename == id
 ```
 
-The schema is `src/lib/schema.ts`; extra checks are in `crossCheck` in `src/lib/content.ts` (levels add up, ties point at real characters, ruleset-specific fields, customization options tag exactly one entry…). `content/oneshots/the-drowned-bell` is the reference.
+The schema is `src/lib/schema.ts`; extra checks are in `crossCheck` in `src/lib/content.ts` (levels add up, ties point at real characters, ruleset-specific fields, customization options tag exactly one entry…) and `src/lib/rules.ts`. That file checks HP against the fixed-average rule (with Tough and dwarf bonuses), spell slots against the class tables (half casters by edition, multiclass caster levels), warlock pact slots, and that no spell is above the highest slot. `content/oneshots/the-drowned-bell` is the reference.
+
+Optional extras in `oneshot.json`:
+- `"skin": "dossier"`: see *Skins* above.
+- `"variants": [{ "level": 3, "note": "…" }]`: then write `content/oneshots/<slug>/variants/3/<id>.json` for **every** character, as `{ "id", "mech", "options"? }`. `mech` is the full mechanics at that level; `options` replaces the base options only when they'd be wrong at that level, and should keep the same option ids so saved tweaks carry over. Every level runs through the same checks, and the validator prints each level's key numbers.
+
+Every spell a character can have, at any level and in any option, needs an entry in `content/rules/spells.json`, keyed by name. Each entry has level, school, casting time, range, components, duration, concentration and ritual, plus a paraphrased `text` and an optional `higher`. Base fields follow 2024; a `"2014"` block lists what differs under 2014 (an empty `higher` there means "no upcasting"). The build fails on a missing spell, so a new cast with new spells needs entries added here too.
 
 Things that make a cast work:
 - `premise` explains why exactly these people are together tonight.
@@ -112,7 +130,7 @@ D&D Beyond has no import API, so each sheet offers a **build recipe** (`src/lib/
 GitHub (private repo — gated content may include non-SRD material) → Vercel. Set these in the Vercel project:
 
 - `APP_PASSWORD`, `GM_PASSWORD` and `AUTH_SECRET`.
-- Optional: `FOUNDRY_TOKEN` (Foundry table sync) and `ANTHROPIC_API_KEY` (drafting casts on `/draft`).
+- Optional: `FOUNDRY_TOKEN` (Foundry table sync).
 - `DATABASE_URL` (Supabase pooler, port 6543, `?pgbouncer=true&schema=tearoff`) and `DIRECT_URL` (port 5432, `?schema=tearoff`). It's the same Supabase project as world-gazetteer, in its own Postgres schema. `prisma migrate deploy` needs `DIRECT_URL`.
 
 `vercel-build` runs `prisma migrate deploy`, then `prisma generate`, then validation, then `next build`.

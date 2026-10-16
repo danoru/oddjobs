@@ -8,6 +8,8 @@ const field = {
   "& .MuiInputBase-root": { color: "var(--ink)", fontFamily: "var(--font-print)" },
   "& .MuiInputLabel-root": { color: "var(--ink-soft)" },
   "& .MuiOutlinedInput-notchedOutline": { borderColor: "var(--ink-soft)" },
+  "& .Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "var(--wax)", borderWidth: 3 },
+  "& .MuiInputLabel-root.Mui-focused": { color: "var(--wax)" },
 };
 
 /**
@@ -41,11 +43,11 @@ export function TableNote({
   const atTable = table && player;
 
   return (
-    <div className={`${s.note} no-print`} style={{ ["--tilt" as string]: "0.4deg", marginBottom: 32 }}>
-      <span className={s.pin} aria-hidden="true" />
+    <div className={`${s.note} no-print`} data-part="note" style={{ ["--tilt" as string]: "0.4deg", marginBottom: 32 }}>
+      <span className={s.pin} data-part="pin" aria-hidden="true" />
       {atTable ? (
         <Box sx={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "4px 16px" }}>
-          <p className={s.noteTitle} style={{ margin: 0 }}>
+          <p className={s.noteTitle} data-part="noteTitle" style={{ margin: 0 }}>
             Table {table}
           </p>
           <Typography sx={{ fontFamily: "var(--font-print)", fontSize: 17 }}>
@@ -57,7 +59,7 @@ export function TableNote({
         </Box>
       ) : (
         <Box component="form" onSubmit={submit}>
-          <p className={s.noteTitle}>{table ? `Table ${table}` : "Playing at a table?"}</p>
+          <p className={s.noteTitle} data-part="noteTitle">{table ? `Table ${table}` : "Playing at a table?"}</p>
           <Typography sx={{ fontFamily: "var(--font-print)", fontSize: 16, mb: 1.5 }}>
             {table
               ? "Give the table your name before you tear a poster."

@@ -1,9 +1,10 @@
 import type { POSTER_ICONS } from "@/lib/schema";
 
-type IconKey = (typeof POSTER_ICONS)[number];
+export type IconKey = (typeof POSTER_ICONS)[number];
 
 // Woodcut-ish silhouettes on a 24×24 grid. Filled, so they print as solid ink.
-const PATHS: Record<IconKey, string> = {
+/** Exported for the token renderer, which draws them with Path2D. */
+export const PATHS: Record<IconKey, string> = {
   sword: "M19.5 2.5 21.5 4.5 11 15l-2-2zM6.5 13.5l4 4-1.5 1.5-1.2-1.2L5 20.6 3.4 19l2.8-2.8L5 15z",
   dagger: "M17 3l4 0-.5 3.5-7 7-3-3 7-7zM8 12.5l3.5 3.5-1.5 1.5-1-1-3.5 4.5-2-2 4.5-3.5-1-1z",
   bow: "M5 3c7 2 13 8 16 16l-2 .8C16.4 12.8 11 7.4 4.2 4.9zM4 4l15.5 15.5-1 1L3 5zM14 4h6v6l-2-2-3 3-2-2 3-3z",

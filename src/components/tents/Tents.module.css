@@ -1,0 +1,285 @@
+/* Name tents: two per Letter/A4 page. Each tent is a strip folded along the
+   middle; the top half is printed upside down so that once folded and stood
+   up, the name reads upright for the table and the numbers for the player. */
+
+.root {
+  color: var(--ink);
+}
+
+.root[data-contrast] {
+  --ink: #000;
+  --ink-soft: #000;
+  --wax: #000;
+}
+
+.root[data-dyslexia] {
+  --font-print: var(--font-legible);
+  --font-sheet: var(--font-legible);
+  --font-label: var(--font-legible);
+  --font-poster: var(--font-legible);
+}
+
+.root[data-dyslexia] * {
+  font-style: normal !important;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2in;
+  max-width: 7.5in;
+  margin: 0 auto 28px;
+}
+
+.tent {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  height: 4.85in;
+  border: 1.5px dotted rgba(0, 0, 0, 0.55);
+  background: #fbf5e6;
+  background-image:
+    radial-gradient(ellipse at 10% 0%, rgba(255, 255, 255, 0.7), transparent 55%),
+    radial-gradient(ellipse at 90% 100%, rgba(160, 110, 50, 0.14), transparent 50%);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  font-family: var(--font-sheet);
+  overflow: hidden;
+}
+
+.root[data-contrast] .tent {
+  background: #fff;
+  border: 2px dotted #000;
+}
+
+/* ---- The table's side (upside down on the page) ---------------------------- */
+
+.tableFace {
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  gap: 0.25in;
+  padding: 0.18in 0.35in;
+  min-height: 0;
+  border: 3px double var(--ink);
+  margin: 0.12in;
+}
+
+.portrait {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.55in;
+  height: 1.55in;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px double var(--ink);
+  background:
+    repeating-linear-gradient(135deg, rgba(43, 29, 14, 0.08) 0 1px, transparent 1px 4px),
+    rgba(43, 29, 14, 0.04);
+  color: var(--ink);
+}
+
+.portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tableText {
+  min-width: 0;
+}
+
+.header {
+  font-family: var(--font-poster);
+  font-size: 15pt;
+  letter-spacing: 0.12em;
+  color: var(--wax);
+}
+
+.bigName {
+  font-family: var(--font-print);
+  font-size: 40pt;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.epithet {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 19pt;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+.fold {
+  position: relative;
+  height: 0;
+  border-top: 1.5px dashed rgba(0, 0, 0, 0.6);
+}
+
+.fold span {
+  position: absolute;
+  left: 50%;
+  top: -0.6em;
+  transform: translateX(-50%);
+  padding: 0 8px;
+  background: #fbf5e6;
+  font-family: var(--font-label);
+  font-size: 8pt;
+  letter-spacing: 0.2em;
+  color: rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+}
+
+.root[data-contrast] .fold span {
+  background: #fff;
+}
+
+/* ---- The player's side ------------------------------------------------------ */
+
+.playerFace {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08in;
+  padding: 0.18in 0.3in 0.14in;
+  min-height: 0;
+  font-size: 10pt;
+  line-height: 1.25;
+}
+
+.who {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  align-items: baseline;
+  font-family: var(--font-label);
+  font-size: 10.5pt;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 3px;
+}
+
+.who b {
+  font-family: var(--font-print);
+  font-weight: 400;
+  font-size: 15pt;
+}
+
+.ruleset {
+  margin-left: auto;
+  color: var(--ink-soft);
+  font-size: 9pt;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0.82in, 1fr));
+  gap: 0.07in;
+}
+
+.stat {
+  border: 1.5px solid var(--ink);
+  text-align: center;
+  padding: 2px 2px 3px;
+}
+
+.statLabel {
+  font-family: var(--font-label);
+  font-size: 7.5pt;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.statValue {
+  font-family: var(--font-print);
+  font-size: 19pt;
+  line-height: 1.05;
+}
+
+.statNote {
+  font-size: 7.5pt;
+  color: var(--ink-soft);
+}
+
+.lines {
+  display: grid;
+  gap: 2px;
+}
+
+.lineLabel {
+  font-family: var(--font-label);
+  font-size: 8.5pt;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.goal {
+  margin-top: 2px;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+/* ---- Tokens (screen only) ---------------------------------------------------- */
+
+.tokens {
+  margin-top: 40px;
+}
+
+.tokenGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 24px;
+}
+
+.token {
+  margin: 0;
+  text-align: center;
+  color: var(--parchment);
+}
+
+.tokenCanvas {
+  width: 170px;
+  height: 170px;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.5));
+}
+
+.tokenName {
+  font-family: var(--font-print);
+  font-size: 18px;
+}
+
+.tokenArt {
+  font-size: 13px;
+  color: #c4b08c;
+  min-height: 1.4em;
+  margin-bottom: 6px;
+}
+
+@media screen and (max-width: 700px) {
+  .tent {
+    height: auto;
+  }
+  .tableFace {
+    transform: none;
+    flex-direction: column;
+    text-align: center;
+  }
+  .bigName {
+    font-size: 30pt;
+  }
+}
+
+@media print {
+  .page {
+    margin: 0 auto;
+    break-after: page;
+    gap: 0.25in;
+  }
+  .page:last-of-type {
+    break-after: auto;
+  }
+  .tent {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}

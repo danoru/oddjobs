@@ -110,5 +110,6 @@
   "content": {
     "sources": ["PHB 2014", "Xanathar's Guide to Everything", "Monster Manual 2014"],
     "warnings": ["faked death and grief", "fraud and impersonation", "an NPC bound and gagged (offscreen)", "cartoonish violence"]
-  }
+  },
+  "skin": "dossier"
 }
