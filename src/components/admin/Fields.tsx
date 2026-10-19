@@ -363,7 +363,17 @@ function SpellName({ path, label }: { path: DocPath; label: string }) {
           {...params}
           label={label}
           error={problems.length > 0}
-          helperText={typeof value === "string" && value && !known ? "Not in the spell book yet (content/rules/spells.json)" : undefined}
+          helperText={
+            typeof value === "string" && value && !known ? (
+              <>
+                Not in the spell book yet.{" "}
+                <a href={`/admin/spells?new=${encodeURIComponent(value)}`} target="_blank" rel="noopener">
+                  Add it
+                </a>{" "}
+                (opens a new tab; reload this page afterwards)
+              </>
+            ) : undefined
+          }
           slotProps={{ ...params.slotProps, htmlInput: { ...params.slotProps.htmlInput, "data-field": pathKey(path) } }}
         />
       )}

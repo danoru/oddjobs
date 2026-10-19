@@ -25,11 +25,23 @@ export const CONTENT_ROOT = path.join(/*turbopackIgnore: true*/ process.cwd(), "
 /** Paraphrased spell text for the 5e card printables. */
 export const SPELL_BOOK = path.join(/*turbopackIgnore: true*/ process.cwd(), "content", "rules", "spells.json");
 
-let book: Record<string, dnd5e.SpellInfo> | null = null;
+// Cached per file and keyed on its mtime and size, so a dev server sees the
+// builder's spell-book edits without a restart. (Pages and API routes are
+// separate bundles in dev, each with its own copy of this cache.)
+const books = new Map<string, { stamp: string; book: Record<string, dnd5e.SpellInfo> }>();
 
 export function loadSpellBook(file = SPELL_BOOK): Record<string, dnd5e.SpellInfo> {
-  if (file !== SPELL_BOOK) return parse(dnd5e.spellBookSchema, file);
-  book ??= parse(dnd5e.spellBookSchema, file);
+  let stamp = "";
+  try {
+    const st = fs.statSync(file);
+    stamp = `${st.mtimeMs}:${st.size}`;
+  } catch {
+    /* missing: parse() reports it */
+  }
+  const hit = books.get(file);
+  if (hit && stamp && hit.stamp === stamp) return hit.book;
+  const book = parse(dnd5e.spellBookSchema, file);
+  books.set(file, { stamp, book });
   return book;
 }
 

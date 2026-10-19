@@ -11,8 +11,8 @@ export type { OneShotDoc, DocPath } from "@/lib/oneShotCheck";
 /** Lowercase kebab, like every id in content. Also what keeps a slug or id from leaving its folder. */
 export const SAFE_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-/** First path segments the site already uses, so no one-shot can be published over them. */
-export const RESERVED_SLUGS = ["admin", "api", "login", "logout", "fonts", "textures", "pdf", "favicon.ico", "_next", "404", "500"];
+/** First path segments the site already uses, so no one-shot can be published over them ("spells" is /admin/spells). */
+export const RESERVED_SLUGS = ["admin", "api", "login", "logout", "fonts", "textures", "pdf", "favicon.ico", "_next", "404", "500", "spells"];
 
 export function isSafeId(x: unknown): x is string {
   return typeof x === "string" && x.length <= 64 && SAFE_ID.test(x);

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { requestRole } from "./auth";
-import { getStore, PublishError, StoreError, type OneShotStore } from "./store";
+import { getStore, PublishError, StoreError, type OneShotStore, type WriteGate } from "./store";
 
 /**
  * Every /api/admin route starts here: GM only (the proxy lets any signed-in
@@ -12,7 +12,18 @@ export async function adminGuard(
   req: NextApiRequest,
   res: NextApiResponse,
   opts: { write: boolean; store?: OneShotStore },
-): Promise<OneShotStore | null> {
+): Promise<OneShotStore | null>;
+/** The same, for another store behind the content write gate (the spell book). */
+export async function adminGuard<S extends { gate(): WriteGate }>(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  opts: { write: boolean; store: S },
+): Promise<S | null>;
+export async function adminGuard(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  opts: { write: boolean; store?: { gate(): WriteGate } },
+): Promise<{ gate(): WriteGate } | null> {
   res.setHeader("Cache-Control", "private, no-store");
   if ((await requestRole(req)) !== "gm") {
     res.status(403).json({ error: "Only the GM can use the builder" });

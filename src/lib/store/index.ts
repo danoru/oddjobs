@@ -16,3 +16,5 @@ export function getStore(): OneShotStore {
 
 export * from "./types";
 export { contentWriteGate, FileStore } from "./fileStore";
+export { getSpellStore, SpellBookStore } from "./spellStore";
+export { spellNameProblem } from "./spellName";
