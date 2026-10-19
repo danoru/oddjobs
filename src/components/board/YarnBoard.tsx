@@ -1,4 +1,4 @@
-import type { PublicCharacter } from "@/lib/public";
+import type { CoreCharacter } from "@/lib/schema";
 import { sag, yarnLayout } from "@/lib/yarn";
 import { tiltFor } from "./Poster";
 import s from "./YarnBoard.module.css";
@@ -12,7 +12,7 @@ export function YarnBoard({
   cast,
   claimedBy,
 }: {
-  cast: PublicCharacter[];
+  cast: Pick<CoreCharacter, "id" | "name" | "poster" | "story">[];
   /** id → player name (null when unknown). Omit before anyone's claimed. */
   claimedBy?: Record<string, { name: string | null }>;
 }) {

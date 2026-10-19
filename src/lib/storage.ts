@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { decodeTweaks, emptyTweaks, tweaksSchema, type Tweaks } from "./customize";
-import type { Character } from "./schema";
+import { decodeTweaks, emptyTweaks, tweaksSchema, type Tweaks } from "@/systems/dnd5e/customize";
 import { parseReading, type Reading, type ReadingMode } from "./reading";
-import { levelsOf, pickLevel, withVariant, type HasLevels } from "./variants";
+import { levelsOf, pickLevel, withVariant, type HasLevels } from "@/systems/dnd5e/variants";
+import type { Character } from "@/systems/dnd5e/schema";
 import {
   normalizeCode,
   PLAYER_HEADER,
@@ -315,20 +315,29 @@ export function useTweaks(slug: string, id: string) {
  * The level this browser plays a one-shot at. A `?level=N` in the URL (the GM's
  * join link carries one) is saved for next time. Returns the one-shot with the
  * cast's mechanics at that level, so every sheet, card and export follows it.
+ * One-shots without levels (Ten Candles) come back as they are, at level 0
+ * with no choices.
  */
-export function useLevel<C extends Pick<Character, "id" | "mech" | "options">, T extends HasLevels<C> & { slug: string }>(
-  os: T,
-) {
+export function useLevel<T extends { slug: string }>(os: T) {
   const slug = os.slug;
+  const leveled = hasLevels(os) ? os : null;
   useEffect(() => {
+    if (!leveled) return;
     const wanted = new URLSearchParams(window.location.search).get("level");
-    if (wanted && pickLevel(os, wanted) === Number(wanted)) write(levelKey(slug), Number(wanted));
-  }, [os, slug]);
+    if (wanted && pickLevel(leveled, wanted) === Number(wanted)) write(levelKey(slug), Number(wanted));
+  }, [leveled, slug]);
 
-  const level = pickLevel(os, parseJson(useStored(levelKey(slug))));
-  const at = useMemo(() => withVariant(os, level), [os, level]);
-  const setLevel = useCallback((n: number) => write(levelKey(slug), n === os.level ? null : n), [slug, os.level]);
-  return { os: at, level, setLevel, levels: levelsOf(os) };
+  const stored = parseJson(useStored(levelKey(slug)));
+  const level = leveled ? pickLevel(leveled, stored) : 0;
+  const at = useMemo(() => (leveled ? (withVariant(leveled, level) as unknown as T) : os), [os, leveled, level]);
+  const base = leveled?.level;
+  const setLevel = useCallback((n: number) => write(levelKey(slug), n === base ? null : n), [slug, base]);
+  return { os: at, level, setLevel, levels: leveled ? levelsOf(leveled) : [] };
+}
+
+type Leveled = HasLevels<Pick<Character, "id" | "mech" | "options">>;
+function hasLevels(os: object): os is Leveled {
+  return "level" in os && typeof os.level === "number" && "variants" in os && Array.isArray(os.variants);
 }
 
 /** This viewer's reading modes (large print, high contrast, dyslexia-friendly), for every sheet and printable. */

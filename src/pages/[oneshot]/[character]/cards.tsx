@@ -1,20 +1,21 @@
 import type { GetStaticPaths, GetStaticProps } from "next";
-import { loadOneShot, publishedSlugs, spellBookFor } from "@/lib/content";
+import { load5e, loadOneShot, publishedSlugs, spellBookFor } from "@/lib/content";
+import { hasRoute } from "@/systems/registry";
 import { toPublic, type PublicOneShot } from "@/lib/public";
-import type { SpellInfo } from "@/lib/schema";
-import { CardsView } from "@/components/cards/CardsView";
+import type { SpellInfo } from "@/systems/dnd5e/schema";
+import { CardsView } from "@/systems/dnd5e/components/cards/CardsView";
 
 type Props = { os: PublicOneShot; id: string; book: Record<string, SpellInfo> };
 
 export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: publishedSlugs().flatMap((slug) =>
-    loadOneShot(slug).cast.map((c) => ({ params: { oneshot: slug, character: c.id } })),
-  ),
+  paths: publishedSlugs()
+    .filter((slug) => hasRoute(loadOneShot(slug), "cards"))
+    .flatMap((slug) => load5e(slug).cast.map((c) => ({ params: { oneshot: slug, character: c.id } }))),
   fallback: false,
 });
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
-  const os = loadOneShot(String(params!.oneshot));
+  const os = load5e(String(params!.oneshot));
   return { props: { os: toPublic(os), id: String(params!.character), book: spellBookFor(os) } };
 };
 

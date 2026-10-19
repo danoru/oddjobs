@@ -158,6 +158,27 @@
   color: var(--wax);
 }
 
+/* Which game a posting is for: a little inked tab, top left. */
+.systemBadge {
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  transform: rotate(-3deg);
+  background: var(--ink);
+  color: var(--parchment);
+  padding: 1px 8px 2px;
+  font-family: var(--font-label);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.systemBadge[data-system="tencandles"] {
+  background: #17110b;
+  color: #f3c770;
+}
+
 .tones {
   display: flex;
   flex-wrap: wrap;
@@ -561,10 +582,11 @@
 
 /* On a phone the ruleset stamp sits above the header instead of over it. */
 @media screen and (max-width: 600px) {
-  .stamp {
+  .stamp,
+  .systemBadge {
     position: static;
     display: inline-block;
-    margin: 0 0 8px;
+    margin: 0 8px 8px 0;
     transform: rotate(-4deg);
   }
 }

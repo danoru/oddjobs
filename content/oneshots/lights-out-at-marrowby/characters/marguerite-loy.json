@@ -1,0 +1,29 @@
+{
+  "id": "marguerite-loy",
+  "name": "Marguerite Loy",
+  "order": 3,
+  "poster": {
+    "header": "MISSING",
+    "epithet": "the postwoman",
+    "hook": "Still delivering the mail. Every letter is addressed to the same house.",
+    "icon": "book"
+  },
+  "flashback": "Whose house are the letters for, and what's in the one you haven't opened?",
+  "ifUnclaimed": {
+    "npc": "Marguerite sits in the waiting room sorting the same letters over and over. Use her to put a hard, kind truth in front of whoever needs it.",
+    "reassign": [],
+    "cuts": []
+  },
+  "story": {
+    "pronouns": "she/her",
+    "concept": "A rural postwoman who kept doing her round after the dark came, because someone had to. Practical, funny, and lying about how she got here.",
+    "look": "Royal Mail anorak, a bicycle clip still on one ankle, a sack over her shoulder heavier than letters should be, hair cut short with kitchen scissors.",
+    "namePrompts": ["Peg Loy", "Jean Fairhurst"],
+    "carrying": ["a sack of letters", "a bicycle pump", "a tin of mints"],
+    "stake": "One of the letters in her sack is for this station. She hasn't decided whether to deliver it.",
+    "ties": [
+      { "to": "owen-pask", "text": "He saw her at the crossing. She's told him it was someone else, and she can see he doesn't believe her.", "public": "met him at the crossing" },
+      { "to": "stanley-arkwright", "text": "His name and his old address are on one of her letters. He hasn't asked her about it yet.", "public": "has his name in her sack" }
+    ]
+  }
+}

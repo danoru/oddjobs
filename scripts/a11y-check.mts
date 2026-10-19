@@ -7,7 +7,7 @@
  *   pnpm a11y-check              — board, job pages, a sheet, cards, tents and the GM page
  *   pnpm a11y-check lot-thirteen/odalys-quill the-drowned-bell/print
  *
- * Signs in with GM_PASSWORD (so the GM page is included) from .env.local or the
+ * Signs in with GM_PASSWORD (so the GM page is included) from .env or the
  * environment. Exits 1 on any axe violation or focus stop without a ring.
  */
 import { chromium } from "playwright";
@@ -23,15 +23,17 @@ const TABS = 12;
 
 function gmPassword(): string {
   if (process.env.GM_PASSWORD) return process.env.GM_PASSWORD;
-  const env = path.join(ROOT, ".env.local");
+  const env = [".env.local", ".env"].map((f) => path.join(ROOT, f)).find((f) => fs.existsSync(f)) ?? path.join(ROOT, ".env");
   const line = fs.existsSync(env) ? fs.readFileSync(env, "utf8").match(/^GM_PASSWORD=(.*)$/m) : null;
-  if (!line) throw new Error("Set GM_PASSWORD (or put it in .env.local)");
+  if (!line) throw new Error("Set GM_PASSWORD (or put it in .env)");
   return line[1].trim();
 }
 
 function defaultRoutes(): string[] {
   const slugs = publishedSlugs();
-  const first = loadOneShot(slugs[0]);
+  const all = slugs.map((s) => loadOneShot(s));
+  const first = all.find((os) => os.system === "dnd5e")!;
+  const candles = all.filter((os) => os.system === "tencandles");
   return [
     "",
     ...slugs,
@@ -39,6 +41,7 @@ function defaultRoutes(): string[] {
     `${first.slug}/cards`,
     `${first.slug}/tents`,
     `${first.slug}/gm`,
+    ...candles.flatMap((os) => [`${os.slug}/play`, `${os.slug}/kit`, `${os.slug}/gm`, `${os.slug}/tv`]),
   ];
 }
 

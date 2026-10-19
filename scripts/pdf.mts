@@ -4,31 +4,37 @@
  * vercel-build. Run it against a dev or prod server, then commit the output.
  *
  *   pnpm dev                       (in another terminal)
- *   pnpm pdf                       — every one-shot: <slug>-sheets, -cards, -tents and -flyer PDFs,
- *                                    plus <slug>-l<N>-… for each level variant
+ *   pnpm pdf                       — every 5e one-shot: <slug>-sheets, -cards, -tents and -flyer PDFs,
+ *                                    plus <slug>-l<N>-… for each level variant; Ten Candles:
+ *                                    <slug>-kit and -flyer
  *   pnpm pdf the-drowned-bell      — just one
  *   pnpm pdf --a4                  — A4 instead of US Letter
  *   BASE_URL=http://localhost:3000 pnpm pdf
  *
- * Signs in with APP_PASSWORD from .env.local (or the environment).
+ * Signs in with GM_PASSWORD (for the Ten Candles kit), else APP_PASSWORD, from .env or the environment.
+ * PDF_OUT=dir writes somewhere other than public/pdf.
  * First run on a new machine: pnpm exec playwright install chromium
  */
 import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
 import { loadOneShot, publishedSlugs } from "../src/lib/content";
-import { levelsOf } from "../src/lib/variants";
+import { levelsOf } from "../src/systems/dnd5e/variants";
 
 const ROOT = path.join(import.meta.dirname, "..");
-const OUT = path.join(ROOT, "public", "pdf");
+const OUT = process.env.PDF_OUT ? path.resolve(process.env.PDF_OUT) : path.join(ROOT, "public", "pdf");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
 
+/** The GM password if there is one (it opens everything players see, plus the GM-only Ten Candles kit), else the table's. */
 function password(): string {
-  if (process.env.APP_PASSWORD) return process.env.APP_PASSWORD;
-  const env = path.join(ROOT, ".env.local");
-  const line = fs.existsSync(env) ? fs.readFileSync(env, "utf8").match(/^APP_PASSWORD=(.*)$/m) : null;
-  if (!line) throw new Error("Set APP_PASSWORD (or put it in .env.local)");
-  return line[1].trim();
+  const env = [".env.local", ".env"].map((f) => path.join(ROOT, f)).find((f) => fs.existsSync(f)) ?? path.join(ROOT, ".env");
+  const text = fs.existsSync(env) ? fs.readFileSync(env, "utf8") : "";
+  for (const key of ["GM_PASSWORD", "APP_PASSWORD"]) {
+    if (process.env[key]) return process.env[key]!;
+    const line = text.match(new RegExp(`^${key}=(.*)$`, "m"));
+    if (line?.[1].trim()) return line[1].trim();
+  }
+  throw new Error("Set GM_PASSWORD or APP_PASSWORD (or put them in .env)");
 }
 
 const args = process.argv.slice(2);
@@ -46,18 +52,27 @@ const page = await context.newPage();
 let failed = false;
 for (const slug of targets) {
   const base = loadOneShot(slug);
-  for (const { level } of levelsOf(base)) {
+  // Ten Candles: the table kit and the missing poster.
+  const levels = base.system === "dnd5e" ? levelsOf(base).map((l) => l.level) : [null];
+  for (const level of levels) {
     // The page reads its level from ?level= (and remembers it), like a GM's link.
-    const tag = level === base.level ? "" : `-l${level}`;
-    for (const [kind, route] of [
-      ["sheets", "print"],
-      ["cards", "cards"],
-      ["tents", "tents"],
-      ["flyer", "flyer"],
-    ] as const) {
+    const tag = level === null || (base.system === "dnd5e" && level === base.level) ? "" : `-l${level}`;
+    const kinds =
+      base.system === "dnd5e"
+        ? ([
+            ["sheets", "print"],
+            ["cards", "cards"],
+            ["tents", "tents"],
+            ["flyer", "flyer"],
+          ] as const)
+        : ([
+            ["kit", "kit"],
+            ["flyer", "flyer"],
+          ] as const);
+    for (const [kind, route] of kinds) {
       const file = path.join(OUT, `${slug}${tag}-${kind}${a4 ? "-a4" : ""}.pdf`);
       try {
-        await page.goto(`${BASE}/${slug}/${route}?level=${level}`, { waitUntil: "networkidle" });
+        await page.goto(`${BASE}/${slug}/${route}${level === null ? "" : `?level=${level}`}`, { waitUntil: "networkidle" });
         await page.evaluate(() => document.fonts.ready);
         // Margins come from the pages' own @page rules (0.45in for sheets, 0.25in for cards).
         await page.pdf({ path: file, format: a4 ? "A4" : "Letter", printBackground: true });

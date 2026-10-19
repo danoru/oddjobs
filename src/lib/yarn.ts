@@ -1,4 +1,6 @@
-import type { PublicCharacter } from "./public";
+import type { CoreCharacter } from "./schema";
+
+type YarnCharacter = Pick<CoreCharacter, "id" | "name" | "poster" | "story">;
 
 /**
  * Layout for the red-yarn board: characters pinned round an oval, one string
@@ -21,7 +23,7 @@ export interface YarnString {
   labels: string[];
 }
 
-export function yarnLayout(cast: PublicCharacter[]): { cards: YarnCard[]; strings: YarnString[] } {
+export function yarnLayout(cast: YarnCharacter[]): { cards: YarnCard[]; strings: YarnString[] } {
   const n = cast.length;
   const cards = cast.map((c, i): YarnCard => {
     // Start at the top and go clockwise; a slight squash leaves room for labels.

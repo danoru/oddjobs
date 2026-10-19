@@ -25,6 +25,19 @@
   text-shadow: 0 3px 0 #120b06;
 }
 
+.systemBadge {
+  display: inline-block;
+  margin-bottom: 10px;
+  background: var(--parchment);
+  color: var(--ink);
+  padding: 2px 10px 3px;
+  font-family: var(--font-label);
+  font-size: clamp(11px, 0.9vw, 16px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
 .join {
   display: flex;
   align-items: center;

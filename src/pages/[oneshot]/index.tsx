@@ -10,8 +10,11 @@ import TvIcon from "@mui/icons-material/Tv";
 import HistoryEduIcon from "@mui/icons-material/HistoryEdu";
 import StyleIcon from "@mui/icons-material/Style";
 import BadgeIcon from "@mui/icons-material/Badge";
+import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
+import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import { loadOneShot, publishedSlugs } from "@/lib/content";
-import { toPublic, type PublicOneShot } from "@/lib/public";
+import { toPublic, type PublicAnyOneShot } from "@/lib/public";
+import { SYSTEMS } from "@/systems/registry";
 import { useClaims, useLevel } from "@/lib/storage";
 import { skinFrom, SKIN_WORDS } from "@/lib/skins";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -31,14 +34,14 @@ export const getStaticPaths: GetStaticPaths = async () => ({
   fallback: false,
 });
 
-export const getStaticProps: GetStaticProps<{ os: PublicOneShot; cameos: Survivor[] }> = async ({ params }) => {
+export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot; cameos: Survivor[] }> = async ({ params }) => {
   const slug = String(params!.oneshot);
   return { props: { os: toPublic(loadOneShot(slug)), cameos: cameosFor(slug, loadSurvivors()) } };
 };
 
 const inkButton = { color: "var(--ink)", borderColor: "var(--ink-soft)" } as const;
 
-export default function JobPage({ os: base, cameos }: { os: PublicOneShot; cameos: Survivor[] }) {
+export default function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Survivor[] }) {
   const router = useRouter();
   const { os, level, setLevel, levels } = useLevel(base);
   const table = useClaims(os.slug);
@@ -47,7 +50,7 @@ export default function JobPage({ os: base, cameos }: { os: PublicOneShot; cameo
   const words = SKIN_WORDS[skin];
   const linkCode = typeof router.query.table === "string" ? router.query.table : undefined;
   const claimedCast = os.cast.filter((c) => claims.includes(c.id));
-  const covered = new Set(claimedCast.flatMap((c) => c.roles));
+  const covered = new Set(claimedCast.flatMap((c) => ("roles" in c ? c.roles : [])));
   const missingCore = os.coreRoles.filter((id) => !claims.includes(id));
   const nameOf = (id: string) => {
     const c = os.cast.find((x) => x.id === id);
@@ -65,9 +68,14 @@ export default function JobPage({ os: base, cameos }: { os: PublicOneShot; cameo
         <main id="main" tabIndex={-1} className={`${s.frame} ${k.skinned}`} data-skin={skin} data-part="frame">
           <div className={s.note} data-part="posting" style={{ ["--tilt" as string]: "-0.6deg", marginBottom: 32 }}>
             <span className={s.brassPin} data-part="pin" aria-hidden="true" />
-            <span className={os.ruleset === "2014" ? s.stamp2014 : s.stamp2024} data-part="rulesStamp">
-              {words.rules(os.ruleset)}
+            <span className={s.systemBadge} data-system={os.system} data-part="systemBadge">
+              {SYSTEMS[os.system].label}
             </span>
+            {os.system === "dnd5e" && (
+              <span className={os.ruleset === "2014" ? s.stamp2014 : s.stamp2024} data-part="rulesStamp">
+                {words.rules(os.ruleset)}
+              </span>
+            )}
             <div className={s.postingHeader} data-part="postingHeader">
               {os.posting.header}
             </div>
@@ -78,7 +86,7 @@ export default function JobPage({ os: base, cameos }: { os: PublicOneShot; cameo
               {os.premise}
             </p>
             <div className={s.meta} data-part="meta">
-              <span>Level {os.level}</span>
+              {os.system === "dnd5e" && <span>Level {os.level}</span>}
               <span>
                 {os.players.min}–{os.players.max} players
               </span>
@@ -94,34 +102,62 @@ export default function JobPage({ os: base, cameos }: { os: PublicOneShot; cameo
               </div>
             )}
             <LevelPicker levels={levels} level={level} onChange={setLevel} />
-            <Box
-              component="nav"
-              aria-label="Printables and table tools"
-              className="no-print"
-              sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 2 }}
-            >
-              <Button component={Link} href={`/${os.slug}/print`} variant="outlined" size="small" startIcon={<PrintIcon />} sx={inkButton}>
-                Print every sheet
-              </Button>
-              <Button component={Link} href={`/${os.slug}/cards`} variant="outlined" size="small" startIcon={<StyleIcon />} sx={inkButton}>
-                Spell &amp; item cards
-              </Button>
-              <Button component={Link} href={`/${os.slug}/tents`} variant="outlined" size="small" startIcon={<BadgeIcon />} sx={inkButton}>
-                Name tents &amp; tokens
-              </Button>
-              <Button component={Link} href={`/${os.slug}/flyer`} variant="outlined" size="small" startIcon={<ContentCutIcon />} sx={inkButton}>
-                Print the tear-off flyer
-              </Button>
-              <Button component={Link} href={`/${os.slug}/tv`} variant="outlined" size="small" startIcon={<TvIcon />} sx={inkButton}>
-                Board on the TV
-              </Button>
-              <Button component={Link} href={`/${os.slug}/epilogue`} variant="outlined" size="small" startIcon={<HistoryEduIcon />} sx={inkButton}>
-                The morning after
-              </Button>
-              <Button component={Link} href={`/${os.slug}/gm`} size="small" startIcon={<VisibilityIcon />} sx={{ color: "var(--ink-soft)" }}>
-                GM&apos;s view
-              </Button>
-            </Box>
+            {os.system === "dnd5e" ? (
+              <Box
+                component="nav"
+                aria-label="Printables and table tools"
+                className="no-print"
+                sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 2 }}
+              >
+                <Button component={Link} href={`/${os.slug}/print`} variant="outlined" size="small" startIcon={<PrintIcon />} sx={inkButton}>
+                  Print every sheet
+                </Button>
+                <Button component={Link} href={`/${os.slug}/cards`} variant="outlined" size="small" startIcon={<StyleIcon />} sx={inkButton}>
+                  Spell &amp; item cards
+                </Button>
+                <Button component={Link} href={`/${os.slug}/tents`} variant="outlined" size="small" startIcon={<BadgeIcon />} sx={inkButton}>
+                  Name tents &amp; tokens
+                </Button>
+                <Button component={Link} href={`/${os.slug}/flyer`} variant="outlined" size="small" startIcon={<ContentCutIcon />} sx={inkButton}>
+                  Print the tear-off flyer
+                </Button>
+                <Button component={Link} href={`/${os.slug}/tv`} variant="outlined" size="small" startIcon={<TvIcon />} sx={inkButton}>
+                  Board on the TV
+                </Button>
+                <Button component={Link} href={`/${os.slug}/epilogue`} variant="outlined" size="small" startIcon={<HistoryEduIcon />} sx={inkButton}>
+                  The morning after
+                </Button>
+                <Button component={Link} href={`/${os.slug}/gm`} size="small" startIcon={<VisibilityIcon />} sx={{ color: "var(--ink-soft)" }}>
+                  GM&apos;s view
+                </Button>
+              </Box>
+            ) : (
+              <Box
+                component="nav"
+                aria-label="Play aid and printables"
+                className="no-print"
+                sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 2 }}
+              >
+                <Button component={Link} href={`/${os.slug}/play`} variant="outlined" size="small" startIcon={<LocalFireDepartmentIcon />} sx={inkButton}>
+                  At the table (phones)
+                </Button>
+                <Button component={Link} href={`/${os.slug}/kit`} variant="outlined" size="small" startIcon={<PrintIcon />} sx={inkButton}>
+                  Print the table kit (GM)
+                </Button>
+                <Button component={Link} href={`/${os.slug}/flyer`} variant="outlined" size="small" startIcon={<ContentCutIcon />} sx={inkButton}>
+                  Print the missing poster
+                </Button>
+                <Button component={Link} href={`/${os.slug}/tv`} variant="outlined" size="small" startIcon={<TvIcon />} sx={inkButton}>
+                  Candles on the TV
+                </Button>
+                <Button component={Link} href={`/${os.slug}/sounds`} variant="outlined" size="small" startIcon={<MusicNoteIcon />} sx={inkButton}>
+                  Soundboard
+                </Button>
+                <Button component={Link} href={`/${os.slug}/gm`} size="small" startIcon={<VisibilityIcon />} sx={{ color: "var(--ink-soft)" }}>
+                  GM&apos;s view
+                </Button>
+              </Box>
+            )}
           </div>
 
           <TableNote claims={table} initialCode={linkCode} />
@@ -161,14 +197,16 @@ export default function JobPage({ os: base, cameos }: { os: PublicOneShot; cameo
                       .map((c) => (claimedBy[c.id]?.name ? `${c.name} (${claimedBy[c.id].name})` : c.name))
                       .join(", ")}.`}
               </Typography>
-              <ul className={s.roleChips} aria-label="Party roles covered">
-                {ROLE_ORDER.map((r) => (
-                  <li key={r} className={covered.has(r) ? s.roleChipOn : s.roleChip}>
-                    {r}
-                    <span className={s.srOnly}>{covered.has(r) ? ": covered" : ": not yet"}</span>
-                  </li>
-                ))}
-              </ul>
+              {os.system === "dnd5e" && (
+                <ul className={s.roleChips} aria-label="Party roles covered">
+                  {ROLE_ORDER.map((r) => (
+                    <li key={r} className={covered.has(r) ? s.roleChipOn : s.roleChip}>
+                      {r}
+                      <span className={s.srOnly}>{covered.has(r) ? ": covered" : ": not yet"}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
               {claimedCast.length > 0 && missingCore.length > 0 && (
                 <Typography sx={{ fontFamily: "var(--font-print)", fontStyle: "italic", fontSize: 15, mt: 1.5 }}>
                   Still needed: {missingCore.map(nameOf).join(", ")}.

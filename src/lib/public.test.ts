@@ -29,3 +29,23 @@ describe("toPublic: other GM-only fields", () => {
     }
   });
 });
+
+describe("toPublic: Ten Candles", () => {
+  it("keeps the module and suggested truths off player pages", () => {
+    const tc = loadAll().filter((os) => os.system === "tencandles");
+    expect(tc.length).toBeGreaterThan(0);
+    for (const os of tc) {
+      if (os.system !== "tencandles") continue;
+      const pub = toPublic(os);
+      expect("module" in pub).toBe(false);
+      expect("suggestedTruths" in pub).toBe(false);
+      const json = JSON.stringify(pub);
+      expect(json).not.toContain(os.module.intro.slice(0, 60));
+      expect(json).not.toContain(os.module.them.slice(0, 60));
+      expect(json).not.toContain(os.module.goal);
+      for (const a of os.module.areas) expect(json).not.toContain(a.text.slice(0, 60));
+      for (const t of os.suggestedTruths) expect(json).not.toContain(t);
+      for (const c of os.cast) if (c.ifUnclaimed) expect(json).not.toContain(c.ifUnclaimed.npc);
+    }
+  });
+});

@@ -15,6 +15,8 @@
     "pdf": "tsx scripts/pdf.mts",
     "print-check": "tsx scripts/print-check.mts",
     "a11y-check": "tsx scripts/a11y-check.mts",
+    "parity": "tsx scripts/parity.mts",
+    "e2e:candles": "tsx scripts/e2e-tencandles.mts",
     "validate": "tsx scripts/validate.ts",
     "db:dev": "prisma dev --name tearoff --detach",
     "db:migrate": "prisma migrate dev",

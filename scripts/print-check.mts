@@ -18,17 +18,17 @@ import { chromium, type Page } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
 import { loadOneShot, loadSpellBook, publishedSlugs } from "../src/lib/content";
-import { cardsFor, paginate } from "../src/lib/cards";
-import { levelsOf, withVariant } from "../src/lib/variants";
+import { cardsFor, paginate } from "../src/systems/dnd5e/cards";
+import { levelsOf, withVariant } from "../src/systems/dnd5e/variants";
 
 const ROOT = path.join(import.meta.dirname, "..");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
 
 function password(): string {
   if (process.env.APP_PASSWORD) return process.env.APP_PASSWORD;
-  const env = path.join(ROOT, ".env.local");
+  const env = [".env.local", ".env"].map((f) => path.join(ROOT, f)).find((f) => fs.existsSync(f)) ?? path.join(ROOT, ".env");
   const line = fs.existsSync(env) ? fs.readFileSync(env, "utf8").match(/^APP_PASSWORD=(.*)$/m) : null;
-  if (!line) throw new Error("Set APP_PASSWORD (or put it in .env.local)");
+  if (!line) throw new Error("Set APP_PASSWORD (or put it in .env)");
   return line[1].trim();
 }
 
@@ -79,6 +79,8 @@ for (const mode of MODES) {
 
   for (const slug of targets) {
     const base = loadOneShot(slug);
+    // The Ten Candles table kit has no per-character layout promises to check.
+    if (base.system !== "dnd5e") continue;
     for (const { level } of levelsOf(base)) {
       const os = withVariant(base, level);
       const n = os.cast.length;

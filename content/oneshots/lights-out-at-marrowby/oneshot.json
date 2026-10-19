@@ -1,0 +1,135 @@
+{
+  "slug": "lights-out-at-marrowby",
+  "title": "Lights Out at Marrowby",
+  "system": "tencandles",
+  "pitch": "The sun hasn't risen for nineteen days. Tonight the last train to the coast is due through a moorland junction whose signal lamp is the only light for forty miles.",
+  "premise": "Nineteen days ago the sun failed to come up, and on the third day the stars went out too. Since then Marrowby Junction, a signal box, a platform, a waiting room and a lamp room on a high moor, has kept one lamp burning on its signal post, because the radio said the last train to Saltcoats would run when the line was clear, and somebody has to clear it. You are the people who ended up there: the signalwoman who never left her post, and the ones who walked toward her light across the moor. The paraffin is nearly gone. Something has started humming in the rails.",
+  "players": { "min": 3, "max": 5 },
+  "durationHrs": 3,
+  "tone": ["tragic horror", "quiet dread", "strangers at the end"],
+  "setting": "Marrowby Junction, a railway halt on a high moor in the north of England, nineteen days into the dark",
+  "posting": {
+    "header": "MISSING: THE 6:10 TO SALTCOATS. LAST SEEN AT MARROWBY",
+    "reward": "A seat on the last train, if it comes"
+  },
+  "coreRoles": [],
+  "gmNotes": "This is a Ten Candles module, not a cast to survive: everyone dies, and the night is about how. The pre-made concepts are optional; players write their own traits, moments and brinks at the table either way.\n\nPace it by the light. Early scenes are about keeping the lamp lit and deciding who to trust. Middle scenes are about the paraffin running out and what people will burn instead. The end is the tunnel, because the coast line runs through it and the hum comes out of it.\n\nThe train is real. It's coming. It doesn't stop. Whether it carries anyone away is up to the last scene, and it should cost the most.\n\nNever give Them a weakness but light. Don't name Them. Let the table's truths decide what They wear.",
+  "gazette": { "name": "The Marrowby Courier", "town": "Marrowby Junction", "price": "Not sold" },
+  "sounds": {
+    "beds": [
+      { "id": "moor-dark", "label": "The dark on the moor", "preset": "dark" },
+      { "id": "gale", "label": "Gale off the tops", "preset": "gale" },
+      { "id": "lamp-room", "label": "The lamp room stove", "preset": "fire" },
+      { "id": "hum", "label": "The hum in the rails", "preset": "drone" }
+    ],
+    "stingers": [
+      { "id": "snuff", "label": "A candle goes out", "preset": "snuff" },
+      { "id": "signal-bell", "label": "The block bell", "preset": "bell" },
+      { "id": "scream", "label": "Someone out on the moor", "preset": "scream" },
+      { "id": "door", "label": "The waiting-room door", "preset": "door" },
+      { "id": "heartbeat", "label": "Hold your breath", "preset": "heartbeat" }
+    ]
+  },
+  "letters": [
+    {
+      "id": "timetable",
+      "to": "ida-kell",
+      "title": "The last entry in the train register",
+      "when": "When the paraffin runs low (about five candles)",
+      "text": "You find it in your own handwriting, in the train register, dated the second night: \"6:10 Saltcoats passed Marrowby, 2 min late, all lamps lit, no one at the windows.\" You don't remember writing it. You don't remember the train. The next line is in your hand too, and the ink is still wet: \"Line clear.\""
+    }
+  ],
+  "content": {
+    "sources": [
+      "Original module for Ten Candles (Cavalry Games). You need the game to play: this is a play aid, and every rule here is our own summary."
+    ],
+    "warnings": [
+      "every character dies",
+      "darkness and isolation",
+      "grief and abandonment",
+      "bodies (not described closely)",
+      "fire"
+    ]
+  },
+  "skin": "noticeboard",
+  "module": {
+    "intro": "It has been dark for nineteen days. Not night: dark. The sun didn't rise, and three days later the stars went out one by one, like lamps along a street. Phones died. The radio still talks sometimes, a man reading the same list of railway stations, and at the end of the list he says the last train to the coast will run when the line is clear.\n\nMarrowby Junction is a signal box, a platform and a stone waiting room on the high moor, forty miles from anywhere with a name. On the signal post a single paraffin lamp is burning. You can see it from miles away, the only light in the world. Every one of you walked toward it. Some of you walked a long way.\n\nThe stove in the waiting room is warm. There is tea, of a kind. Ida Kell, who has worked this box for thirty years, has kept the lamp lit every hour of every day, and tonight, for the first time, she has said out loud how much paraffin is left.\n\nIn the rails, very faintly, something has started to hum.",
+    "goal": "Keep the signal lit until the last train comes through, and get someone, anyone, aboard it.",
+    "them": "They come up the line from Gallows Hill tunnel. You hear Them before anything else: a hum in the rails like a train that never arrives, then the smell of wet coal. Near the light They are only a pressure at the edge of it, a crowd that keeps its distance. In the dark They are close enough to touch. People who go out to Them come back to the edge of the lamplight and stand there, facing in, and do not answer to their names. Let the table decide what else They are. Light is the only thing They won't cross.",
+    "areas": [
+      {
+        "id": "signal-box",
+        "name": "The signal box",
+        "text": "A wooden box on stilts with a long frame of levers and a brass block bell that still rings when the line ahead is occupied. Ida sleeps in the chair. The windows look down the line both ways: north to the moor, south to the tunnel mouth.",
+        "finds": ["the train register", "a working block bell", "a hand lamp with a red glass", "detonator caps for the rails"]
+      },
+      {
+        "id": "waiting-room",
+        "name": "The waiting room",
+        "text": "Stone walls, a pot-bellied stove, two benches, a timetable under glass with the 6:10 circled in pencil by someone who has stopped coming in. People have left things here: shoes, a pram with nothing in it, a stack of letters addressed to the same house.",
+        "finds": ["coal, enough for a day", "an empty pram", "unposted letters", "a bag of barley sugar"]
+      },
+      {
+        "id": "lamp-room",
+        "name": "The lamp room",
+        "text": "A lean-to that smells of paraffin and burnt wick. Racks of station lamps, most of them dry. One drum of paraffin with a dipstick: Ida marks the level in chalk on the wall each night, and the marks are getting closer together.",
+        "finds": ["the last drum of paraffin", "wicks", "lamp oil that's mostly water", "a box of tinned candles from the war"]
+      },
+      {
+        "id": "crossing",
+        "name": "The level crossing",
+        "text": "Where the moor road crosses the line, two hundred yards north. The gates are shut. Cars stand on the road behind them, doors open, lights long dead. Footprints in the frost lead from the cars toward the lamp and stop halfway.",
+        "finds": ["car batteries", "a road atlas", "a child's torch with one weak bulb"]
+      },
+      {
+        "id": "stationmasters-house",
+        "name": "The stationmaster's house",
+        "text": "A cottage below the platform. The stationmaster went into the tunnel on the fifth day to look for the train and didn't come back. His wife still sets two places at the table. She won't come up to the light. She says she can hear him on the line.",
+        "finds": ["a shotgun with four shells", "a pantry", "a gramophone", "a family Bible with names crossed out in pencil"]
+      },
+      {
+        "id": "tunnel",
+        "name": "Gallows Hill tunnel",
+        "text": "A mile and a quarter of brick-lined dark under the hill, the only way the coast line goes. The hum comes from inside. Water runs down the walls. Halfway along there's a refuge alcove where someone has left a lit candle, and nobody knows who keeps lighting it.",
+        "finds": ["a platelayer's trolley", "the stationmaster's cap", "a lit candle in the refuge"]
+      }
+    ],
+    "stages": [
+      {
+        "title": "Keep the lamp lit",
+        "candles": 10,
+        "text": "Strangers sizing each other up in the waiting room. Who walked in from where, and what did they see on the way? Ida says there's paraffin for three nights at most. Someone suggests going down to the stationmaster's house for supplies.",
+        "beats": ["the block bell rings once with nothing on the line", "a figure stands at the edge of the light and won't come closer", "the radio reads the list of stations and leaves Marrowby out"]
+      },
+      {
+        "title": "What will burn",
+        "candles": 7,
+        "text": "The paraffin is going. Light becomes the only currency. People start burning things to keep it: letters, benches, the timetable, the pram. The cars at the crossing have batteries. Someone has to cross two hundred yards of dark to get them.",
+        "beats": ["the stationmaster's wife calls from the dark by name", "a lamp goes out in the lamp room though no one touched it", "Ida writes in the register and won't say what"]
+      },
+      {
+        "title": "The line is clear",
+        "candles": 4,
+        "text": "The bell rings properly now, the long code for a train approaching. It's coming from the coast end, through the tunnel. For it to take anyone, someone has to set the signal and someone has to be on the platform, and both need light.",
+        "beats": ["the hum becomes a rhythm, like wheels", "someone who went out comes back to the edge of the light, facing in", "the last full lamp has to go one way or the other: the signal or the platform"]
+      },
+      {
+        "title": "Through the tunnel",
+        "candles": 2,
+        "text": "The train hasn't come out of Gallows Hill. Whatever's holding it is in there. The only light left is what you can carry. The candle in the refuge alcove is still burning.",
+        "beats": ["the trolley on the rails, pushed into the dark", "the refuge candle, and whoever lit it", "the far end of the tunnel, where there might be a grey light, or might not"]
+      }
+    ],
+    "lastStand": "One candle. Let it be the lamp on the signal post, or the candle from the tunnel refuge. The train comes. It doesn't slow down. Its windows are lit, every one, and there's no one at them, and its light is the last light. Ask each player in turn what their character does as it passes."
+  },
+  "suggestedTruths": [
+    "The block bell rang twice tonight with nothing on the line.",
+    "Ida has marked the paraffin level lower than it really is.",
+    "There is a smell of wet coal in the waiting room that won't go away.",
+    "The man on the radio sounded closer tonight.",
+    "Someone's coat is missing from the hook by the stove.",
+    "The footprints at the crossing have moved a little nearer to the light.",
+    "The stationmaster's wife has laid a third place at her table.",
+    "The candle in the tunnel refuge is still burning."
+  ]
+}

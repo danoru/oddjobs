@@ -1,0 +1,732 @@
+/*
+ * Ten Candles at the table: soot, wax and the last light. Shared by the
+ * phone, the GM page and the TV. Flames flicker unless the viewer asked for
+ * less motion; then they hold a steady glow.
+ */
+
+.room {
+  --soot: #0d0a07;
+  --soot-2: #17110b;
+  --ember: #f3c770;
+  --ember-deep: #d9822b;
+  --ash: #8d8273;
+  --bone: #efe4cf;
+  color: var(--bone);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(243, 199, 112, 0.1), transparent 60%),
+    linear-gradient(180deg, var(--soot-2), var(--soot));
+  border: 1px solid #2c2117;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.7);
+  padding: clamp(14px, 3vw, 28px);
+}
+
+.room h1,
+.room h2,
+.room h3 {
+  font-family: var(--font-print);
+  font-weight: 400;
+  color: var(--ember);
+  margin: 0 0 8px;
+}
+
+.eyebrow {
+  font-family: var(--font-label);
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ash);
+  margin: 0 0 4px;
+}
+
+.prose {
+  font-family: var(--font-print);
+  font-size: 18px;
+  line-height: 1.45;
+  margin: 0 0 12px;
+}
+
+.hint {
+  font-family: var(--font-sheet);
+  font-size: 15px;
+  color: var(--ash);
+  margin: 4px 0 10px;
+}
+
+.error {
+  font-family: var(--font-sheet);
+  font-size: 15px;
+  color: #ffb4a3;
+  margin: 8px 0 0;
+}
+
+.section {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(239, 228, 207, 0.12);
+}
+
+/* ---- Candles ------------------------------------------------------------ */
+
+.candles {
+  /* Ten in a row, even on a phone. */
+  --size: clamp(18px, 6vw, 34px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: calc(var(--size) * 0.35);
+  padding: calc(var(--size) * 0.9) 4px calc(var(--size) * 0.2);
+  flex-wrap: wrap;
+}
+
+.candle {
+  position: relative;
+  width: var(--size);
+  height: calc(var(--size) * 2.4);
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: default;
+  flex: none;
+}
+
+button.candle {
+  cursor: pointer;
+}
+
+button.candle:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: 4px;
+}
+
+.wax {
+  position: absolute;
+  inset: auto 12% 0 12%;
+  height: 78%;
+  border-radius: 18% 18% 6% 6% / 8% 8% 4% 4%;
+  background: linear-gradient(90deg, #cdbf9f, #f6ecd4 40%, #e6d7b5 70%, #b9a985);
+  box-shadow: inset 0 -6px 10px rgba(80, 60, 30, 0.25);
+}
+
+.wax::before {
+  /* the pool of melted wax at the top, and a drip */
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: -3%;
+  height: 12%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 40%, #fff6dc, #e8d6ad);
+}
+
+.wax::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  top: 4%;
+  width: 14%;
+  height: 26%;
+  border-radius: 0 0 50% 50%;
+  background: linear-gradient(180deg, #fbf1d8, #e6d2a6);
+}
+
+.wick {
+  position: absolute;
+  left: 50%;
+  bottom: 77%;
+  width: 2px;
+  height: 9%;
+  margin-left: -1px;
+  background: #2a1d10;
+  border-radius: 1px;
+}
+
+.flame {
+  position: absolute;
+  left: 50%;
+  bottom: 84%;
+  width: 46%;
+  height: 34%;
+  margin-left: -23%;
+  border-radius: 50% 50% 45% 45% / 62% 62% 38% 38%;
+  background: radial-gradient(ellipse at 50% 78%, #fff 0 12%, #ffe7a3 26%, #ffb63e 52%, rgba(255, 110, 20, 0.6) 72%, transparent 76%);
+  transform-origin: 50% 90%;
+  filter: blur(0.3px);
+  animation: flicker var(--flicker, 1.9s) ease-in-out infinite alternate;
+  animation-delay: var(--delay, 0s);
+}
+
+.glow {
+  position: absolute;
+  left: 50%;
+  bottom: 70%;
+  width: 260%;
+  height: 160%;
+  transform: translate(-50%, 30%);
+  background: radial-gradient(circle, rgba(255, 190, 90, 0.35), rgba(255, 150, 60, 0.08) 45%, transparent 70%);
+  pointer-events: none;
+  animation: breathe var(--flicker, 1.9s) ease-in-out infinite alternate;
+  animation-delay: var(--delay, 0s);
+}
+
+.dark .wax {
+  background: linear-gradient(90deg, #6d6555, #9c927c 40%, #8a806a 70%, #5b5446);
+}
+
+.dark .wax::before {
+  background: radial-gradient(ellipse at 50% 40%, #a39985, #7e745f);
+}
+
+.dark .wax::after {
+  background: linear-gradient(180deg, #a59b85, #7a7060);
+}
+
+.smoke {
+  position: absolute;
+  left: 50%;
+  bottom: 86%;
+  width: 6px;
+  height: 40%;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: linear-gradient(0deg, rgba(200, 190, 175, 0.45), transparent);
+  filter: blur(2px);
+  opacity: 0;
+  animation: smoke 2.8s ease-out 1;
+}
+
+@keyframes flicker {
+  0% {
+    transform: scale(1, 1) skewX(0deg);
+    opacity: 0.95;
+  }
+  20% {
+    transform: scale(0.94, 1.08) skewX(2deg);
+  }
+  45% {
+    transform: scale(1.04, 0.95) skewX(-2.5deg);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.97, 1.05) skewX(1deg);
+    opacity: 0.88;
+  }
+  100% {
+    transform: scale(1.02, 0.98) skewX(-1deg);
+    opacity: 1;
+  }
+}
+
+@keyframes breathe {
+  from {
+    opacity: 0.75;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes smoke {
+  0% {
+    opacity: 0.7;
+    transform: translateY(0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scaleX(2.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flame,
+  .glow,
+  .smoke {
+    animation: none;
+  }
+  .smoke {
+    display: none;
+  }
+}
+
+/* ---- Index cards ---------------------------------------------------------- */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 14px;
+}
+
+.card {
+  position: relative;
+  min-height: 120px;
+  padding: 26px 14px 14px;
+  color: #1f2a3a;
+  background:
+    linear-gradient(90deg, transparent 22px, rgba(200, 60, 60, 0.45) 22px 23.5px, transparent 23.5px),
+    repeating-linear-gradient(180deg, transparent 0 23px, rgba(70, 110, 170, 0.28) 23px 24px),
+    linear-gradient(180deg, #fbf8ef, #f1ebda);
+  background-position: 0 0, 0 18px, 0 0;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+  transform: rotate(var(--tilt, 0deg));
+}
+
+.cardKind {
+  position: absolute;
+  top: 6px;
+  left: 30px;
+  font-family: var(--font-label);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8a3a2a;
+}
+
+.cardFrom {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-family: var(--font-label);
+  font-size: 11px;
+  color: #6b7480;
+}
+
+.cardText {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 19px;
+  line-height: 24px;
+  margin: 0 0 0 16px;
+}
+
+.cardTop {
+  outline: 3px solid var(--ember);
+  outline-offset: 3px;
+  box-shadow: 0 0 26px rgba(243, 199, 112, 0.35), 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+.cardBurned {
+  filter: sepia(0.8) brightness(0.55);
+  opacity: 0.6;
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(20, 10, 0, 0.85) 92%),
+    linear-gradient(180deg, #d8c9a8, #b9a37a);
+}
+
+.cardBurned .cardText {
+  text-decoration: line-through;
+  text-decoration-color: rgba(60, 20, 0, 0.6);
+}
+
+.cardDown {
+  background:
+    repeating-linear-gradient(45deg, #2b2016 0 6px, #241a11 6px 12px),
+    #241a11;
+  color: var(--ash);
+}
+
+.cardDown .cardKind {
+  color: var(--ember);
+}
+
+.cardDown .cardText {
+  font-style: normal;
+  font-family: var(--font-sheet);
+  color: var(--ash);
+}
+
+/* ---- Dice ----------------------------------------------------------------- */
+
+.dice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.die {
+  --pip: #1b130c;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #fbf6ea, #ddd0b4);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.5);
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.die span {
+  display: block;
+  width: 7px;
+  height: 7px;
+  margin: auto;
+  border-radius: 50%;
+  background: var(--pip);
+}
+
+.die span[data-off] {
+  visibility: hidden;
+}
+
+.six {
+  outline: 3px solid var(--ember);
+  box-shadow: 0 0 16px rgba(243, 199, 112, 0.6), inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+}
+
+.one {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+.hopeDie {
+  --pip: #fff4d2;
+  background: linear-gradient(145deg, #e3962e, #9c4f12);
+}
+
+.gmDie {
+  --pip: var(--bone);
+  background: linear-gradient(145deg, #3a2e24, #1a130d);
+}
+
+.tally {
+  font-family: var(--font-label);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  color: var(--ash);
+}
+
+/* ---- Buttons -------------------------------------------------------------- */
+
+.btn {
+  border: 1px solid rgba(243, 199, 112, 0.6);
+  background: linear-gradient(180deg, #3a2a18, #24180d);
+  color: var(--ember);
+  font-family: var(--font-label);
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  padding: 10px 18px;
+  cursor: pointer;
+  border-radius: 2px;
+  min-height: 44px;
+}
+
+.btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #4a3520, #2e1f11);
+}
+
+.btn:focus-visible,
+.quiet:focus-visible,
+.field:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.big {
+  font-size: 20px;
+  padding: 14px 26px;
+  width: 100%;
+}
+
+.danger {
+  border-color: rgba(255, 140, 120, 0.6);
+  color: #ffb4a3;
+}
+
+.quiet {
+  border: 0;
+  background: none;
+  color: var(--ash);
+  font-family: var(--font-label);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 4px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.field {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-print);
+  font-size: 18px;
+  padding: 10px 12px;
+  background: rgba(239, 228, 207, 0.08);
+  color: var(--bone);
+  border: 1px solid rgba(239, 228, 207, 0.3);
+  border-radius: 2px;
+}
+
+textarea.field {
+  min-height: 74px;
+  resize: vertical;
+}
+
+.label {
+  display: block;
+  font-family: var(--font-label);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--ash);
+  margin: 12px 0 4px;
+}
+
+/* ---- Seats, truths, log ---------------------------------------------------- */
+
+.seats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.seat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(239, 228, 207, 0.05);
+  border-left: 3px solid rgba(243, 199, 112, 0.4);
+  font-family: var(--font-sheet);
+  font-size: 16px;
+}
+
+.seatDead {
+  opacity: 0.5;
+  border-left-color: #555;
+  text-decoration: line-through;
+}
+
+.seatNo {
+  font-family: var(--font-label);
+  color: var(--ash);
+  min-width: 1.5em;
+}
+
+.badge {
+  font-family: var(--font-label);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  padding: 1px 7px;
+  border: 1px solid rgba(243, 199, 112, 0.5);
+  color: var(--ember);
+}
+
+.truths {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.truths li {
+  font-family: var(--font-print);
+  font-size: 19px;
+  line-height: 1.35;
+  padding: 6px 0;
+  border-bottom: 1px dotted rgba(239, 228, 207, 0.15);
+}
+
+.truthBy {
+  display: block;
+  font-family: var(--font-label);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ash);
+}
+
+.opening {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--ember);
+  margin: 0 0 10px;
+}
+
+.alive {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 26px;
+  color: var(--ember);
+  text-align: center;
+  margin: 18px 0 6px;
+}
+
+/* ---- Unconfirmed-rule markers --------------------------------------------- */
+
+.mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border: 1px dashed rgba(243, 199, 112, 0.7);
+  border-radius: 10px;
+  background: none;
+  color: var(--ember);
+  font-family: var(--font-label);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.markText {
+  display: block;
+  margin: 6px 0 10px;
+  padding: 8px 10px;
+  border-left: 3px dashed rgba(243, 199, 112, 0.7);
+  background: rgba(243, 199, 112, 0.06);
+  font-family: var(--font-sheet);
+  font-size: 14px;
+  color: var(--bone);
+}
+
+/* ---- Layouts ---------------------------------------------------------------- */
+
+.phone {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.gmGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.panel {
+  background: rgba(239, 228, 207, 0.04);
+  border: 1px solid rgba(239, 228, 207, 0.1);
+  padding: 14px 16px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- The TV ----------------------------------------------------------------- */
+
+.tv {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: clamp(18px, 3vw, 48px);
+  background: radial-gradient(ellipse at 50% 90%, rgba(243, 199, 112, 0.12), transparent 60%), #070504;
+  color: #efe4cf;
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+}
+
+.tvTitle {
+  font-family: var(--font-print);
+  font-size: clamp(28px, 3.6vw, 60px);
+  color: #f3c770;
+  margin: 0;
+  text-align: center;
+}
+
+.tvCandles {
+  --size: clamp(34px, 5.6vw, 92px);
+}
+
+.tvStage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1.6vh;
+}
+
+.tvLine {
+  font-family: var(--font-print);
+  font-size: clamp(22px, 2.6vw, 46px);
+  line-height: 1.3;
+  max-width: 34ch;
+  margin: 0;
+}
+
+.tvSmall {
+  font-family: var(--font-label);
+  font-size: clamp(14px, 1.2vw, 22px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8d8273;
+  margin: 0;
+}
+
+.tvTruths {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-width: 60ch;
+}
+
+.tvTruths li {
+  font-family: var(--font-print);
+  font-size: clamp(18px, 1.9vw, 34px);
+  line-height: 1.35;
+  margin: 0.3em 0;
+  animation: fadeIn 1.2s ease-out both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tvTruths li {
+    animation: none;
+  }
+}
+
+.tvDice .die {
+  width: clamp(40px, 4vw, 70px);
+  height: clamp(40px, 4vw, 70px);
+}
+
+.tvDice .die span {
+  width: 22%;
+  height: 22%;
+}
+
+.tvBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-family: var(--font-label);
+  color: #8d8273;
+}

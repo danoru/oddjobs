@@ -1,0 +1,33 @@
+{
+  "id": "owen-pask",
+  "name": "Owen Pask",
+  "order": 2,
+  "poster": {
+    "header": "MISSING",
+    "epithet": "the one who walked from the crash",
+    "hook": "Nineteen. Trainee nurse. Walked eleven miles toward the only light.",
+    "icon": "eye"
+  },
+  "flashback": "Who was in the car with you when the lights went out, and why didn't they walk with you?",
+  "ifUnclaimed": {
+    "npc": "Owen arrives during the first scene, out of breath, with a split lip. He'll do whatever the kindest person in the room says.",
+    "reassign": [],
+    "cuts": []
+  },
+  "story": {
+    "pronouns": "he/him",
+    "concept": "A trainee nurse who was being driven home from a night shift when the dark came. He's good in a crisis because he hasn't had time to fall apart yet.",
+    "look": "Hospital scrubs under a borrowed parka, a lanyard with his photo on it, trainers soaked through, a split lip he keeps touching.",
+    "namePrompts": ["Danny Pask", "Rhys Moran"],
+    "carrying": ["a pen torch with a dying battery", "a roll of tape", "his mum's house keys"],
+    "stake": "There were people in the cars at the crossing. He thinks some of them might still be alive.",
+    "ties": [
+      { "to": "ida-kell", "text": "She's the first adult who's told him what to do in nineteen days. He'd follow her anywhere.", "public": "follows Ida about" },
+      {
+        "to": "marguerite-loy",
+        "text": "He saw her at the crossing, standing by one of the cars, before she came up to the light. She told him she'd only just arrived.",
+        "public": "met her at the crossing"
+      }
+    ]
+  }
+}

@@ -13,7 +13,7 @@ import {
 import PrintIcon from "@mui/icons-material/Print";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { loadOneShot, publishedSlugs } from "@/lib/content";
-import { toPublic, type PublicOneShot } from "@/lib/public";
+import { toPublic, type PublicAnyOneShot } from "@/lib/public";
 import { FATE_LABEL, FATES, type Fate } from "@/lib/legacy";
 import { emptyEpilogue, survivorsFrom, useEpilogue } from "@/lib/epilogue";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -24,7 +24,7 @@ export const getStaticPaths: GetStaticPaths = async () => ({
   fallback: false,
 });
 
-export const getStaticProps: GetStaticProps<{ os: PublicOneShot }> = async ({ params }) => ({
+export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = async ({ params }) => ({
   props: { os: toPublic(loadOneShot(String(params!.oneshot))) },
 });
 
@@ -33,7 +33,7 @@ export const getStaticProps: GetStaticProps<{ os: PublicOneShot }> = async ({ pa
  * That prints as a broadsheet keepsake, and the record joins the shared world
  * so survivors can turn up in later one-shots.
  */
-export default function EpiloguePage({ os }: { os: PublicOneShot }) {
+export default function EpiloguePage({ os }: { os: PublicAnyOneShot }) {
   const { ep, setEp } = useEpilogue(os.slug);
   const setEntry = (id: string, patch: Partial<EpilogueEntry>) =>
     setEp({ ...ep, entries: { ...ep.entries, [id]: { ...ep.entries[id], ...patch } } });

@@ -1,5 +1,5 @@
 import { FATE_LABEL, type Fate } from "@/lib/legacy";
-import type { PublicOneShot } from "@/lib/public";
+import type { PublicAnyOneShot } from "@/lib/public";
 import { PosterIcon } from "@/components/PosterIcon";
 import s from "./Gazette.module.css";
 
@@ -20,7 +20,7 @@ export interface Epilogue {
 }
 
 /** The morning-after front page, typeset from the table's epilogue. */
-export function Gazette({ os, ep }: { os: PublicOneShot; ep: Epilogue }) {
+export function Gazette({ os, ep }: { os: PublicAnyOneShot; ep: Epilogue }) {
   const g = os.gazette ?? { name: `The ${os.title.replace(/^the\s+/i, "")} Gazette`, town: os.setting.split(/[(;,.]/)[0].trim(), price: "One penny" };
   const shown = os.cast.filter((c) => ep.entries[c.id]?.fate || ep.entries[c.id]?.line);
   const living = shown.filter((c) => ep.entries[c.id].fate !== "fell");

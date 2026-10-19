@@ -1,4 +1,4 @@
-import type { Character } from "./schema";
+import type { CoreCharacter as Character } from "./schema";
 
 /**
  * "What changes tonight": given who's actually playing, work out which absent

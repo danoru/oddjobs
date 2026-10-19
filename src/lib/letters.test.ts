@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { loadOneShot } from "./content";
+import { load5e } from "./content";
 import { availableLetters, beatId, letterIdSchema, letterText, resolveLetter } from "./letters";
 
-const bell = loadOneShot("the-drowned-bell");
+const bell = load5e("the-drowned-bell");
 const everyone = bell.cast.map((c) => c.id);
 
 describe("letters", () => {

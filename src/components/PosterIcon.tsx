@@ -27,6 +27,7 @@ export const PATHS: Record<IconKey, string> = {
   ghost:
     "M12 2a7 7 0 0 1 7 7v13l-2.3-1.8L14.3 22 12 20.2 9.7 22l-2.4-1.8L5 22V9a7 7 0 0 1 7-7zM9.5 8a1.5 2 0 1 0 0 4 1.5 2 0 0 0 0-4zm5 0a1.5 2 0 1 0 0 4 1.5 2 0 0 0 0-4z",
   star: "M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z",
+  candle: "M12 1.5c1.4 2 2.2 3.4 2.2 4.6a2.2 2.2 0 0 1-4.4 0c0-1.2.8-2.6 2.2-4.6zM11.3 8.6h1.4v1.2h-1.4zM9 10h6v10H9zM6 20.5h12V22H6z",
 };
 
 export function PosterIcon({ icon, size = 48, className }: { icon: IconKey; size?: number; className?: string }) {

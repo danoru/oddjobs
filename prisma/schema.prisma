@@ -17,6 +17,8 @@ model Table {
   claims     Claim[]
   deliveries Delivery[]
   flashbacks Flashback[]
+  game       Game?
+  recordings Recording[]
   createdAt  DateTime   @default(now())
 }
 
@@ -62,4 +64,36 @@ model Flashback {
   updatedAt   DateTime @updatedAt
 
   @@unique([tableId, characterId])
+}
+
+/// Live table play for systems that have it (Ten Candles): the whole game as
+/// one JSON state, changed only through the system's reducer
+/// (src/systems/<id>/game.ts). `version` guards against two phones acting at
+/// once: a write only lands if nobody else wrote since it was read.
+model Game {
+  id        String   @id @default(cuid())
+  tableId   String   @unique
+  table     Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  system    String
+  state     Json
+  version   Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
+
+/// A player's final words (Ten Candles), kept only when the GM chooses to
+/// keep recordings at this table. Small and capped: a short voice clip, or a
+/// written message for players without a microphone.
+model Recording {
+  id        String   @id @default(cuid())
+  tableId   String
+  table     Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  /// The recording player's made-up browser id; never sent to anyone.
+  playerId  String
+  mime      String
+  audio     Bytes?
+  text      String?
+  size      Int
+  createdAt DateTime @default(now())
+
+  @@unique([tableId, playerId])
 }

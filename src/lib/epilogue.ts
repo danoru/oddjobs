@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 import { FATES, survivorSchema, type Survivor } from "./legacy";
 import type { Epilogue } from "@/components/gazette/Gazette";
-import type { PublicOneShot } from "./public";
+import type { PublicAnyOneShot } from "./public";
 
 /** The table's epilogue for a one-shot, kept on this device until it's printed and recorded. */
 
@@ -74,7 +74,7 @@ export function useEpilogue(slug: string) {
 }
 
 /** Records for the shared world: one per character the table gave a fate. */
-export function survivorsFrom(os: PublicOneShot, ep: Epilogue): Survivor[] {
+export function survivorsFrom(os: PublicAnyOneShot, ep: Epilogue): Survivor[] {
   return os.cast.flatMap((c) => {
     const e = ep.entries[c.id];
     if (!e?.fate) return [];

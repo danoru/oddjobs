@@ -4,19 +4,24 @@ import { useMemo, useState } from "react";
 import type { GetStaticProps } from "next";
 import { Box, Container, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { loadAll } from "@/lib/content";
-import { levelsOf } from "@/lib/variants";
+import { levelsOf } from "@/systems/dnd5e/variants";
+import { SYSTEMS } from "@/systems/registry";
 import { FATE_LABEL, type Survivor } from "@/lib/legacy";
 import { loadSurvivors } from "@/lib/legacy.server";
-import type { OneShotWithCast } from "@/lib/schema";
+import { SYSTEM_IDS, type OneShotWithCast, type SystemId } from "@/lib/schema";
 import { SiteHeader } from "@/components/SiteHeader";
 import { PosterIcon } from "@/components/PosterIcon";
 import { tiltFor } from "@/components/board/Poster";
 import s from "@/components/board/Board.module.css";
 
-type Summary = Pick<
-  OneShotWithCast,
-  "slug" | "title" | "pitch" | "ruleset" | "level" | "players" | "durationHrs" | "tone" | "posting"
-> & { levels: number[]; cast: { id: string; icon: OneShotWithCast["cast"][number]["poster"]["icon"] }[] };
+type Summary = Pick<OneShotWithCast, "slug" | "title" | "pitch" | "players" | "durationHrs" | "tone" | "posting"> & {
+  system: SystemId;
+  /** 5e only: the ruleset and every level it plays at. */
+  ruleset: "2014" | "2024" | null;
+  level: number | null;
+  levels: number[];
+  cast: { id: string; icon: OneShotWithCast["cast"][number]["poster"]["icon"] }[];
+};
 
 export const getStaticProps: GetStaticProps<{ jobs: Summary[]; survivors: Survivor[] }> = async () => ({
   props: {
@@ -27,9 +32,10 @@ export const getStaticProps: GetStaticProps<{ jobs: Summary[]; survivors: Surviv
       slug: os.slug,
       title: os.title,
       pitch: os.pitch,
-      ruleset: os.ruleset,
-      level: os.level,
-      levels: levelsOf(os).map((l) => l.level),
+      system: os.system,
+      ruleset: os.system === "dnd5e" ? os.ruleset : null,
+      level: os.system === "dnd5e" ? os.level : null,
+      levels: os.system === "dnd5e" ? levelsOf(os).map((l) => l.level) : [],
       players: os.players,
       durationHrs: os.durationHrs,
       tone: os.tone,
@@ -40,16 +46,18 @@ export const getStaticProps: GetStaticProps<{ jobs: Summary[]; survivors: Surviv
 });
 
 export default function BoardPage({ jobs, survivors }: { jobs: Summary[]; survivors: Survivor[] }) {
+  const [system, setSystem] = useState<"all" | SystemId>("all");
   const [ruleset, setRuleset] = useState<"all" | "2014" | "2024">("all");
   const [party, setParty] = useState<number | "any">("any");
   const shown = useMemo(
     () =>
       jobs.filter(
         (j) =>
+          (system === "all" || j.system === system) &&
           (ruleset === "all" || j.ruleset === ruleset) &&
           (party === "any" || (j.players.min <= party && party <= j.players.max)),
       ),
-    [jobs, ruleset, party],
+    [jobs, system, ruleset, party],
   );
 
   return (
@@ -73,6 +81,25 @@ export default function BoardPage({ jobs, survivors }: { jobs: Summary[]; surviv
               <ToggleButtonGroup
                 size="small"
                 exclusive
+                value={system}
+                onChange={(_, v) => {
+                  if (!v) return;
+                  setSystem(v);
+                  if (v !== "dnd5e" && v !== "all") setRuleset("all");
+                }}
+                aria-label="Game system"
+              >
+                <ToggleButton value="all">All games</ToggleButton>
+                {SYSTEM_IDS.map((id) => (
+                  <ToggleButton key={id} value={id}>
+                    {SYSTEMS[id].label}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+              <ToggleButtonGroup
+                size="small"
+                exclusive
+                disabled={system === "tencandles"}
                 value={ruleset}
                 onChange={(_, v) => v && setRuleset(v)}
                 aria-label="Ruleset"
@@ -103,7 +130,7 @@ export default function BoardPage({ jobs, survivors }: { jobs: Summary[]; surviv
               <div className={s.note} style={{ maxWidth: 420, margin: "0 auto" }}>
                 <span className={s.pin} aria-hidden="true" />
                 <p className={s.noteTitle}>Nothing pinned for that</p>
-                <p className={s.postingPitch}>Try another ruleset or table size.</p>
+                <p className={s.postingPitch}>Try another game, ruleset or table size.</p>
               </div>
             ) : (
               <div className={s.wideGrid}>
@@ -115,10 +142,15 @@ export default function BoardPage({ jobs, survivors }: { jobs: Summary[]; surviv
                     style={{ ["--tilt" as string]: `${tiltFor(j.slug, 1.6)}deg` }}
                   >
                     <span className={s.brassPin} aria-hidden="true" />
-                    <span className={j.ruleset === "2014" ? s.stamp2014 : s.stamp2024}>
-                      {j.ruleset}
-                      <span className={s.srOnly}> rules</span>
+                    <span className={s.systemBadge} data-system={j.system}>
+                      {SYSTEMS[j.system].label}
                     </span>
+                    {j.ruleset && (
+                      <span className={j.ruleset === "2014" ? s.stamp2014 : s.stamp2024}>
+                        {j.ruleset}
+                        <span className={s.srOnly}> rules</span>
+                      </span>
+                    )}
                     <div className={s.postingHeader}>{j.posting.header}</div>
                     <h2 className={s.postingTitle} id={`job-${j.slug}`}>
                       {j.title}
@@ -127,7 +159,9 @@ export default function BoardPage({ jobs, survivors }: { jobs: Summary[]; surviv
                       {j.pitch}
                     </p>
                     <div className={s.meta} id={`job-${j.slug}-meta`}>
-                      <span>{j.levels.length > 1 ? `Level ${j.levels.join(" or ")}` : `Level ${j.level}`}</span>
+                      {j.level !== null && (
+                        <span>{j.levels.length > 1 ? `Level ${j.levels.join(" or ")}` : `Level ${j.level}`}</span>
+                      )}
                       <span>
                         {j.players.min}–{j.players.max} players
                       </span>

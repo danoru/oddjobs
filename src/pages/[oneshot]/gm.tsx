@@ -7,6 +7,8 @@ import { requestRole } from "@/lib/auth";
 import { loadOneShot } from "@/lib/content";
 import type { OneShotWithCast } from "@/lib/schema";
 import { useClaims, useLevel } from "@/lib/storage";
+import { posterTag } from "@/systems/registry";
+import { GmTable } from "@/systems/tencandles/components/GmTable";
 import { LevelPicker } from "@/components/board/LevelPicker";
 import { SiteHeader } from "@/components/SiteHeader";
 import { GmTablePanels } from "@/components/gm/GmTablePanels";
@@ -40,12 +42,13 @@ const mono = { fontFamily: "var(--font-print)", fontSize: 16 } as const;
 
 export default function GmPage({ os: base }: Props) {
   const { os, level, setLevel, levels } = useLevel(base);
-  const levelQuery = level === base.level ? "" : `&level=${level}`;
+  const levelQuery = base.system !== "dnd5e" || level === base.level ? "" : `&level=${level}`;
   const claims = useClaims(os.slug);
   const { table, claimedBy, loading, error, openTable, leave, release } = claims;
   const [problem, setProblem] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const nameOf = (id: string) => os.cast.find((c) => c.id === id)?.name ?? id;
+  const joinPath = `/${os.slug}${os.system === "tencandles" ? "/play" : ""}?table=${table}${levelQuery}`;
 
   async function open() {
     setBusy(true);
@@ -73,7 +76,9 @@ export default function GmPage({ os: base }: Props) {
               <LevelPicker levels={levels} level={level} onChange={setLevel} />
               {table ? (
                 <>
-                  <Typography sx={{ ...mono, mt: 1 }}>Read this out — players join with it on the job page:</Typography>
+                  <Typography sx={{ ...mono, mt: 1 }}>
+                    Read this out — players join with it on {os.system === "tencandles" ? "their phones, at the table page" : "the job page"}:
+                  </Typography>
                   <Typography
                     aria-label={`Table code ${table.split("").join(" ")}`}
                     sx={{ fontFamily: "var(--font-poster)", fontSize: 52, letterSpacing: "0.18em", color: "var(--wax)" }}
@@ -82,7 +87,7 @@ export default function GmPage({ os: base }: Props) {
                   </Typography>
                   <Typography sx={{ ...mono, fontSize: 14, color: "var(--ink-soft)" }}>
                     Or share{" "}
-                    <Link href={`/${os.slug}?table=${table}${levelQuery}`}>{`/${os.slug}?table=${table}${levelQuery}`}</Link>
+                    <Link href={joinPath}>{joinPath}</Link>
                   </Typography>
                   <Box sx={{ display: "flex", gap: 1, mt: 1.5, flexWrap: "wrap" }}>
                     <Button size="small" variant="outlined" onClick={open} disabled={busy} sx={{ color: "var(--ink)", borderColor: "var(--ink-soft)" }}>
@@ -140,6 +145,8 @@ export default function GmPage({ os: base }: Props) {
             </div>
           </div>
 
+          {os.system === "tencandles" && <GmTable os={os} code={table} />}
+
           <GmTablePanels os={os} table={table} present={Object.keys(claimedBy)} />
 
           {os.gmNotes && (
@@ -163,15 +170,31 @@ export default function GmPage({ os: base }: Props) {
                 </h3>
                 <div className={s.meta} style={{ marginBottom: 8 }}>
                   <span>{c.poster.epithet}</span>
-                  <span>{c.mech.classes.map((k) => `${k.name} ${k.level}`).join(" / ")}</span>
+                  <span>{posterTag(c)}</span>
                   {claimedBy[c.id]?.name && <span>played by {claimedBy[c.id].name}</span>}
                 </div>
-                <Typography sx={mono}>
-                  <b>Tonight:</b> {c.story.stake}
-                </Typography>
-                <Typography sx={{ ...mono, mt: 1, color: "var(--wax)" }}>
-                  <b>Secret:</b> {c.story.secret}
-                </Typography>
+                {"secret" in c.story ? (
+                  <>
+                    <Typography sx={mono}>
+                      <b>Tonight:</b> {c.story.stake}
+                    </Typography>
+                    <Typography sx={{ ...mono, mt: 1, color: "var(--wax)" }}>
+                      <b>Secret:</b> {c.story.secret}
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <Typography sx={mono}>{c.story.concept}</Typography>
+                    <Typography sx={{ ...mono, mt: 1 }}>
+                      <b>Look:</b> {c.story.look}
+                    </Typography>
+                    {c.story.stake && (
+                      <Typography sx={{ ...mono, mt: 1 }}>
+                        <b>Out here because:</b> {c.story.stake}
+                      </Typography>
+                    )}
+                  </>
+                )}
                 <ul className={s.yarnList} style={{ marginTop: 8 }}>
                   {c.story.ties.map((t) => (
                     <li key={t.to}>

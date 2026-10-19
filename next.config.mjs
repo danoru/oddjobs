@@ -8,9 +8,13 @@ const nextConfig = {
   // Keys are globs, so a [param] segment is written as * ("[oneshot]" would be a character class).
   outputFileTracingIncludes: {
     "/*/gm": ["./content/**/*.json"],
+    // The Ten Candles table kit is GM-only too (it carries the module).
+    "/*/kit": ["./content/**/*.json"],
     "/api/foundry/tables/*": ["./content/**/*.json"],
     // Sealed letters resolve their text from content on each request.
     "/api/tables/*/letters": ["./content/**/*.json"],
+    // Live table play finds the one-shot's system (and a module's intro) in content.
+    "/api/tables/*/game": ["./content/**/*.json"],
   },
 };
 

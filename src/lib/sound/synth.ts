@@ -519,6 +519,57 @@ const drone: Voicing = (env, rig, out) => {
   }
 };
 
+/** The dark outside: a sub-bass beat between two close sines, a brown-noise rumble, and now and then a far-off groan. */
+const dark: Voicing = (env, rig, out) => {
+  const c = env.ctx;
+  const g = rig.keep(G(c, 0.5));
+  g.connect(out);
+  for (const [f, level] of [
+    [41, 0.5],
+    [43.7, 0.4],
+    [61.7, 0.12],
+  ] as const) {
+    const vg = rig.keep(G(c, level));
+    osc(env, rig, "sine", f, 0).connect(vg);
+    vg.connect(g);
+  }
+  const lp = rig.keep(F(c, "lowpass", 140, 0.7));
+  const rg = rig.keep(G(c, 0.5));
+  wire(noiseSrc(env, rig, "brown"), lp, rg, g);
+  lfo(env, rig, rg.gain, 0.04, 0.25);
+  lfo(env, rig, g.gain, 0.06, 0.15);
+  // A distant groan: a slow, falling, filtered saw that swells and fades.
+  rig.every(14000, 32000, () => {
+    const t = c.currentTime + 0.05;
+    const f = rand(70, 95);
+    const og = G(c, 0);
+    swell(og.gain, t, 0.12, 2.2, 6);
+    const bp = F(c, "bandpass", 300, 2.5);
+    const o = osc(env, rig, "sawtooth", f, t, 6.2, og, bp);
+    o.frequency.setValueAtTime(f, t);
+    o.frequency.exponentialRampToValueAtTime(f * 0.7, t + 6);
+    wire(o, bp, og, g);
+  }, rand(6000, 12000));
+};
+
+/** A gale: the wind bed pushed harder, with gusts that rise and break over it. */
+const gale: Voicing = (env, rig, out) => {
+  const c = env.ctx;
+  layer(env, rig, out, 1.2, wind);
+  rig.every(4000, 11000, () => {
+    const t = c.currentTime + 0.02;
+    const len = rand(2.5, 4.5);
+    const bp = F(c, "bandpass", 400, 1.2);
+    bp.frequency.setValueAtTime(380, t);
+    bp.frequency.exponentialRampToValueAtTime(rand(900, 1500), t + len * 0.45);
+    bp.frequency.exponentialRampToValueAtTime(350, t + len);
+    const g = G(c, 0);
+    swell(g.gain, t, rand(0.8, 1.3), len * 0.4, len);
+    noiseSrc(env, rig, "pink", { t, dur: len + 0.1, owned: [bp, g] }).connect(bp);
+    wire(bp, g, out);
+  }, rand(1500, 4000));
+};
+
 const storm: Voicing = (env, rig, out) => {
   layer(env, rig, out, 1.3, rain);
   layer(env, rig, out, 0.9, wind);
@@ -781,6 +832,55 @@ const whoosh: Stinging = (env, rig, out) => {
   return total + 0.2;
 };
 
+/** Someone screaming far off: a formant-filtered saw that climbs, wavers and breaks, softened by distance. */
+const scream: Stinging = (env, rig, out) => {
+  const c = env.ctx;
+  const t = c.currentTime + 0.01;
+  const total = 2.4;
+  const f0 = rand(520, 640);
+  const g = rig.keep(G(c, 0));
+  swell(g.gain, t, 0.22, 0.35, total);
+  const lp = rig.keep(F(c, "lowpass", 2600));
+  wire(g, lp, out);
+  const o = osc(env, rig, "sawtooth", f0 * 0.8, t, total + 0.1);
+  o.frequency.setValueAtTime(f0 * 0.8, t);
+  o.frequency.exponentialRampToValueAtTime(f0 * 1.25, t + 0.5);
+  o.frequency.exponentialRampToValueAtTime(f0 * 0.6, t + total);
+  const vib = rig.keep(G(c, 18));
+  osc(env, rig, "sine", 6.5, t, total + 0.1, vib).connect(vib);
+  vib.connect(o.frequency);
+  // Two vowel-ish formants ("aah").
+  for (const [f, q, level] of [
+    [900, 6, 1],
+    [1350, 8, 0.6],
+    [2700, 10, 0.25],
+  ] as const) {
+    const bp = rig.keep(F(c, "bandpass", f, q));
+    const bg = rig.keep(G(c, level));
+    wire(o, bp, bg, g);
+  }
+  return total + 0.6;
+};
+
+/** A candle going out: a short breath, a soft pop of the wick. */
+const snuff: Stinging = (env, rig, out) => {
+  const c = env.ctx;
+  const t = c.currentTime + 0.01;
+  const bp = F(c, "bandpass", 1800, 0.9);
+  bp.frequency.setValueAtTime(2400, t);
+  bp.frequency.exponentialRampToValueAtTime(500, t + 0.45);
+  const g = G(c, 0);
+  swell(g.gain, t, 0.9, 0.08, 0.5);
+  noiseSrc(env, rig, "pink", { t, dur: 0.55, owned: [bp, g] }).connect(bp);
+  wire(bp, g, out);
+  const pg = G(c, 0);
+  pluck(pg.gain, t + 0.42, 0.25, 0.002, 0.08);
+  const plp = F(c, "lowpass", 600);
+  noiseSrc(env, rig, "brown", { t: t + 0.42, dur: 0.12, owned: [plp, pg] }).connect(plp);
+  wire(plp, pg, out);
+  return 0.8;
+};
+
 // ---------------------------------------------------------------------------
 // Preset maps. Typed with Record<enum, ...> so a missing implementation is a compile error.
 // ---------------------------------------------------------------------------
@@ -798,6 +898,8 @@ export const BED_PRESETS: Record<SoundBed, BedPreset> = {
   tavern: { wet: 0.1, play: tavern },
   drone: { wet: 0.25, play: drone },
   crowd: { wet: 0.2, play: crowd },
+  dark: { wet: 0.35, play: dark },
+  gale: { wet: 0.12, play: gale },
 };
 
 export const STINGER_PRESETS: Record<SoundStinger, StingerPreset> = {
@@ -811,6 +913,8 @@ export const STINGER_PRESETS: Record<SoundStinger, StingerPreset> = {
   glass: { wet: 0.3, play: glass },
   cheer: { wet: 0.2, play: cheer },
   whoosh: { wet: 0.15, play: whoosh },
+  scream: { wet: 0.65, play: scream },
+  snuff: { wet: 0.1, play: snuff },
 };
 
 // ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-import type { Character } from "@/lib/schema";
+import type { CoreCharacter as Character } from "@/lib/schema";
 import { planTonight } from "@/lib/tonight";
 import s from "@/components/board/Board.module.css";
 

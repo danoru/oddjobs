@@ -1,40 +1,36 @@
 import fs from "node:fs";
 import type { z } from "zod";
 import path from "node:path";
-import {
-  characterSchema,
-  oneShotSchema,
-  spellBookSchema,
-  variantCharacterSchema,
-  type Character,
-  type OneShot,
-  type OneShotWithCast,
-  type SpellInfo,
-  type VariantCharacter,
-} from "./schema";
-import { totalLevel } from "./derive";
-import { rulesCheck } from "./rules";
-import { withVariant } from "./variants";
-import { spellNames } from "./cards";
+import { oneShotSchema, type CoreCharacter, type OneShotWithCast } from "./schema";
+import * as dnd5e from "@/systems/dnd5e/schema";
+import * as tencandles from "@/systems/tencandles/schema";
+import { crossCheck } from "./crossCheck";
+import { withVariant } from "@/systems/dnd5e/variants";
+import { spellNames } from "@/systems/dnd5e/cards";
 
 /**
  * Content lives in git as JSON:
  *   content/oneshots/<slug>/oneshot.json
  *   content/oneshots/<slug>/characters/<id>.json
  * Everything is parsed with Zod and cross-checked; any problem throws, which
- * fails `next build` rather than shipping a broken sheet.
+ * fails `next build` rather than shipping a broken sheet. `oneshot.json` says
+ * which game system it is, and its characters are parsed with that system's
+ * schema. The checks themselves are pure (./crossCheck.ts), so an editor can
+ * run them on a draft; this file only adds the reading from disk.
  */
+
+export { coreCrossCheck, crossCheck, RESERVED_IDS } from "./crossCheck";
 
 // Read only at build time (every page is SSG), so keep it out of server file tracing.
 export const CONTENT_ROOT = path.join(/*turbopackIgnore: true*/ process.cwd(), "content", "oneshots");
-/** Paraphrased spell text for the card printables. */
+/** Paraphrased spell text for the 5e card printables. */
 export const SPELL_BOOK = path.join(/*turbopackIgnore: true*/ process.cwd(), "content", "rules", "spells.json");
 
-let book: Record<string, SpellInfo> | null = null;
+let book: Record<string, dnd5e.SpellInfo> | null = null;
 
-export function loadSpellBook(file = SPELL_BOOK): Record<string, SpellInfo> {
-  if (file !== SPELL_BOOK) return parse(spellBookSchema, file);
-  book ??= parse(spellBookSchema, file);
+export function loadSpellBook(file = SPELL_BOOK): Record<string, dnd5e.SpellInfo> {
+  if (file !== SPELL_BOOK) return parse(dnd5e.spellBookSchema, file);
+  book ??= parse(dnd5e.spellBookSchema, file);
   return book;
 }
 
@@ -55,93 +51,29 @@ function parse<S extends z.ZodTypeAny>(schema: S, file: string): z.infer<S> {
   return res.data;
 }
 
-/** Character ids that would collide with pages under /<oneshot>/. */
-const RESERVED_IDS = ["print", "flyer", "gm", "tv", "epilogue", "sounds", "cards", "tents"];
-
-/** Problems that Zod alone can't see. Returns human-readable messages. */
-export function crossCheck(os: OneShot, cast: Character[]): string[] {
-  const errs: string[] = [];
-  const ids = new Set(cast.map((c) => c.id));
-  if (ids.size !== cast.length) errs.push("duplicate character ids");
-  if (new Set(cast.map((c) => c.order)).size !== cast.length) errs.push("duplicate character order values");
-  if (cast.length < os.players.min) errs.push(`only ${cast.length} characters for min ${os.players.min} players`);
-  if (os.players.min > os.players.max) errs.push("players.min > players.max");
-
-  for (const r of os.coreRoles) if (!ids.has(r)) errs.push(`coreRoles: no character "${r}"`);
-  if (os.coreRoles.length > os.players.min) errs.push("more coreRoles than players.min");
-
-  for (const c of cast) {
-    const at = `${c.id}:`;
-    if (RESERVED_IDS.includes(c.id)) errs.push(`${at} id clashes with the /${c.id} page`);
-    if (totalLevel(c) !== os.level) errs.push(`${at} level ${totalLevel(c)} but one-shot is level ${os.level}`);
-    else errs.push(...rulesCheck(c, os.ruleset));
-    if (c.mech.saves.length !== 2) errs.push(`${at} expected 2 saving throw proficiencies`);
-    for (const t of c.story.ties) {
-      if (t.to === c.id) errs.push(`${at} tie to self`);
-      else if (!ids.has(t.to)) errs.push(`${at} tie to unknown character "${t.to}"`);
-    }
-    if (os.ruleset === "2024" && !c.mech.originFeat) errs.push(`${at} 2024 characters need an originFeat`);
-    if (os.ruleset === "2014" && c.mech.originFeat) errs.push(`${at} originFeat is a 2024 rule`);
-    if (os.ruleset === "2014" && c.mech.weaponMasteries.length) errs.push(`${at} weapon masteries are a 2024 rule`);
-    for (const e of c.mech.expertise)
-      if (!c.mech.skills.includes(e)) errs.push(`${at} expertise in ${e} without proficiency`);
-
-    for (const opt of c.options) {
-      const tagged =
-        opt.kind === "spell"
-          ? (c.mech.spellcasting?.spells ?? []).filter((s) => s.option === opt.id).map((s) => s.name)
-          : opt.kind === "attack"
-            ? c.mech.attacks.filter((a) => a.option === opt.id).map((a) => a.name)
-            : opt.kind === "equipment"
-              ? c.mech.equipment.filter((e) => e.option === opt.id).map((e) => e.name)
-              : opt.kind === "feature"
-                ? c.mech.features.filter((f) => f.option === opt.id).map((f) => f.name)
-                : c.story.trinket
-                  ? [c.story.trinket]
-                  : [];
-      if (tagged.length !== 1) {
-        errs.push(`${at} option "${opt.id}" must tag exactly one ${opt.kind} (found ${tagged.length})`);
-        continue;
-      }
-      if (opt.kind === "spell") {
-        const atk = c.mech.attacks.filter((a) => a.option === opt.id);
-        const stock = opt.choices.find((ch) => ch.value.name === tagged[0]);
-        if (atk.length > 1) errs.push(`${at} option "${opt.id}" tags more than one attack`);
-        if (stock && Boolean(stock.attack) !== (atk.length === 1))
-          errs.push(`${at} option "${opt.id}": stock choice attack and tagged attack disagree`);
-      }
-      const names = opt.choices.map((ch) => (typeof ch.value === "string" ? ch.value : ch.value.name));
-      if (!names.includes(tagged[0])) errs.push(`${at} option "${opt.id}" has no choice matching stock "${tagged[0]}"`);
-    }
-
-    for (const r of c.ifUnclaimed?.reassign ?? [])
-      for (const to of r.to)
-        if (to === c.id || !ids.has(to)) errs.push(`${at} ifUnclaimed beat "${r.beat}" reassigns to bad id "${to}"`);
-  }
-
-  const letterIds = new Set<string>();
-  for (const l of os.letters) {
-    if (!ids.has(l.to)) errs.push(`letter "${l.id}" is addressed to unknown character "${l.to}"`);
-    if (letterIds.has(l.id)) errs.push(`duplicate letter id "${l.id}"`);
-    letterIds.add(l.id);
-  }
-  const sounds = [...(os.sounds?.beds ?? []), ...(os.sounds?.stingers ?? [])];
-  if (new Set(sounds.map((x) => x.id)).size !== sounds.length) errs.push("duplicate sound ids");
-  return errs;
+function readCast<S extends z.ZodTypeAny>(slug: string, dir: string, schema: S): z.infer<S>[] {
+  const charDir = path.join(dir, "characters");
+  const files = fs.existsSync(charDir) ? fs.readdirSync(charDir).filter((f) => f.endsWith(".json")) : [];
+  const cast = files.map((f) => {
+    const c = parse(schema, path.join(charDir, f)) as CoreCharacter;
+    if (`${c.id}.json` !== f) throw new Error(`${slug}/characters/${f}: id "${c.id}" doesn't match filename`);
+    return c;
+  });
+  return cast.sort((a, b) => a.order - b.order) as z.infer<S>[];
 }
 
 export function loadOneShot(slug: string, root = CONTENT_ROOT): OneShotWithCast {
   const dir = path.join(root, slug);
   const os = parse(oneShotSchema, path.join(dir, "oneshot.json"));
   if (os.slug !== slug) throw new Error(`${slug}/oneshot.json: slug "${os.slug}" doesn't match folder`);
-  const charDir = path.join(dir, "characters");
-  const files = fs.existsSync(charDir) ? fs.readdirSync(charDir).filter((f) => f.endsWith(".json")) : [];
-  const cast = files.map((f) => {
-    const c = parse(characterSchema, path.join(charDir, f));
-    if (`${c.id}.json` !== f) throw new Error(`${slug}/characters/${f}: id "${c.id}" doesn't match filename`);
-    return c;
-  });
-  cast.sort((a, b) => a.order - b.order);
+  if (os.system === "tencandles") {
+    const cast = readCast(slug, dir, tencandles.characterSchema);
+    const errs = crossCheck(os, cast);
+    if (errs.length) throw new Error(`${slug} failed checks:\n  ${errs.join("\n  ")}`);
+    return { ...os, cast };
+  }
+
+  const cast = readCast(slug, dir, dnd5e.characterSchema);
   const errs = crossCheck(os, cast);
 
   // Level variants: every declared level has mechanics for the whole cast, and
@@ -149,8 +81,8 @@ export function loadOneShot(slug: string, root = CONTENT_ROOT): OneShotWithCast 
   const variants = os.variants.map((v) => {
     const vdir = path.join(dir, "variants", String(v.level));
     const vfiles = fs.existsSync(vdir) ? fs.readdirSync(vdir).filter((f) => f.endsWith(".json")) : [];
-    const chars: VariantCharacter[] = vfiles.map((f) => {
-      const vc = parse(variantCharacterSchema, path.join(vdir, f));
+    const chars: dnd5e.VariantCharacter[] = vfiles.map((f) => {
+      const vc = parse(dnd5e.variantCharacterSchema, path.join(vdir, f));
       if (`${vc.id}.json` !== f) throw new Error(`${slug}/variants/${v.level}/${f}: id "${vc.id}" doesn't match filename`);
       return vc;
     });
@@ -178,6 +110,13 @@ export function loadOneShot(slug: string, root = CONTENT_ROOT): OneShotWithCast 
 
   if (errs.length) throw new Error(`${slug} failed checks:\n  ${errs.join("\n  ")}`);
   return { ...os, cast, variants };
+}
+
+/** A one-shot that must be 5e (for 5e-only pages, scripts and tests). */
+export function load5e(slug: string, root = CONTENT_ROOT): dnd5e.OneShotWithCast {
+  const os = loadOneShot(slug, root);
+  if (os.system !== "dnd5e") throw new Error(`${slug} is a ${os.system} one-shot, not 5e`);
+  return os;
 }
 
 export function listSlugs(root = CONTENT_ROOT): string[] {
@@ -216,12 +155,17 @@ export function loadAll(root = CONTENT_ROOT): OneShotWithCast[] {
   return publishedSlugs(root).map((s) => loadOneShot(s, root));
 }
 
-function castsAtEveryLevel(os: Pick<OneShotWithCast, "cast" | "variants">) {
+/** Every published 5e one-shot. */
+export function loadAll5e(root = CONTENT_ROOT): dnd5e.OneShotWithCast[] {
+  return loadAll(root).filter((os): os is dnd5e.OneShotWithCast => os.system === "dnd5e");
+}
+
+function castsAtEveryLevel(os: Pick<dnd5e.OneShotWithCast, "cast" | "variants">) {
   return [os.cast, ...os.variants.map((v) => v.cast.map((x) => ({ ...x, options: x.options ?? [] })))];
 }
 
-/** Just the spells a one-shot uses at any level, for its cards pages. */
-export function spellBookFor(os: OneShotWithCast): Record<string, SpellInfo> {
+/** Just the spells a 5e one-shot uses at any level, for its cards pages. */
+export function spellBookFor(os: dnd5e.OneShotWithCast): Record<string, dnd5e.SpellInfo> {
   const all = loadSpellBook();
   return Object.fromEntries(spellNames(castsAtEveryLevel(os)).map((n) => [n, all[n]]));
 }

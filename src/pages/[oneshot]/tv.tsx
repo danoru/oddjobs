@@ -7,7 +7,9 @@ import { Box, Button, Typography } from "@mui/material";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import { loadOneShot, publishedSlugs } from "@/lib/content";
-import { toPublic, type PublicOneShot } from "@/lib/public";
+import { toPublic, type PublicAnyOneShot, type PublicOneShot } from "@/lib/public";
+import { SYSTEMS } from "@/systems/registry";
+import { CandlesTv } from "@/systems/tencandles/components/CandlesTv";
 import { useClaims, useLevel } from "@/lib/storage";
 import { playRip } from "@/lib/rip";
 import { PosterIcon } from "@/components/PosterIcon";
@@ -19,7 +21,7 @@ export const getStaticPaths: GetStaticPaths = async () => ({
   fallback: false,
 });
 
-export const getStaticProps: GetStaticProps<{ os: PublicOneShot }> = async ({ params }) => ({
+export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = async ({ params }) => ({
   props: { os: toPublic(loadOneShot(String(params!.oneshot))) },
 });
 
@@ -28,7 +30,11 @@ export const getStaticProps: GetStaticProps<{ os: PublicOneShot }> = async ({ pa
  * players scan the code, tear posters on their phones, and they rip off here
  * live (with a paper-rip, once someone taps "sound on").
  */
-export default function TvPage({ os }: { os: PublicOneShot }) {
+export default function TvPage({ os }: { os: PublicAnyOneShot }) {
+  return os.system === "tencandles" ? <CandlesTv os={os} /> : <PosterTv os={os} />;
+}
+
+function PosterTv({ os }: { os: PublicOneShot }) {
   const { table, claimedBy, error } = useClaims(os.slug);
   const { level } = useLevel(os);
   const [qr, setQr] = useState("");
@@ -84,6 +90,7 @@ export default function TvPage({ os }: { os: PublicOneShot }) {
       <main id="main" className={s.screen}>
         <div className={s.top}>
           <div>
+            <span className={s.systemBadge}>{SYSTEMS[os.system].label}</span>
             <h1 className={s.title}>{os.title}</h1>
             <Typography sx={{ fontFamily: "var(--font-print)", fontSize: "clamp(16px, 1.4vw, 24px)", color: "var(--parchment-dark)", mt: 1 }}>
               {os.posting.header}

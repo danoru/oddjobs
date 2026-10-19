@@ -1,0 +1,270 @@
+/*
+ * The Ten Candles table kit, on paper: the module, a candle and scene
+ * tracker, index-card templates for the stacks, the missing posters and the
+ * flyer. Light paper on screen, plain white in print.
+ */
+
+.kit {
+  color: #1b1209;
+}
+
+.page {
+  background: #fbf5e6;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+  max-width: 8.5in;
+  margin: 0 auto 28px;
+  padding: 0.5in;
+  box-sizing: border-box;
+  font-family: var(--font-sheet);
+  font-size: 11pt;
+  line-height: 1.35;
+}
+
+.page h1 {
+  font-family: var(--font-print);
+  font-weight: 400;
+  font-size: 30pt;
+  margin: 0 0 4pt;
+}
+
+.page h2 {
+  font-family: var(--font-label);
+  font-size: 12pt;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border-bottom: 1.5pt solid #1b1209;
+  padding-bottom: 2pt;
+  margin: 14pt 0 6pt;
+}
+
+.page h3 {
+  font-family: var(--font-print);
+  font-weight: 400;
+  font-size: 14pt;
+  margin: 8pt 0 2pt;
+}
+
+.page p {
+  margin: 0 0 6pt;
+}
+
+.readAloud {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 12pt;
+  border-left: 3pt solid #1b1209;
+  padding: 4pt 0 4pt 10pt;
+  margin: 6pt 0 10pt;
+}
+
+.cols {
+  columns: 2;
+  column-gap: 0.3in;
+}
+
+.cols > * {
+  break-inside: avoid;
+}
+
+.small {
+  font-size: 9pt;
+  color: #4a3b28;
+}
+
+/* ---- Tracker ------------------------------------------------------------- */
+
+.candleRow {
+  display: flex;
+  justify-content: space-between;
+  margin: 10pt 0 14pt;
+}
+
+.paperCandle {
+  width: 0.5in;
+  text-align: center;
+  font-family: var(--font-label);
+  font-size: 9pt;
+}
+
+.paperCandle svg {
+  display: block;
+  margin: 0 auto 2pt;
+}
+
+.log {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10pt;
+}
+
+.log th,
+.log td {
+  border: 0.75pt solid #6b5a42;
+  padding: 3pt 5pt;
+  vertical-align: top;
+  text-align: left;
+}
+
+.log th {
+  font-family: var(--font-label);
+  letter-spacing: 0.06em;
+}
+
+.log td {
+  height: 0.34in;
+}
+
+/* ---- Index cards: 3 x 5 in, four to a page, cut on the dashed lines --------- */
+
+.cardSheet {
+  display: grid;
+  grid-template-columns: repeat(2, 3in);
+  grid-auto-rows: 5in;
+  gap: 0.25in;
+  justify-content: center;
+  max-width: 8.5in;
+  margin: 0 auto 28px;
+  padding: 0.25in 0;
+  background: #fbf5e6;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+
+.indexCard {
+  position: relative;
+  box-sizing: border-box;
+  border: 1pt dashed #8a7a62;
+  padding: 0.3in 0.22in 0.2in 0.42in;
+  background:
+    linear-gradient(90deg, transparent 0.3in, rgba(200, 60, 60, 0.55) 0.3in 0.315in, transparent 0.315in),
+    repeating-linear-gradient(180deg, transparent 0 0.3in, rgba(70, 110, 170, 0.35) 0.3in 0.31in),
+    #fff;
+  background-position: 0 0, 0 0.85in, 0 0;
+  background-size: auto, 100% calc(100% - 0.85in), auto;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  overflow: hidden;
+}
+
+.cardLabel {
+  font-family: var(--font-label);
+  font-size: 15pt;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8a3a2a;
+  margin: 0;
+}
+
+.cardPrompt {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 11pt;
+  color: #4a3b28;
+  margin: 2pt 0 0;
+}
+
+.cardFoot {
+  position: absolute;
+  left: 0.42in;
+  right: 0.22in;
+  bottom: 0.14in;
+  font-family: var(--font-label);
+  font-size: 8pt;
+  color: #8a7a62;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ---- Posters -------------------------------------------------------------- */
+
+.posterSheet {
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0.3in;
+  max-width: 8.5in;
+  height: 11in;
+  margin: 0 auto 28px;
+  padding: 0.4in;
+  box-sizing: border-box;
+  background: #fbf5e6;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+
+.missing {
+  border: 2.5pt solid #1b1209;
+  padding: 0.22in 0.3in;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4pt;
+  overflow: hidden;
+}
+
+.missingHeader {
+  font-family: var(--font-poster);
+  font-size: 40pt;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.missingName {
+  font-family: var(--font-print);
+  font-size: 22pt;
+}
+
+.missingEpithet {
+  font-family: var(--font-label);
+  font-size: 12pt;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.missingText {
+  font-family: var(--font-print);
+  font-size: 12pt;
+  max-width: 5.4in;
+}
+
+.toolbar {
+  max-width: 8.5in;
+  margin: 0 auto 18px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  color: var(--parchment-dark);
+  font-family: var(--font-sheet);
+}
+
+@media print {
+  @page kit {
+    margin: 0.4in;
+  }
+  body:has(.kit) {
+    page: kit;
+  }
+  .page,
+  .cardSheet,
+  .posterSheet {
+    box-shadow: none;
+    background: #fff;
+    margin: 0;
+    max-width: none;
+    break-after: page;
+  }
+  .page {
+    padding: 0;
+  }
+  .cardSheet {
+    padding: 0;
+    height: 10.2in;
+    align-content: center;
+  }
+  .posterSheet {
+    padding: 0;
+    height: 10.1in;
+  }
+  .flyerWrap {
+    break-before: page;
+  }
+}

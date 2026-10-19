@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import ContentCutIcon from "@mui/icons-material/ContentCut";
-import type { Character, Skin } from "@/lib/schema";
+import type { Skin } from "@/lib/schema";
+import type { PublicCharacter, PublicTcCharacter } from "@/lib/public";
+import { posterTag, SYSTEMS } from "@/systems/registry";
 import type { ClaimInfo } from "@/lib/storage";
 import { roman, SKIN_WORDS } from "@/lib/skins";
 import { PosterIcon } from "@/components/PosterIcon";
@@ -32,7 +34,7 @@ export function Poster({
   tilt,
 }: {
   slug: string;
-  character: Character;
+  character: PublicCharacter | PublicTcCharacter;
   core?: boolean;
   /** Who tore it, if anyone. */
   claim?: ClaimInfo;
@@ -47,7 +49,9 @@ export function Poster({
   const claimed = Boolean(claim);
   const words = SKIN_WORDS[skin];
   const [justTorn, setJustTorn] = useState(false);
-  const cls = c.mech.classes.map((k) => `${k.name} ${k.level}`).join(" / ");
+  const cls = posterTag(c);
+  // A Ten Candles pre-made is taken, not torn down for a sheet.
+  const tearWords = ("mech" in c ? undefined : SYSTEMS.tencandles.claimVerb) ?? words.tear;
   const shownName = revealName ? c.name : (c.poster.alias ?? c.name);
 
   function tear() {
@@ -141,7 +145,7 @@ export function Poster({
             </span>
           ) : (
             <button type="button" className={s.strip} data-part="strip" onClick={tear}>
-              <ContentCutIcon sx={{ fontSize: 16 }} aria-hidden="true" /> {words.tear}
+              <ContentCutIcon sx={{ fontSize: 16 }} aria-hidden="true" /> {tearWords}
               <span className={s.srOnly}>: {shownName}</span>
             </button>
           ))}

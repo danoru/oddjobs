@@ -1,0 +1,33 @@
+{
+  "id": "ida-kell",
+  "name": "Ida Kell",
+  "order": 1,
+  "poster": {
+    "header": "LAST SEEN",
+    "epithet": "the signalwoman",
+    "hook": "Thirty years in the Marrowby box. Hasn't let the lamp go out once.",
+    "icon": "candle"
+  },
+  "flashback": "What was the last thing you said to the stationmaster before he walked into the tunnel?",
+  "ifUnclaimed": {
+    "npc": "Ida stays in the signal box and keeps the lamp. Play her as the stubborn heart of the place: kind, short with fools, and writing things in the register she won't let anyone read.",
+    "reassign": [],
+    "cuts": ["Her letter (the register entry) can't be delivered; reveal it yourself when someone reads the register."]
+  },
+  "story": {
+    "pronouns": "she/her",
+    "concept": "The signalwoman. Fifty-eight, widowed, thirty years on this box. She believes in the timetable the way other people believe in God, and right now it's the only thing holding her up.",
+    "look": "Railway-issue oilskin over a cardigan, lamp-black ground into her fingers, reading glasses on a string, a watch she winds every hour whether or not it matters.",
+    "namePrompts": ["Maud Kell", "Agnes Rook"],
+    "carrying": ["a pocket watch", "a chalk stub", "the key to the lamp room"],
+    "stake": "The radio said the line must be clear. She's going to clear it.",
+    "ties": [
+      {
+        "to": "stanley-arkwright",
+        "text": "She has no memory of the 6:10 stopping on the second night, and she'd remember. She's watching him.",
+        "public": "doesn't believe he got off any train"
+      },
+      { "to": "owen-pask", "text": "He reminds her of her son, and she's furious with herself for it.", "public": "keeps giving him the last of the tea" }
+    ]
+  }
+}

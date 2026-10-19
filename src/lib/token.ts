@@ -1,4 +1,4 @@
-import type { Character } from "./schema";
+import type { CoreCharacter as Character } from "./schema";
 import { cropSquare, INK, PARCHMENT } from "./woodcut";
 import { PATHS, type IconKey } from "@/components/PosterIcon";
 

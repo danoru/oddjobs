@@ -1,0 +1,29 @@
+{
+  "id": "stanley-arkwright",
+  "name": "Stanley Arkwright",
+  "order": 4,
+  "poster": {
+    "header": "LAST SEEN",
+    "epithet": "the man in the good coat",
+    "hook": "Says he got off the last train. The register says no one did.",
+    "icon": "ghost"
+  },
+  "flashback": "What do you remember about the train you got off, and what don't you want to remember?",
+  "ifUnclaimed": {
+    "npc": "Stanley is already in the waiting room when the first players arrive, polite and dry-coated. He's a question the table can keep asking. Don't answer it.",
+    "reassign": [],
+    "cuts": []
+  },
+  "story": {
+    "pronouns": "he/him",
+    "concept": "A soft-spoken insurance man in a good camel coat that's somehow dry. He says he stepped off the 6:10 on the second night. He's certain of it. He's less certain of other things.",
+    "look": "Camel coat, polished brogues without a speck of moor on them, a trilby he holds in both hands, a smell of coal smoke that follows him.",
+    "namePrompts": ["Leonard Vine", "Clifford Ames"],
+    "carrying": ["a ticket to Saltcoats, unpunched", "a fountain pen", "a photograph of a woman on a beach"],
+    "stake": "He has to get back on that train. He can't say why, only that someone's waiting at the other end.",
+    "ties": [
+      { "to": "ida-kell", "text": "She watches him like he's a signal she can't read. He'd like to tell her the truth, if he knew what it was.", "public": "Ida doesn't trust him" },
+      { "to": "marguerite-loy", "text": "He's seen his own name on an envelope in her sack. He hasn't asked. He's afraid of what the address will be.", "public": "won't ask about the letter" }
+    ]
+  }
+}

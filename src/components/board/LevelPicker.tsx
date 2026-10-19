@@ -1,4 +1,4 @@
-import type { LevelChoice } from "@/lib/variants";
+import type { LevelChoice } from "@/systems/dnd5e/variants";
 import s from "./Board.module.css";
 
 /**

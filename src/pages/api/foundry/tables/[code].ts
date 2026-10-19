@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { checkFoundryToken, shapeFoundryTable } from "@/lib/foundry-sync";
+import { checkFoundryToken, shapeFoundryTable } from "@/systems/dnd5e/foundry-sync";
 import { loadOneShot } from "@/lib/content";
 import { normalizeCode } from "@/lib/tables";
 import { tableState } from "@/lib/tables.server";
@@ -37,7 +37,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!state) return res.status(404).json({ error: "No table with that code" });
 
   try {
-    return res.status(200).json(shapeFoundryTable(loadOneShot(state.oneshot), state));
+    const os = loadOneShot(state.oneshot);
+    if (os.system !== "dnd5e") return res.status(404).json({ error: "Foundry sync is for 5e one-shots" });
+    return res.status(200).json(shapeFoundryTable(os, state));
   } catch (e) {
     console.error(`[foundry] could not load one-shot "${state.oneshot}":`, e);
     return res.status(500).json({ error: "Could not load the table's one-shot" });
