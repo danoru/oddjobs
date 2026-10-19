@@ -15,15 +15,16 @@ import { playRip } from "@/lib/rip";
 import { PosterIcon } from "@/components/PosterIcon";
 import { tiltFor } from "@/components/board/Poster";
 import s from "@/components/tv/Tv.module.css";
+import { onlyIfOnDisk } from "@/lib/onDisk";
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: publishedSlugs().map((oneshot) => ({ params: { oneshot } })),
   fallback: false,
 });
 
-export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = async ({ params }) => ({
+export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = onlyIfOnDisk(async ({ params }) => ({
   props: { os: toPublic(loadOneShot(String(params!.oneshot))) },
-});
+}));
 
 /**
  * The board on the TV. Cast it from the GM's browser after opening a table:

@@ -4,8 +4,7 @@ import path from "node:path";
 import { oneShotSchema, type CoreCharacter, type OneShotWithCast } from "./schema";
 import * as dnd5e from "@/systems/dnd5e/schema";
 import * as tencandles from "@/systems/tencandles/schema";
-import { crossCheck } from "./crossCheck";
-import { withVariant } from "@/systems/dnd5e/variants";
+import { checkParsed, type SpellBook } from "./oneShotCheck";
 import { spellNames } from "@/systems/dnd5e/cards";
 
 /**
@@ -15,7 +14,7 @@ import { spellNames } from "@/systems/dnd5e/cards";
  * Everything is parsed with Zod and cross-checked; any problem throws, which
  * fails `next build` rather than shipping a broken sheet. `oneshot.json` says
  * which game system it is, and its characters are parsed with that system's
- * schema. The checks themselves are pure (./crossCheck.ts), so an editor can
+ * schema. The checks themselves are pure (./oneShotCheck.ts), so the builder can
  * run them on a draft; this file only adds the reading from disk.
  */
 
@@ -62,22 +61,22 @@ function readCast<S extends z.ZodTypeAny>(slug: string, dir: string, schema: S):
   return cast.sort((a, b) => a.order - b.order) as z.infer<S>[];
 }
 
-export function loadOneShot(slug: string, root = CONTENT_ROOT): OneShotWithCast {
+export function loadOneShot(slug: string, root = CONTENT_ROOT, spells: SpellBook = loadSpellBook()): OneShotWithCast {
   const dir = path.join(root, slug);
   const os = parse(oneShotSchema, path.join(dir, "oneshot.json"));
   if (os.slug !== slug) throw new Error(`${slug}/oneshot.json: slug "${os.slug}" doesn't match folder`);
+  const fail = (errs: string[]) => {
+    if (errs.length) throw new Error(`${slug} failed checks:\n  ${errs.join("\n  ")}`);
+  };
   if (os.system === "tencandles") {
     const cast = readCast(slug, dir, tencandles.characterSchema);
-    const errs = crossCheck(os, cast);
-    if (errs.length) throw new Error(`${slug} failed checks:\n  ${errs.join("\n  ")}`);
+    fail(checkParsed(os, cast, [], spells).map((e) => e.message));
     return { ...os, cast };
   }
 
   const cast = readCast(slug, dir, dnd5e.characterSchema);
-  const errs = crossCheck(os, cast);
-
-  // Level variants: every declared level has mechanics for the whole cast, and
-  // each level passes the same checks as the base.
+  // Level variants: one file per character per declared level (the checks
+  // that every level is complete and passes the rules are in checkParsed).
   const variants = os.variants.map((v) => {
     const vdir = path.join(dir, "variants", String(v.level));
     const vfiles = fs.existsSync(vdir) ? fs.readdirSync(vdir).filter((f) => f.endsWith(".json")) : [];
@@ -86,29 +85,19 @@ export function loadOneShot(slug: string, root = CONTENT_ROOT): OneShotWithCast 
       if (`${vc.id}.json` !== f) throw new Error(`${slug}/variants/${v.level}/${f}: id "${vc.id}" doesn't match filename`);
       return vc;
     });
-    const shape: string[] = [];
-    if (v.level === os.level) shape.push("variant repeats the base level");
-    for (const c of cast) if (!chars.some((x) => x.id === c.id)) shape.push(`no variants/${v.level}/${c.id}.json`);
-    for (const x of chars) if (!cast.some((c) => c.id === x.id)) shape.push(`${x.id} isn't in the cast`);
-    if (shape.length === 0) {
-      const merged = withVariant({ ...os, cast, variants: [{ ...v, cast: chars }] }, v.level);
-      shape.push(...crossCheck(merged, merged.cast));
-    }
-    errs.push(...shape.map((e) => `level ${v.level}: ${e}`));
     return { ...v, cast: chars };
   });
-  if (new Set(os.variants.map((v) => v.level)).size !== os.variants.length) errs.push("duplicate variant levels");
+  const errs = checkParsed(
+    os,
+    cast,
+    variants.map((v) => v.cast),
+    spells,
+  ).map((e) => e.message);
   const vroot = path.join(dir, "variants");
   if (fs.existsSync(vroot))
     for (const d of fs.readdirSync(vroot))
       if (!os.variants.some((v) => String(v.level) === d)) errs.push(`variants/${d} isn't declared in oneshot.json`);
-
-  // Every spell at every level needs card text.
-  const spells = loadSpellBook();
-  for (const name of spellNames(castsAtEveryLevel({ cast, variants })))
-    if (!spells[name]) errs.push(`spell "${name}" isn't in content/rules/spells.json (the cards need its text)`);
-
-  if (errs.length) throw new Error(`${slug} failed checks:\n  ${errs.join("\n  ")}`);
+  fail(errs);
   return { ...os, cast, variants };
 }
 

@@ -1,6 +1,9 @@
 import type { SystemId } from "@/lib/schema";
 import type * as dnd5e from "./dnd5e/schema";
 import type * as tencandles from "./tencandles/schema";
+import type { SystemEditor } from "@/lib/editor/types";
+import { editor as dnd5eEditor } from "./dnd5e/editor";
+import { editor as tencandlesEditor } from "./tencandles/editor";
 
 /**
  * What each game system brings, in one place. Shared pages ask this which
@@ -10,7 +13,8 @@ import type * as tencandles from "./tencandles/schema";
  *
  * To add a system: a schema in src/systems/<id>/schema.ts joined into the
  * union in src/lib/schema.ts, its checks in content.ts, its toPublic branch
- * in src/lib/public.ts, and an entry here. docs/SYSTEMS.md has the sketches.
+ * in src/lib/public.ts, its builder in editor.ts, and an entry here.
+ * docs/SYSTEMS.md has the sketches.
  */
 
 export interface SystemRoutes {
@@ -37,6 +41,8 @@ export interface SystemMeta {
   routes: SystemRoutes;
   /** What players do to take a character, on the poster's tear strip, when it isn't the skin's own words. */
   claimVerb?: string;
+  /** The admin builder's sections, field hints and starting templates (src/systems/<id>/editor.ts). */
+  editor: SystemEditor;
 }
 
 export const SYSTEMS: Record<SystemId, SystemMeta> = {
@@ -45,6 +51,7 @@ export const SYSTEMS: Record<SystemId, SystemMeta> = {
     label: "D&D 5e",
     badge: "5e",
     routes: { print: true, cards: true, tents: true, play: false, kit: false },
+    editor: dnd5eEditor,
   },
   tencandles: {
     id: "tencandles",
@@ -53,6 +60,7 @@ export const SYSTEMS: Record<SystemId, SystemMeta> = {
     publisher: "Cavalry Games",
     routes: { print: false, cards: false, tents: false, play: true, kit: true },
     claimVerb: "TAKE THIS ONE",
+    editor: tencandlesEditor,
   },
 };
 

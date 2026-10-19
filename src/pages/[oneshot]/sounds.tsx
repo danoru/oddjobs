@@ -6,6 +6,7 @@ import { toPublic } from "@/lib/public";
 import type { Sounds } from "@/lib/schema";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Soundboard } from "@/components/sound/Soundboard";
+import { onlyIfOnDisk } from "@/lib/onDisk";
 
 type Props = { slug: string; title: string; sounds: Sounds | null };
 
@@ -14,10 +15,10 @@ export const getStaticPaths: GetStaticPaths = async () => ({
   fallback: false,
 });
 
-export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
+export const getStaticProps: GetStaticProps<Props> = onlyIfOnDisk(async ({ params }) => {
   const os = toPublic(loadOneShot(String(params!.oneshot)));
   return { props: { slug: os.slug, title: os.title, sounds: os.sounds ?? null } };
-};
+});
 
 /** The GM's one-tap soundboard: synthesised ambience beds and stingers, built for a phone on the table. */
 export default function SoundsPage({ slug, title, sounds }: Props) {

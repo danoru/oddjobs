@@ -4,7 +4,7 @@ A tavern notice board of ready-made one-shot **casts**. Each one-shot is a job p
 
 One-shots come in more than one game system. **D&D 5e** (2014 and 2024) is the original; **Ten Candles** is a play aid for tables that own the game, with candles, dice, cards, truths and last words run from everyone's phones. See [docs/SYSTEMS.md](docs/SYSTEMS.md) for how systems plug in, the Ten Candles rules and their sources, and sketches for Daggerheart and Paranoia.
 
-Next 16 (Pages Router) · React 19 · MUI 9 · CSS Modules · Zod · Vitest · Prisma 6 + Postgres · pnpm · Vercel. Content is JSON in git, validated at build time; the database only holds table sessions (who tore which poster).
+Next 16 (Pages Router) · React 19 · MUI 9 · CSS Modules · Zod · Vitest · Prisma 6 + Postgres · pnpm · Vercel. Content is JSON in git, validated at build time, and written through the **builder** at `/admin` (see [The builder](#the-builder)); the database only holds table sessions (who tore which poster).
 
 ## Run it
 
@@ -36,6 +36,7 @@ Without a database the site still works: claims just stay in each browser, as in
 | `pnpm pdf [slug] [--a4]` | **Local only.** Render `public/pdf/<slug>-sheets`, `-cards`, `-tents` and `-flyer` PDFs (and `<slug>-l<N>-…` for each level variant; `<slug>-kit` and `-flyer` for Ten Candles) from a running server with Playwright. Never runs on Vercel. |
 | `pnpm a11y-check [route…]` | **Local only.** Run axe-core over the main pages (signed in as GM) and Tab through each, checking every focus stop shows a ring. Exits 1 on any problem. |
 | `pnpm parity snap <dir>` / `pnpm parity diff <a> <b>` | **Local only.** Snapshot every 5e page's visible text, every printable's PDF page count and a few screenshots, then compare two snapshots. Run it before and after a refactor: phase 4 used it to prove moving 5e into `src/systems/dnd5e/` changed nothing. |
+| `pnpm e2e:builder` | **Local only.** Builds a 5e one-shot (three characters) and a Ten Candles module from nothing in the builder, in headless Chromium against a running dev server: trips and fixes the checks, publishes both, reads them back on the board and their sheets, duplicates, edits and unpublishes one, checks players can't reach `/admin` or its API, then deletes every test one-shot. `SHOTS=dir` saves screenshots, `KEEP=1` leaves the test one-shots. |
 | `pnpm e2e:candles` | **Local only.** Plays a whole Ten Candles night in headless Chromium against a running server with a database: a GM and three phones with fake microphones, creation, recordings, truths, rolls, the Last Stand and the end. Checks along the way that nobody sees another player's cards or recordings. `SHOTS=dir` saves screenshots. |
 | `pnpm print-check [slug]` | **Local only.** Render every printable at every level, on Letter and A4, in each reading mode, count the PDF pages and look for card text that overflows. Exits 1 if anything doesn't fit. |
 
@@ -52,6 +53,7 @@ Without a database the site still works: claims just stay in each browser, as in
 - `/<oneshot>/tv` — the board for the TV: big posters, the table code and a join QR. Posters rip off live as players claim them on their phones.
 - `/<oneshot>/sounds` — the GM's soundboard: ambience beds that crossfade and one-shot stingers, all synthesised in the browser (no audio files).
 - `/<oneshot>/epilogue` — the morning after: give each character a fate and one line, print a broadsheet front page, and save survivors to the shared world.
+- `/admin` — **GM password only.** The one-shot builder: every one-shot, published and draft, to create, edit, duplicate, unpublish, delete, import and export. `/admin/<slug>` edits one; `/admin/preview/<slug>[/<character>|/print]` shows the real player pages from the saved draft.
 
 Ten Candles one-shots have no sheets, cards or tents. Instead:
 
@@ -102,7 +104,30 @@ The GM opens a **table** on the GM page and gets a five-character code (no 0/O/1
 
 Customizations are stored per browser (localStorage) and can be shared with a `#t=` link.
 
+## The builder
+
+`/admin` (GM password) is where one-shots are written now; nobody needs to hand-write JSON. It runs on your own machine and writes the same files the build reads, which you then commit.
+
+- **The list.** Every one-shot with its system and whether it's on the board, a draft, or published with unpublished changes. **New one-shot** (pick the system, give a title), **Duplicate as template**, **Edit**, **Unpublish** (back to a draft), **Delete** (type the slug to confirm), **Import JSON** and **Export**.
+- **The editor.** The one-shot's sections and the cast on the left (reorder with the arrows, add by name), the form in the middle, problems and a live preview on the right.
+  - Shared sections: posting and premise, skin (and 5e level variants), table play (sealed letters, soundboard presets with a play button, the broadsheet), GM notes. Per character: poster (with a 90-character counter on the hook and an icon picker), story and ties (pick who; the board-safe line has an 80-character counter and warns when it shares words with the secret), the session-zero flashback, and *if unclaimed* (heirs picked in order from the rest of the cast).
+  - **5e mechanics with rules help:** ability scores with standard-array and point-buy helpers, class, subclass and level, live modifiers, saves, skills, passives, initiative and spell DC (`src/systems/dnd5e/derive.ts`), hit points from the fixed average (with an override), AC, the class table's spell slots and pact magic, spells picked from the spell book, and each attack's to-hit and damage. One tab per level when the one-shot has level variants.
+  - **Ten Candles:** the module (intro, goal, Them, areas, stages with a ten-candle strip, the Last Stand), suggested truths, and optional pre-made concepts.
+- **Checks as you type.** Every change runs the build's own checks (Zod plus `crossCheck`, the rules math, level variants and the spell book; `src/lib/oneShotCheck.ts`) and shows each problem on its field and in a list with jump links. Drafts may be invalid; **Publish** (the wax seal) needs zero problems, and the server checks again by loading the files exactly as `next build` does.
+- **Preview.** The real poster, yarn-board and sheet components, as you type. "Job page preview", "Full page" and "Print view" open the real pages from the saved draft.
+- **Autosave.** Drafts save a moment after you stop typing; leaving with unsaved changes asks first.
+
+**Where it writes.** Drafts are `content/drafts/<slug>/draft.json` (the whole one-shot in one file). Publishing writes `content/oneshots/<slug>/…` and removes the draft; only files whose JSON changed are rewritten, so a git diff shows just your edits. Every write goes to a temp file and is renamed into place, and slugs and ids are checked before they touch a path. A note lists the files changed since you last committed: **commit them yourself**; the builder never runs git.
+
+**When it can write.** Only when the app runs on your machine: `pnpm dev` (`NODE_ENV=development`), or `TEAROFF_CONTENT_WRITE=1` for a local production build (`TEAROFF_CONTENT_WRITE=0` turns it off). On Vercel, or any production build without the flag, the builder is read-only and says why; the API refuses writes the same way.
+
+A dev server keeps each page's list of paths for a moment, so right after publishing the builder knocks on the new job page once before it says so; another page of a brand-new one-shot can still 404 on the very first visit (reload). A production build has the new one-shot only after you commit, push and deploy.
+
+The store behind it is an interface (`src/lib/store/`), so a database store can replace the files later without touching the builder; [docs/PLAN.md](docs/PLAN.md#migrating-to-a-database-store) has the plan.
+
 ## Writing a one-shot
+
+The builder writes these files for you; this is what's in them.
 
 ```
 content/oneshots/<slug>/oneshot.json
@@ -165,6 +190,7 @@ GitHub (private repo — gated content may include non-SRD material) → Vercel.
 
 - `APP_PASSWORD`, `GM_PASSWORD` and `AUTH_SECRET`.
 - Optional: `FOUNDRY_TOKEN` (Foundry table sync).
+- Don't set `TEAROFF_CONTENT_WRITE` there: the deployed builder is read-only (Vercel's disk is too, and the store refuses to write whenever `VERCEL` is set).
 - `DATABASE_URL` (Supabase pooler, port 6543, `?pgbouncer=true&schema=tearoff`) and `DIRECT_URL` (port 5432, `?schema=tearoff`). It's the same Supabase project as world-gazetteer, in its own Postgres schema. `prisma migrate deploy` needs `DIRECT_URL`.
 
 `vercel-build` runs `prisma migrate deploy`, then `prisma generate`, then validation, then `next build`.

@@ -18,15 +18,16 @@ import { FATE_LABEL, FATES, type Fate } from "@/lib/legacy";
 import { emptyEpilogue, survivorsFrom, useEpilogue } from "@/lib/epilogue";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Gazette, type EpilogueEntry } from "@/components/gazette/Gazette";
+import { onlyIfOnDisk } from "@/lib/onDisk";
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: publishedSlugs().map((oneshot) => ({ params: { oneshot } })),
   fallback: false,
 });
 
-export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = async ({ params }) => ({
+export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = onlyIfOnDisk(async ({ params }) => ({
   props: { os: toPublic(loadOneShot(String(params!.oneshot))) },
-});
+}));
 
 /**
  * After the session: each character gets a fate and one line for the paper.

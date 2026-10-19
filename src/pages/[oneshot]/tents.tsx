@@ -3,6 +3,7 @@ import { load5e, loadOneShot, publishedSlugs } from "@/lib/content";
 import { hasRoute } from "@/systems/registry";
 import { toPublic, type PublicOneShot } from "@/lib/public";
 import { TentsView } from "@/systems/dnd5e/components/tents/TentsView";
+import { onlyIfOnDisk } from "@/lib/onDisk";
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: publishedSlugs()
@@ -11,9 +12,9 @@ export const getStaticPaths: GetStaticPaths = async () => ({
   fallback: false,
 });
 
-export const getStaticProps: GetStaticProps<{ os: PublicOneShot }> = async ({ params }) => ({
+export const getStaticProps: GetStaticProps<{ os: PublicOneShot }> = onlyIfOnDisk(async ({ params }) => ({
   props: { os: toPublic(load5e(String(params!.oneshot))) },
-});
+}));
 
 export default function CastTentsPage({ os }: { os: PublicOneShot }) {
   return <TentsView os={os} />;

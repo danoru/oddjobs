@@ -7,15 +7,16 @@ import { toPublic, type PublicAnyOneShot } from "@/lib/public";
 import { useLevel } from "@/lib/storage";
 import { SiteHeader } from "@/components/SiteHeader";
 import { FlyerSheet } from "@/components/flyer/FlyerSheet";
+import { onlyIfOnDisk } from "@/lib/onDisk";
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: publishedSlugs().map((oneshot) => ({ params: { oneshot } })),
   fallback: false,
 });
 
-export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = async ({ params }) => ({
+export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = onlyIfOnDisk(async ({ params }) => ({
   props: { os: toPublic(loadOneShot(String(params!.oneshot))) },
-});
+}));
 
 /** The physical version of the board: a flyer with one tear-off strip per character. */
 export default function FlyerPage({ os: base }: { os: PublicAnyOneShot }) {

@@ -15,6 +15,10 @@ const nextConfig = {
     "/api/tables/*/letters": ["./content/**/*.json"],
     // Live table play finds the one-shot's system (and a module's intro) in content.
     "/api/tables/*/game": ["./content/**/*.json"],
+    // The builder reads (and, locally, writes) content per request; deployed it's read-only.
+    "/admin": ["./content/**/*.json"],
+    "/admin/**/*": ["./content/**/*.json"],
+    "/api/admin/**/*": ["./content/**/*.json"],
   },
 };
 

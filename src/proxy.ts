@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, AUTH_COOKIE } from "@/lib/auth";
 
-/** `/<oneshot>/gm` — the GM's view of one table — and `/<oneshot>/kit`, the GM's printable kit. */
-const GM_PAGE = /^\/[^/]+\/(gm|kit)\/?$/;
+/**
+ * `/<oneshot>/gm` (the GM's view of one table), `/<oneshot>/kit` (the GM's
+ * printable kit) and the one-shot builder under `/admin`.
+ */
+const GM_PAGE = /^\/(?:[^/]+\/(?:gm|kit)|admin(?:\/.*)?)\/?$/;
 
 // Everything is behind the table password except the door itself, and the GM
 // pages also need the GM password. This is the convenience redirect; the GM

@@ -74,6 +74,9 @@ export default function GmPage({ os: base }: Props) {
                 {os.title}
               </h1>
               <LevelPicker levels={levels} level={level} onChange={setLevel} />
+              <Button component={Link} href={`/admin/${os.slug}`} size="small" className="no-print" sx={{ color: "var(--ink-soft)", px: 0 }}>
+                Edit in the builder
+              </Button>
               {table ? (
                 <>
                   <Typography sx={{ ...mono, mt: 1 }}>

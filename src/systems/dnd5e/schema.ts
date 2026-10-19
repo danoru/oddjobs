@@ -41,124 +41,133 @@ const skill = z.enum(skillKeys);
 // ---- Mechanics ------------------------------------------------------------
 
 export const spellSchema = z.object({
-  name: z.string(),
-  level: z.number().int().min(0).max(9),
+  name: z.string().describe("Spell"),
+  level: z.number().int().min(0).max(9).describe("Level (0 = cantrip)"),
   /** Always prepared / granted by a feature (doesn't count against prep). */
-  always: z.boolean().optional(),
-  note: z.string().optional(),
+  always: z.boolean().optional().describe("Always prepared"),
+  note: z.string().optional().describe("Note"),
   /** Customization slot this entry belongs to (see `options`). */
-  option: id.optional(),
+  option: id.optional().describe("Customization option id"),
 });
 
 export const attackSchema = z.object({
-  name: z.string(),
-  kind: z.enum(["weapon", "spell"]),
-  ability: ability,
+  name: z.string().describe("Name"),
+  kind: z.enum(["weapon", "spell"]).describe("Kind"),
+  ability: ability.describe("Ability"),
   /** Saving-throw spells/effects: target saves against the spell DC instead of an attack roll. */
-  save: ability.optional(),
-  proficient: z.boolean().default(true),
+  save: ability.optional().describe("Target saves with (instead of an attack roll)"),
+  proficient: z.boolean().default(true).describe("Proficient"),
   /** Damage dice, e.g. "1d8" or "2d6". */
-  dice: z.string().regex(/^\d+d\d+(\s*\+\s*\d+d\d+)*$/),
-  damageType: z.string(),
+  dice: z.string().regex(/^\d+d\d+(\s*\+\s*\d+d\d+)*$/, "damage dice look like 1d8 or 2d6 + 1d4").describe("Damage dice"),
+  damageType: z.string().describe("Damage type"),
   /** Add the ability modifier to damage (false for most cantrips, off-hand). */
-  addMod: z.boolean().default(true),
-  magicBonus: z.number().int().default(0),
-  range: z.string().optional(),
-  properties: z.array(z.string()).default([]),
+  addMod: z.boolean().default(true).describe("Add ability modifier to damage"),
+  magicBonus: z.number().int().default(0).describe("Magic bonus"),
+  range: z.string().optional().describe("Range"),
+  properties: z.array(z.string()).default([]).describe("Properties"),
   /** 2024 weapon mastery property, if the character has it. */
-  mastery: z.string().optional(),
-  note: z.string().optional(),
-  option: id.optional(),
+  mastery: z.string().optional().describe("Mastery (2024)"),
+  note: z.string().optional().describe("Note"),
+  option: id.optional().describe("Customization option id"),
 });
 
 export const featureSchema = z.object({
-  name: z.string(),
-  source: z.enum(["class", "subclass", "species", "background", "feat", "item", "other"]),
-  text: z.string(),
+  name: z.string().describe("Name"),
+  source: z.enum(["class", "subclass", "species", "background", "feat", "item", "other"]).describe("From"),
+  text: z.string().describe("What it does (your own words)"),
   uses: z
-    .object({ max: z.number().int().positive(), per: z.enum(["short", "long", "day", "turn"]) })
-    .optional(),
-  option: id.optional(),
+    .object({
+      max: z.number().int().positive().describe("Uses"),
+      per: z.enum(["short", "long", "day", "turn"]).describe("Per"),
+    })
+    .optional()
+    .describe("Limited uses"),
+  option: id.optional().describe("Customization option id"),
 });
 
 export const equipmentSchema = z.object({
-  name: z.string(),
-  qty: z.number().int().positive().default(1),
-  equipped: z.boolean().optional(),
-  note: z.string().optional(),
-  option: id.optional(),
+  name: z.string().describe("Item"),
+  qty: z.number().int().positive().default(1).describe("Qty"),
+  equipped: z.boolean().optional().describe("Equipped"),
+  note: z.string().optional().describe("Note"),
+  option: id.optional().describe("Customization option id"),
 });
 
 export const classEntrySchema = z.object({
-  name: z.string(),
-  subclass: z.string().optional(),
-  level: z.number().int().min(1).max(20),
+  name: z.string().describe("Class"),
+  subclass: z.string().optional().describe("Subclass"),
+  level: z.number().int().min(1).max(20).describe("Level"),
   /** Override when the class isn't in the built-in hit-die table. */
-  hitDie: z.number().int().optional(),
+  hitDie: z.number().int().optional().describe("Hit die (only for classes the table doesn't know)"),
 });
 
 export const mechSchema = z.object({
-  species: z.string(),
+  species: z.string().describe("Species"),
   /** e.g. "Variant Human", "Hill Dwarf", "Wood Elf" — shown after species. */
-  lineage: z.string().optional(),
-  size: z.enum(["Small", "Medium"]).default("Medium"),
-  background: z.string(),
-  classes: z.array(classEntrySchema).min(1),
-  abilities: z.record(ability, z.number().int().min(1).max(30)),
-  saves: z.array(ability),
-  skills: z.array(skill),
-  expertise: z.array(skill).default([]),
-  jackOfAllTrades: z.boolean().default(false),
-  hp: z.number().int().positive(),
-  ac: z.object({ value: z.number().int(), note: z.string() }),
-  speed: z.number().int().default(30),
-  initiativeBonus: z.number().int().default(0),
-  senses: z.array(z.string()).default([]),
-  languages: z.array(z.string()),
-  tools: z.array(z.string()).default([]),
-  armorTraining: z.array(z.string()).default([]),
-  weaponTraining: z.array(z.string()).default([]),
+  lineage: z.string().optional().describe("Lineage (e.g. Hill Dwarf)"),
+  size: z.enum(["Small", "Medium"]).default("Medium").describe("Size"),
+  background: z.string().describe("Background"),
+  classes: z.array(classEntrySchema).min(1).describe("Classes"),
+  abilities: z.record(ability, z.number().int().min(1).max(30)).describe("Ability scores"),
+  saves: z.array(ability).describe("Saving throw proficiencies"),
+  skills: z.array(skill).describe("Skill proficiencies"),
+  expertise: z.array(skill).default([]).describe("Expertise"),
+  jackOfAllTrades: z.boolean().default(false).describe("Jack of All Trades"),
+  hp: z.number().int().positive().describe("Hit points"),
+  ac: z.object({ value: z.number().int().describe("Armor Class"), note: z.string().describe("How it adds up") }).describe("Armor Class"),
+  speed: z.number().int().default(30).describe("Speed (ft)"),
+  initiativeBonus: z.number().int().default(0).describe("Extra initiative bonus"),
+  senses: z.array(z.string()).default([]).describe("Senses"),
+  languages: z.array(z.string()).describe("Languages"),
+  tools: z.array(z.string()).default([]).describe("Tools"),
+  armorTraining: z.array(z.string()).default([]).describe("Armor training"),
+  weaponTraining: z.array(z.string()).default([]).describe("Weapon training"),
   /** 2024 only: the background's origin feat. */
-  originFeat: z.string().optional(),
-  feats: z.array(z.string()).default([]),
-  weaponMasteries: z.array(z.string()).default([]),
-  features: z.array(featureSchema),
-  attacks: z.array(attackSchema).default([]),
+  originFeat: z.string().optional().describe("Origin feat (2024)"),
+  feats: z.array(z.string()).default([]).describe("Feats"),
+  weaponMasteries: z.array(z.string()).default([]).describe("Weapon masteries (2024)"),
+  features: z.array(featureSchema).describe("Features"),
+  attacks: z.array(attackSchema).default([]).describe("Attacks"),
   spellcasting: z
     .object({
-      ability: ability,
+      ability: ability.describe("Spellcasting ability"),
       /** Slots per spell level, index 0 = 1st level. Pact slots go in `pact`. */
-      slots: z.array(z.number().int().min(0)).max(9).default([]),
-      pact: z.object({ count: z.number().int(), level: z.number().int() }).optional(),
-      spells: z.array(spellSchema),
-      note: z.string().optional(),
+      slots: z.array(z.number().int().min(0)).max(9).default([]).describe("Spell slots"),
+      pact: z
+        .object({ count: z.number().int().describe("Pact slots"), level: z.number().int().describe("Slot level") })
+        .optional()
+        .describe("Pact magic"),
+      spells: z.array(spellSchema).describe("Spells"),
+      note: z.string().optional().describe("Note"),
     })
-    .optional(),
-  equipment: z.array(equipmentSchema),
-  gold: z.number().min(0).default(0),
+    .optional()
+    .describe("Spellcasting"),
+  equipment: z.array(equipmentSchema).describe("Equipment"),
+  gold: z.number().min(0).default(0).describe("Gold (gp)"),
 });
 
 // ---- Story ----------------------------------------------------------------
 
 export const storySchema = z.object({
-  pronouns: z.string(),
-  age: z.string().optional(),
-  appearance: z.string(),
+  pronouns: z.string().describe("Pronouns"),
+  age: z.string().optional().describe("Age"),
+  appearance: z.string().describe("Appearance"),
   /** Who they are, in a paragraph. */
-  concept: z.string(),
+  concept: z.string().describe("Concept: who they are"),
   /** Why *this* adventure matters to them. */
-  stake: z.string(),
-  goal: z.string(),
+  stake: z.string().describe("Stake in this adventure"),
+  goal: z.string().describe("Goal"),
   /** Private to the player who claims them. */
-  secret: z.string(),
-  voice: z.string(),
-  mannerisms: z.array(z.string()).min(1),
-  trinket: z.string().optional(),
+  secret: z.string().describe("Secret (only the player who claims them sees it)"),
+  voice: z.string().describe("Voice"),
+  mannerisms: z.array(z.string()).min(1).describe("Mannerisms"),
+  trinket: z.string().optional().describe("Trinket"),
   ties: z
     .array(tieSchema)
-    .min(1),
+    .min(1)
+    .describe("Ties"),
   /** A line the player can read aloud to introduce themselves. */
-  intro: z.string().optional(),
+  intro: z.string().optional().describe("Read-aloud introduction"),
 });
 
 // ---- Customization ---------------------------------------------------------
@@ -211,24 +220,33 @@ export const optionSchema = z.discriminatedUnion("kind", [
 export const characterSchema = z.object({
   ...coreCharacterFields,
   /** Party role tags for balance hints. */
-  roles: z.array(z.enum(["face", "healer", "scout", "striker", "tank", "control", "support", "utility"])).min(1),
+  roles: z
+    .array(z.enum(["face", "healer", "scout", "striker", "tank", "control", "support", "utility"]))
+    .min(1)
+    .describe("Party roles"),
   story: storySchema,
   mech: mechSchema,
-  options: z.array(optionSchema).default([]),
+  options: z.array(optionSchema).default([]).describe("Customization options"),
 });
 
 export const oneShotSchema = z.object({
   ...coreOneShotFields,
   system: z.literal("dnd5e"),
-  ruleset: z.enum(["2014", "2024"]),
-  level: z.number().int().min(1).max(20),
+  ruleset: z.enum(["2014", "2024"]).describe("Ruleset"),
+  level: z.number().int().min(1).max(20).describe("Level"),
   /**
    * The same story at other levels. Each level has one file per character in
    * variants/<level>/<id>.json holding that level's mechanics.
    */
   variants: z
-    .array(z.object({ level: z.number().int().min(1).max(20), note: z.string().max(140).optional() }))
-    .default([]),
+    .array(
+      z.object({
+        level: z.number().int().min(1).max(20).describe("Level"),
+        note: z.string().max(140).optional().describe("Note on the level stamp"),
+      }),
+    )
+    .default([])
+    .describe("Level variants"),
 });
 
 /** A character's mechanics at another level: content/oneshots/<slug>/variants/<level>/<id>.json. */
