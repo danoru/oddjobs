@@ -1,0 +1,415 @@
+/* Table toys on the phone and the GM page: dice, notes, the bell, coins, rumors.
+   Parchment cards with wax and brass, like the rest of the board. */
+
+.card {
+  position: relative;
+  background: var(--parchment);
+  color: var(--ink);
+  padding: 16px 16px 14px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+  margin-top: 18px;
+}
+
+.title {
+  font-family: var(--font-label);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  margin: 0 0 8px;
+}
+
+.prose {
+  font-family: var(--font-print);
+  font-size: 17px;
+  line-height: 1.35;
+  margin: 0 0 8px;
+}
+
+.hint {
+  font-family: var(--font-label);
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 4px 0 0;
+}
+
+.error {
+  font-family: var(--font-label);
+  font-size: 13px;
+  color: var(--wax);
+  margin: 6px 0 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn,
+.ghost {
+  border: 0;
+  font-family: var(--font-label);
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  padding: 7px 14px;
+  cursor: pointer;
+  min-height: 36px;
+}
+
+.btn {
+  background: var(--wax);
+  color: #f9e6df;
+}
+
+.ghost {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--ink-soft);
+}
+
+.btn:disabled,
+.ghost:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn:focus-visible,
+.ghost:focus-visible,
+.rollable:focus-visible,
+.coin:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: 2px;
+}
+
+.select,
+.textarea {
+  font: inherit;
+  font-family: var(--font-print);
+  font-size: 16px;
+  padding: 6px 8px;
+  border: 1px solid var(--ink-soft);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--ink);
+}
+
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 64px;
+  resize: vertical;
+}
+
+/* ---- Dice -------------------------------------------------------------------- */
+
+.tray {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1200;
+  background: linear-gradient(180deg, #3b2616, #24170d);
+  border-top: 3px solid var(--brass);
+  color: var(--parchment);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.5);
+}
+
+.trayInner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.trayLabel {
+  font-family: var(--font-label);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--parchment-dark);
+}
+
+.modes {
+  display: inline-flex;
+  border: 1px solid var(--brass);
+}
+
+.mode {
+  border: 0;
+  background: transparent;
+  color: var(--parchment-dark);
+  font-family: var(--font-label);
+  font-size: 13px;
+  padding: 6px 10px;
+  cursor: pointer;
+  min-height: 34px;
+}
+
+.mode[aria-pressed="true"] {
+  background: var(--brass);
+  color: var(--ink);
+}
+
+.result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.total {
+  font-family: var(--font-poster);
+  font-size: 34px;
+  line-height: 1;
+  color: var(--brass);
+  min-width: 2ch;
+  text-align: center;
+}
+
+.natTwenty {
+  color: #ffd76a;
+  text-shadow: 0 0 12px rgba(255, 215, 106, 0.8);
+}
+
+.natOne {
+  color: #e2675a;
+}
+
+.dice {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.die {
+  --size: 34px;
+  width: var(--size);
+  height: var(--size);
+  display: inline-grid;
+  place-items: center;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: calc(var(--size) * 0.42);
+  color: var(--ink);
+  background: radial-gradient(circle at 35% 30%, #fff8e6, var(--parchment-dark));
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  animation: tumble 650ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+.die[data-sides="20"] {
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  border-radius: 0;
+  background: radial-gradient(circle at 35% 30%, #f6d58f, var(--brass));
+}
+
+.die[data-kept="false"] {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+
+.die[data-face="six"] {
+  background: radial-gradient(circle at 35% 30%, #fff8e6, #f0c46a);
+}
+
+.die[data-face="one"] {
+  background: radial-gradient(circle at 35% 30%, #c9b9a0, #8a7a62);
+}
+
+.gmDie {
+  background: radial-gradient(circle at 35% 30%, #5a4a3a, #24170d);
+  color: var(--parchment);
+  border-color: #000;
+}
+
+@keyframes tumble {
+  0% {
+    transform: translate(-40px, -30px) rotate(-260deg) scale(0.4);
+    opacity: 0;
+  }
+  70% {
+    transform: translate(4px, 2px) rotate(12deg) scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* A number on the sheet you can tap to roll it. */
+.rollable {
+  all: unset;
+  cursor: pointer;
+  border-bottom: 1px dotted currentColor;
+  border-radius: 2px;
+}
+
+.rollable:hover {
+  background: rgba(210, 168, 90, 0.25);
+}
+
+@media print {
+  .rollable {
+    border: 0;
+  }
+}
+
+/* ---- The bell ---------------------------------------------------------------- */
+
+.bellFlash {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle, rgba(210, 168, 90, 0.55), rgba(28, 20, 14, 0.92) 70%);
+  animation: flash 2.6s ease-out forwards;
+  pointer-events: none;
+}
+
+.bellGlyph {
+  font-size: 120px;
+  line-height: 1;
+  transform-origin: 50% 10%;
+  animation: swing 0.5s ease-in-out 5 alternate;
+}
+
+.bellText {
+  font-family: var(--font-poster);
+  font-size: 28px;
+  color: var(--parchment);
+  text-align: center;
+  margin-top: 12px;
+}
+
+@keyframes swing {
+  from {
+    transform: rotate(-22deg);
+  }
+  to {
+    transform: rotate(22deg);
+  }
+}
+
+@keyframes flash {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---- Notes ------------------------------------------------------------------- */
+
+.notes {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.note {
+  font-family: var(--font-print);
+  font-size: 16px;
+  background: #fbf3dc;
+  border: 1px solid rgba(43, 29, 14, 0.25);
+  padding: 8px 10px;
+  box-shadow: 2px 3px 0 rgba(43, 29, 14, 0.15);
+  transform: rotate(var(--tilt, -0.6deg));
+}
+
+.noteHead {
+  font-family: var(--font-label);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.folded {
+  font-family: var(--font-label);
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+/* ---- Coins ------------------------------------------------------------------- */
+
+.coin {
+  --size: 44px;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-family: var(--font-poster);
+  font-size: calc(var(--size) * 0.42);
+  color: #5a3c0e;
+  background: radial-gradient(circle at 35% 30%, #fff1c2, #d2a85a 55%, #8a6326);
+  border: 2px solid #6b4a18;
+  box-shadow:
+    inset 0 0 0 4px rgba(255, 241, 194, 0.35),
+    0 3px 6px rgba(0, 0, 0, 0.35);
+}
+
+.purse {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.count {
+  font-family: var(--font-poster);
+  font-size: 30px;
+}
+
+/* ---- Rumors ------------------------------------------------------------------ */
+
+.rumor {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 17px;
+  border-left: 3px solid var(--brass);
+  padding: 4px 0 4px 10px;
+  margin: 8px 0 0;
+}
+
+.truth {
+  font-family: var(--font-label);
+  font-style: normal;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  margin-left: 6px;
+  padding: 1px 6px;
+  color: #fff;
+}
+
+.truth[data-truth="true"] {
+  background: #3e6b35;
+}
+
+.truth[data-truth="false"] {
+  background: var(--wax);
+}
+
+.truth[data-truth="half"] {
+  background: #8a6326;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .die,
+  .bellGlyph,
+  .bellFlash {
+    animation: none;
+  }
+}

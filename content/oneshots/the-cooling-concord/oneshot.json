@@ -83,28 +83,128 @@
       "to": "sabra-kovane",
       "title": "The line in the lamp-script",
       "when": "Act 2: at the Ash Shrine, when the party rests by the lamp",
-      "text": "Warden. Three Jubilees you have read my words to my granddaughter and stopped one line short. Read it now, to yourself, and then decide. 'Tell Vessia I know what she has bargained, and I forgive it. I will not be carried out of this fire by anyone's army. I will walk, or I will burn. The choice was always mine; I was only waiting for someone to ask.' You swore on the flame to let me go. I am not asking you to break it. I am asking you to wait until I have spoken. T."
+      "text": "Warden. Three Jubilees you have read my words to my granddaughter and stopped one line short. Read it now, to yourself, and then decide. 'Tell Vessia I know what she has bargained, and I forgive it. I will not be carried out of this fire by anyone's army. I will walk, or I will burn. The choice was always mine; I was only waiting for someone to ask.' You swore on the flame to let me go. I am not asking you to break it. I am asking you to wait until I have spoken. T.",
+      "act": "the-hypocaust"
     },
     {
       "id": "the-drafters-seal",
       "to": "selenor-aetheis",
       "title": "Aetheion's sealed note",
       "when": "Late Act 2: behind the Chancery archive grating in the hypocaust, after the lamplighters",
-      "text": "Grandson. If this has found you, the Chancery has handed you a pen and a lie. Fifty years ago they asked me to remove the Rider, and I did, because I was young and the peace was fragile. I told myself the Surety would never know. He knew. Every night I heard the furnace through my study floor. Do not forge his mark. Ask him. If he says no, let the baths go cold; a city survives a cold bath, not a stolen consent. The missing page is not lost. The Witness has carried it from the start. A."
+      "text": "Grandson. If this has found you, the Chancery has handed you a pen and a lie. Fifty years ago they asked me to remove the Rider, and I did, because I was young and the peace was fragile. I told myself the Surety would never know. He knew. Every night I heard the furnace through my study floor. Do not forge his mark. Ask him. If he says no, let the baths go cold; a city survives a cold bath, not a stolen consent. The missing page is not lost. The Witness has carried it from the start. A.",
+      "act": "the-hypocaust"
     },
     {
       "id": "ash-on-the-tongue",
       "to": "vessia-drun",
       "title": "The ash-paper from the coin",
       "when": "Act 3: as the Black Ash cohort comes through the pilgrims' gate and the coin heats",
-      "text": "Optio. The gate is open and the hour was true, and you have done well. Understand what follows. The Tribune is not to be freed. He is to be carried home, chained or unchained, because a banner that speaks is worth a legion. If he refuses, we burn the Thermae and every Hand in it. Hold the gate until we reach the furnace and you will be remembered as the one who brought him home. Break it, and we will tell the legions you sold him for a pension. Centurion Kadrax Vorn."
+      "text": "Optio. The gate is open and the hour was true, and you have done well. Understand what follows. The Tribune is not to be freed. He is to be carried home, chained or unchained, because a banner that speaks is worth a legion. If he refuses, we burn the Thermae and every Hand in it. Hold the gate until we reach the furnace and you will be remembered as the one who brought him home. Break it, and we will tell the legions you sold him for a pension. Centurion Kadrax Vorn.",
+      "act": "the-pilgrims-gate"
     },
     {
       "id": "little-stoker",
       "to": "tamsin-brandle",
       "title": "Soot-writing on the furnace slate",
       "when": "Act 4: at the Heart-furnace door, before the parley begins",
-      "text": "Tam. I know about Damper Seven. I have known for six years and I let you think it was only your kindness. I have been pulling at the wards from inside while your oil kept me clear. I wanted to be able to think when the time came. Do not carry this on your back; I asked it of you without asking. One thing more: do not let them vote for me before they have heard me. Let me say it with my own mouth. Then do whatever I ask, and know that I asked it clear. T."
+      "text": "Tam. I know about Damper Seven. I have known for six years and I let you think it was only your kindness. I have been pulling at the wards from inside while your oil kept me clear. I wanted to be able to think when the time came. Do not carry this on your back; I asked it of you without asking. One thing more: do not let them vote for me before they have heard me. Let me say it with my own mouth. Then do whatever I ask, and know that I asked it clear. T.",
+      "act": "the-heart-furnace"
+    }
+  ],
+  "acts": [
+    {
+      "id": "the-door-of-the-quiet-hand",
+      "title": "The Door of the Quiet Hand",
+      "subtitle": "Jubilee night. A free soak for the whole city. The water has started to boil."
+    },
+    {
+      "id": "the-hypocaust",
+      "title": "The Hypocaust",
+      "subtitle": "Down through brick, ash and old bronze, with the midnight gong getting closer."
+    },
+    {
+      "id": "the-pilgrims-gate",
+      "title": "The Pilgrims' Gate",
+      "subtitle": "Ash on the wind and boots on the old stair. Someone knew the hour."
+    },
+    {
+      "id": "the-heart-furnace",
+      "title": "The Heart-Furnace",
+      "subtitle": "Fifty years of fire, five Hands, and one voice that has waited all this time to be asked."
+    }
+  ],
+  "rumors": [
+    {
+      "id": "damper-seven",
+      "text": "The stokers say Damper Seven has run hot for years, and the Chancery has never once sent anybody down to look at it.",
+      "truth": "true"
+    },
+    {
+      "id": "bricked-up-gate",
+      "text": "There's an old pilgrims' gate under the Thermae, bricked up after the Dissolution. Bricks don't stop a key, though, do they?",
+      "truth": "true"
+    },
+    {
+      "id": "the-bone-tube",
+      "text": "That tide-reader off the Driftwood barge never lets go of his bone tube, not even to drink his tea. Whatever's in it, it's old.",
+      "truth": "true"
+    },
+    {
+      "id": "missing-page",
+      "text": "Word in the Chancery is that a page of the Concord went astray at Amberhall, but it was only the bit about bath fees.",
+      "truth": "half"
+    },
+    {
+      "id": "voice-in-the-furnace",
+      "text": "Put your ear to the furnace door and the old Tribune will talk to you, they say, though all he ever asks for is his granddaughter.",
+      "truth": "half"
+    },
+    {
+      "id": "honest-pyre",
+      "text": "Pyrosi veterans have sworn to bring the Tribune home for an honest pyre at last, and they mean it kindly.",
+      "truth": "half"
+    },
+    {
+      "id": "second-furnace",
+      "text": "The Chancery has a spare furnace built under Amberhall already. If the baths go cold tonight, it's for a week, no more.",
+      "truth": "false"
+    },
+    {
+      "id": "mephit-sabotage",
+      "text": "Those steam mephits came in with the Pyrosi coal barges. Sabotage, plain as day, and the Steward knows it.",
+      "truth": "false"
+    }
+  ],
+  "notices": [
+    {
+      "id": "thermae-closed",
+      "kind": "poster",
+      "title": "Thermae Closed: Scalding Hazard",
+      "text": "By order of the Steward, all pools of the Thermae of the Quiet Hand are closed. The Jubilee soak is postponed. Do not handle your bronze bath-check."
+    },
+    {
+      "id": "ash-cloaks-sighted",
+      "kind": "sighted",
+      "title": "Ash-Black Cloaks on the Pilgrims' Road",
+      "text": "Armed legionaries in ash-black cloaks seen on the old pilgrims' road at dusk, marching without banners. The Watch asks citizens to keep off the lower streets."
+    },
+    {
+      "id": "chancery-purse-raised",
+      "kind": "reward",
+      "title": "Chancery Purse Raised to 400 gp",
+      "text": "The Chancery raises its purse for the five Hands to 400 gp, payable upon renewal of the Concord. No sum is listed for any other outcome."
+    },
+    {
+      "id": "upper-baths-cleared",
+      "kind": "settled",
+      "title": "Upper Baths Cleared",
+      "text": "Bathers brought out of the upper pools and the mephits driven off. Steward Oulane records her thanks to the Hands. Lost towels may be claimed at the door."
+    },
+    {
+      "id": "the-fiftieth-midnight",
+      "kind": "poster",
+      "title": "The Gong Strikes at Midnight",
+      "text": "The Concord gong will strike the fiftieth midnight. Citizens are asked to keep their stoves lit, their windows shut, and their opinions to themselves."
     }
   ],
   "content": {

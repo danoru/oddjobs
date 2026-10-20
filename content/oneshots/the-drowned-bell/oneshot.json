@@ -80,28 +80,128 @@
       "to": "marrow",
       "title": "A wet note from the Tern's bosun",
       "when": "End of Act 1: once the beach is cleared, a drowned hand presses it into Marrow's palm",
-      "text": "Cap'n. Don't say it, you never could. We felt the hatchet go and we knew your arm by the weight of it. The Tern was already lost; the sea only wanted a count, and you gave her fewer than she meant to take. We have walked up this beach every storm for eleven years waiting for you to say our names. Say them tonight. But mind: when the bell rings true we wake for good, and the one who holds the rope goes down to keep us company. I'd sooner it were nobody. I'd sooner it were not you. Hob Tarrant, bosun."
+      "text": "Cap'n. Don't say it, you never could. We felt the hatchet go and we knew your arm by the weight of it. The Tern was already lost; the sea only wanted a count, and you gave her fewer than she meant to take. We have walked up this beach every storm for eleven years waiting for you to say our names. Say them tonight. But mind: when the bell rings true we wake for good, and the one who holds the rope goes down to keep us company. I'd sooner it were nobody. I'd sooner it were not you. Hob Tarrant, bosun.",
+      "act": "the-beach-at-high-water"
     },
     {
       "id": "the-coin-keeps-the-count",
       "to": "rook",
       "title": "The buyer's receipt",
       "when": "Act 2: in the smugglers' cave, when Rook opens the buyer's strongbox or shows the coin to anyone",
-      "text": "Thief. You were paid forty gold for the cutting and one coin for the rowing. The coin is the receipt. It remembers who carried the bell down, and tonight it will ask for payment. But a receipt can be passed on. Hold it to the rope when the bell rings and the sea will count you among her own, and the one who was owed will go free. Give it to the one who has been reaching for it, and she will be spared the walk down. You will not be asked twice. Be gentle with yourself in the choosing; the sea never is. The one in the sea-green coat."
+      "text": "Thief. You were paid forty gold for the cutting and one coin for the rowing. The coin is the receipt. It remembers who carried the bell down, and tonight it will ask for payment. But a receipt can be passed on. Hold it to the rope when the bell rings and the sea will count you among her own, and the one who was owed will go free. Give it to the one who has been reaching for it, and she will be spared the walk down. You will not be asked twice. Be gentle with yourself in the choosing; the sea never is. The one in the sea-green coat.",
+      "act": "the-smugglers-cave"
     },
     {
       "id": "the-keepers-warning",
       "to": "sister-vell",
       "title": "The old keeper's oilskin",
       "when": "Act 3: found tied inside the drowned knight's gauntlet on the wreck",
-      "text": "To whoever keeps the bell after me. Three things I never put in the log. One: the bell is not hung to keep the dead asleep, but to keep a single debt unpaid. Two: if the bay ever gives you a drowned child who breathes on your slab, wash her, wrap her, and tell no one, for she belongs to the sea, and the sea will come for her when the bell goes under. Three: the keeper does not choose who stays at the rope. The rope chooses. I let a thief go once, too. Forgive yourself first. Keeper Aldous Thorne."
+      "text": "To whoever keeps the bell after me. Three things I never put in the log. One: the bell is not hung to keep the dead asleep, but to keep a single debt unpaid. Two: if the bay ever gives you a drowned child who breathes on your slab, wash her, wrap her, and tell no one, for she belongs to the sea, and the sea will come for her when the bell goes under. Three: the keeper does not choose who stays at the rope. The rope chooses. I let a thief go once, too. Forgive yourself first. Keeper Aldous Thorne.",
+      "act": "out-past-the-breakwater"
     },
     {
       "id": "the-last-verse",
       "to": "odo-brambletoe",
       "title": "The scrap from the black night",
       "when": "Act 4: just before the ringing, when it slides out of Biddy's case on the hull",
-      "text": "You have carried this scrap since the black night in the boat and never read it by lamplight. Read it now. It is not a hymn. It is a lullaby, sung to a sleeper by the one who owns her, and the last verse is the only one that answers back. 'Sleep, you who counted the keel, let the rope go slack and kneel. One shall stay and one shall sing; neither is the sea's to bring.' It works in whoever's voice sings it, and it costs them the same. Choose the voice well."
+      "text": "You have carried this scrap since the black night in the boat and never read it by lamplight. Read it now. It is not a hymn. It is a lullaby, sung to a sleeper by the one who owns her, and the last verse is the only one that answers back. 'Sleep, you who counted the keel, let the rope go slack and kneel. One shall stay and one shall sing; neither is the sea's to bring.' It works in whoever's voice sings it, and it costs them the same. Choose the voice well.",
+      "act": "before-the-tide-turns"
+    }
+  ],
+  "acts": [
+    {
+      "id": "the-beach-at-high-water",
+      "title": "The Beach at High Water",
+      "subtitle": "The storm comes in, and the drowned come with it."
+    },
+    {
+      "id": "the-smugglers-cave",
+      "title": "The Smugglers' Cave",
+      "subtitle": "Follow the keel-marks into the cliff, where somebody was paid to wait."
+    },
+    {
+      "id": "out-past-the-breakwater",
+      "title": "Out Past the Breakwater",
+      "subtitle": "Thirty feet down, in the ribs of an old wreck, something is still ringing."
+    },
+    {
+      "id": "before-the-tide-turns",
+      "title": "Before the Tide Turns",
+      "subtitle": "One rope, one bell, and the drowned climbing the hull. Someone has to hold on."
+    }
+  ],
+  "rumors": [
+    {
+      "id": "sea-green-stranger",
+      "text": "A stranger in a sea-green coat paid for a room at the Gull in old gold, and nobody saw him leave by the road.",
+      "truth": "true"
+    },
+    {
+      "id": "fresh-keel-marks",
+      "text": "There are fresh keel-marks in the shingle by the smugglers' cave under the point, and a lantern burning in there that no smuggler lit.",
+      "truth": "true"
+    },
+    {
+      "id": "ringing-under-the-bay",
+      "text": "The fishermen swear the bell's still ringing under the bay, faint as anything, out past the breakwater on the slack of the tide.",
+      "truth": "true"
+    },
+    {
+      "id": "the-tow-line-parted",
+      "text": "Old Wenna says the Tern's tow-line snapped in the big storm, and that's why Marrow only brought one soul home.",
+      "truth": "half"
+    },
+    {
+      "id": "keeper-slept-through-it",
+      "text": "They say the keeper slept right through the theft, snoring like a bellows while the yoke was sawn clean through.",
+      "truth": "half"
+    },
+    {
+      "id": "hymn-in-a-rowboat",
+      "text": "Odo Brambletoe wrote the storm-hymn in one night, drunk in a rowboat, and never could finish the last verse.",
+      "truth": "half"
+    },
+    {
+      "id": "harbourmaster-melted-it",
+      "text": "The harbourmaster had the bell taken down himself to melt for coin. That three hundred gold is guilt money, mark me.",
+      "truth": "false"
+    },
+    {
+      "id": "clean-hands",
+      "text": "The drowned only walk for the ones who drowned them. Keep your hands clean and they'll not so much as look at you.",
+      "truth": "false"
+    }
+  ],
+  "notices": [
+    {
+      "id": "hands-on-the-breakwater",
+      "kind": "poster",
+      "title": "Hands Wanted on the Breakwater",
+      "text": "Strong backs and steady lanterns wanted to hold the sea wall until the storm passes. Report to the harbourmaster's hut. Bring your own rope."
+    },
+    {
+      "id": "lights-under-the-water",
+      "kind": "sighted",
+      "title": "Lights Under the Water",
+      "text": "Lantern-light seen moving beneath the bay off the point, heading for the harbour mouth. Do not row out. Do not answer if you are called by name."
+    },
+    {
+      "id": "sea-green-coat-sighted",
+      "kind": "sighted",
+      "title": "Stranger in a Sea-Green Coat",
+      "text": "Seen on the cliff path at dusk, walking toward the smugglers' stair and leaving wet footprints on dry stone. Anyone who knows him, speak to the watch."
+    },
+    {
+      "id": "bell-reward-raised",
+      "kind": "reward",
+      "title": "Bell Reward Raised to 500 gp",
+      "text": "The harbourmaster now offers 500 gp for the return of the storm-bell, rung or unrung, and will ask no questions of whoever brings it home."
+    },
+    {
+      "id": "lower-beach-cleared",
+      "kind": "settled",
+      "title": "Lower Beach Cleared",
+      "text": "The lower beach is clear of the drowned as of the last watch. Families may come down for their own. The harbourmaster thanks the hands who held it."
     }
   ],
   "content": { "sources": ["PHB 2024"], "warnings": ["undead", "drowning"] },

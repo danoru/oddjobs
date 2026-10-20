@@ -18,7 +18,7 @@ export const editor: SystemEditor = {
       help: "The skin dresses the job page. Level variants play the same story at other levels: each character gets mechanics for every level.",
       panel: "levels5e",
     },
-    coreTablePlay,
+    { ...coreTablePlay, fields: [...coreTablePlay.fields!, "coins"] },
     coreGm,
   ],
   characterSections: [
@@ -62,6 +62,11 @@ export const editor: SystemEditor = {
   ],
   hints: {
     ...coreHints,
+    "oneshot:coins": {
+      help: "Brass coins players toss each other across the TV: Heroic Inspiration under 2024, Inspiration under 2014. Leave empty for the defaults.",
+      fields: ["enabled", "name", "tossesPerAct"],
+    },
+    "oneshot:coins.name": { widget: "text", placeholder: "Heroic Inspiration" },
     "character:story.pronouns": { widget: "text" },
     "character:story.age": { widget: "text" },
     "character:story.trinket": { widget: "text" },

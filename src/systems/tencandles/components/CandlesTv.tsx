@@ -11,6 +11,7 @@ import { litCount, STEPS, type TcView } from "../game";
 import { CLOSING_LINE, OPENING_LINE } from "../rules";
 import { Candles, outcome, RollDice, seatName } from "./Bits";
 import { FinalWords } from "./Recorder";
+import { TvLive } from "@/components/tv/TvLive";
 import s from "./Tc.module.css";
 
 const STEP_LINE: Record<(typeof STEPS)[number], string> = {
@@ -173,6 +174,8 @@ export function CandlesTv({ os }: { os: PublicTcOneShot }) {
             </>
           )}
         </div>
+
+        <TvLive code={table} tray="log" icons={os.cast.map((c) => c.poster.icon)} sound={sound} />
 
         <div className={s.tvBar}>
           <span>{error ?? ""}</span>

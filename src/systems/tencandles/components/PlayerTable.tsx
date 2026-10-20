@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGame } from "@/lib/useGame";
+import { useShake } from "@/lib/shake";
 import type { PublicTcOneShot } from "@/lib/public";
 import { playRip } from "@/lib/rip";
 import { recipients, score, type CardView, type TcView, type TraitKind } from "../game";
@@ -543,6 +544,8 @@ function Scene({ game, seat, act, busy, names }: { game: TcView; seat: number; a
   const last = game.log.at(-1);
   const recent = last && last.scene === game.scene ? last : null;
   const [hopeTo, setHopeTo] = useState<string>("");
+  // Shake the phone to roll the pool, when nothing's on the table yet.
+  const shake = useShake(() => void act({ type: "roll" }), !roll && !busy && me.alive);
 
   if (!me.alive)
     return (
@@ -579,6 +582,11 @@ function Scene({ game, seat, act, busy, names }: { game: TcView; seat: number; a
             {me.top === "moment" && (
               <button type="button" className={`${s.btn} ${s.big}`} disabled={busy} onClick={() => void act({ type: "roll", moment: true })}>
                 Live your Moment
+              </button>
+            )}
+            {shake.permission !== "unsupported" && (
+              <button type="button" className={s.btn} onClick={() => (shake.on ? shake.disable() : void shake.enable())}>
+                {shake.on ? "Shake to roll: on" : "Shake to roll"}
               </button>
             )}
           </div>

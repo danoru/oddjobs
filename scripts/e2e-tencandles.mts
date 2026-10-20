@@ -250,7 +250,8 @@ try {
 
   // ---- The Last Stand: roll until everyone is gone ----
   for (let k = 0; k < 60; k++) {
-    if ((await gm.getByText("The dark", { exact: true }).count()) > 0) break;
+    if ((await gm.getByText("The dark", { exact: true }).filter({ visible: true }).count()) > 0) break;
+    let rolled = false;
     for (const p of phones) {
       // One die, or none if a 1 has already been set aside this scene (then only Hope can save you).
       const roll = p.getByRole("button", { name: /^Roll [01] di/ });
@@ -258,10 +259,13 @@ try {
         await roll.click();
         await p.getByRole("button", { name: "Settle it" }).click();
         await p.waitForTimeout(300);
+        rolled = true;
       }
     }
+    // Phones catch up on their next poll (every 2 s); give them a moment before trying again.
+    if (!rolled) await gm.waitForTimeout(500);
   }
-  await gm.getByText("The dark", { exact: true }).waitFor();
+  await gm.getByText("The dark", { exact: true }).filter({ visible: true }).waitFor();
   check(true, "everyone died; the game ended in the dark");
   await gm.waitForTimeout(800);
   await shot(gm, "gm-ended");

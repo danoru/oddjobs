@@ -20,6 +20,10 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Poster } from "@/components/board/Poster";
 import { SheetBack, SheetFront } from "@/systems/dnd5e/components/sheet/Sheet";
 import { PlayerExtras } from "@/components/table/PlayerExtras";
+import { DiceTray, TableToys } from "@/components/table/TableToys";
+import { useLive } from "@/lib/useLive";
+import { coinFor } from "@/systems/registry";
+import type { RollSpec } from "@/systems/dnd5e/rolls";
 import { CustomizeDrawer } from "@/systems/dnd5e/components/sheet/CustomizeDrawer";
 import { FoundryDialog, RecipeDialog } from "@/systems/dnd5e/components/sheet/ExportDialogs";
 import k from "@/components/board/Skins.module.css";
@@ -39,13 +43,18 @@ export function CharacterPage({ os: base, id }: { os: PublicOneShot; id: string 
   const needsName = Boolean(table && !player);
   const names = Object.fromEntries(os.cast.map((x) => [x.id, x.id === id ? c.name : x.name]));
   const [panel, setPanel] = useState<null | "customize" | "recipe" | "foundry">(null);
+  // At a table with this poster torn: the dice tray, the bell, notes, coins and rumors.
+  const seated = Boolean(table && player && claim?.mine);
+  const live = useLive(seated ? table : null, "player", player?.id ?? null);
+  const [armed, setArmed] = useState<RollSpec | null>(null);
+  const coin = coinFor(os);
 
   return (
     <>
       <Head>
         <title>{`${c.name} · ${os.title} · Tear-Off`}</title>
       </Head>
-      <Container maxWidth="lg" sx={{ pb: 8 }}>
+      <Container maxWidth="lg" sx={{ pb: seated ? 16 : 8 }}>
         <SiteHeader back={{ href: `/${os.slug}`, label: os.title }} reading />
         <Box
           sx={{
@@ -130,14 +139,16 @@ export function CharacterPage({ os: base, id }: { os: PublicOneShot; id: string 
             {table && player && claim?.mine && (
               <div style={{ marginBottom: 24 }}>
                 <PlayerExtras code={table} playerId={player.id} characterId={id} flashback={stock.flashback} />
+                <TableToys live={live} coin={coin} rumors={os.hasRumors} />
               </div>
             )}
-            <SheetFront c={c} ruleset={os.ruleset} oneshotTitle={os.title} titleAs="h1" />
+            <SheetFront c={c} ruleset={os.ruleset} oneshotTitle={os.title} titleAs="h1" onRoll={seated ? (r) => setArmed({ ...r }) : undefined} />
             <SheetBack c={c} oneshotTitle={os.title} names={names} sealedSecret sectionAs="h2" />
           </main>
         </Box>
       </Container>
 
+      {seated && <DiceTray live={live} armed={armed} coin={coin} />}
       <CustomizeDrawer
         open={panel === "customize"}
         onClose={() => setPanel(null)}

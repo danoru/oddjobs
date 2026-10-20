@@ -19,6 +19,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Poster } from "@/components/board/Poster";
 import { TableNote } from "@/components/board/TableNote";
 import { YarnBoard } from "@/components/board/YarnBoard";
+import { TownBoard } from "@/components/board/TownBoard";
 import { LevelPicker } from "@/components/board/LevelPicker";
 import { cameoHook, type Survivor } from "@/lib/legacy";
 import s from "@/components/board/Board.module.css";
@@ -154,6 +155,7 @@ export function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Su
           </div>
 
           <TableNote claims={table} initialCode={linkCode} />
+          <TownBoard code={table.table} playerId={table.player?.id ?? null} />
 
           <h2 className={s.srOnly}>{words.cast}</h2>
           <div className={s.grid} data-part="castGrid">

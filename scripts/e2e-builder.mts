@@ -307,6 +307,27 @@ try {
   await type("oneshot.letters.0.text", "Your orders: let them open it. Then close it behind them.");
   await choose("oneshot.coreRoles", "Ada Quill");
 
+  // ---- Phase 6: an act card, rumors, a town-board notice, the letter's act, coins ----
+  await add("oneshot.acts", "act");
+  await type("oneshot.acts.0.title", "The Vault Door");
+  await type("oneshot.acts.0.subtitle", "Once a year it opens, and tonight is the night.");
+  await choose("oneshot.letters.0.act", "Act 1: The Vault Door");
+  await add("oneshot.rumors", "rumor");
+  await type("oneshot.rumors.0.text", "Too short");
+  check(await issueAt("oneshot.rumors.0.text"), "a rumor too short to be a rumor is flagged on its field");
+  await type("oneshot.rumors.0.text", "The vault's second lock was fitted only last week.");
+  await add("oneshot.rumors", "rumor");
+  check(await issueAt("oneshot.rumors.1.text"), "…and so is a second rumor left empty");
+  await type("oneshot.rumors.1.text", "The guild master has never audited anything himself.");
+  await choose("oneshot.rumors.1.truth", "false");
+  check(!(await issueAt("oneshot.rumors.0.text")) && !(await issueAt("oneshot.rumors.1.text")), "fixed rumors pass");
+  await add("oneshot.notices", "notice");
+  await type("oneshot.notices.0.title", "AUDITORS EXPECTED AT DUSK");
+  await add("oneshot.coins", "inspiration coins");
+  await type("oneshot.coins.tossesPerAct", "9");
+  check(await issueAt("oneshot.coins.tossesPerAct"), "coin tosses past five a player an act are flagged");
+  await type("oneshot.coins.tossesPerAct", "2");
+
   // ---- Reorder: Cora to the top of the board ----
   await page.getByRole("button", { name: "Move Cora Vale up the board" }).click();
   await page.getByRole("button", { name: "Move Cora Vale up the board" }).click();
@@ -337,6 +358,12 @@ try {
   check(/proficiency/i.test(await page.locator(`[aria-label="Live preview"]`).innerText()), "the sheet preview renders the real sheet");
   await publish(HEIST);
   await shot(page, "03-heist-published");
+  {
+    const written = JSON.parse(fs.readFileSync(path.join(ROOT, "content", "oneshots", HEIST, "oneshot.json"), "utf8"));
+    check(written.acts?.[0]?.title === "The Vault Door" && written.letters?.[0]?.act === written.acts[0].id, "the act card and the letter's act are published");
+    check(written.rumors?.length === 2 && written.rumors[1].truth === "false", "the rumors are published with their truths");
+    check(written.notices?.[0]?.title === "AUDITORS EXPECTED AT DUSK" && written.coins?.tossesPerAct === 2, "the notice and the coin settings are published");
+  }
 
   const board = await textOf("/");
   check(board.includes("Builder Test Heist"), "the new 5e one-shot is on the home board");

@@ -15,7 +15,8 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { loadOneShot, publishedSlugs } from "@/lib/content";
 import { toPublic, type PublicAnyOneShot } from "@/lib/public";
 import { FATE_LABEL, FATES, type Fate } from "@/lib/legacy";
-import { emptyEpilogue, survivorsFrom, useEpilogue } from "@/lib/epilogue";
+import { emptyEpilogue, survivorsFrom, useSharedEpilogue } from "@/lib/epilogue";
+import { usePlayer, useTableCode } from "@/lib/storage";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Gazette, type EpilogueEntry } from "@/components/gazette/Gazette";
 import { onlyIfOnDisk } from "@/lib/onDisk";
@@ -35,7 +36,11 @@ export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = onlyIfOn
  * so survivors can turn up in later one-shots.
  */
 export default function EpiloguePage({ os }: { os: PublicAnyOneShot }) {
-  const { ep, setEp } = useEpilogue(os.slug);
+  const code = useTableCode(os.slug);
+  const player = usePlayer();
+  const { ep, setEp, canEdit, shared, saved } = useSharedEpilogue(os.slug, code, player?.id ?? null);
+  const all = canEdit === "all";
+  const mayWrite = (id: string) => all || canEdit.includes(id);
   const setEntry = (id: string, patch: Partial<EpilogueEntry>) =>
     setEp({ ...ep, entries: { ...ep.entries, [id]: { ...ep.entries[id], ...patch } } });
   const records = survivorsFrom(os, ep);
@@ -59,9 +64,10 @@ export default function EpiloguePage({ os }: { os: PublicAnyOneShot }) {
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={{ href: `/${os.slug}`, label: os.title }} />
-        {/* Where the header's skip link lands. */}
-        <div id="main" tabIndex={-1} />
         <Box
+          component="main"
+          id="main"
+          tabIndex={-1}
           sx={{
             display: "grid",
             gridTemplateColumns: { xs: "1fr", md: "minmax(0, 380px) minmax(0, 1fr)" },
@@ -74,14 +80,23 @@ export default function EpiloguePage({ os }: { os: PublicAnyOneShot }) {
               The morning after
             </Typography>
             <Typography color="text.secondary" sx={{ mb: 2 }}>
-              Give each character a fate and one line for the paper. It saves on this device as you type.
+              {shared
+                ? all
+                  ? `Give each character a fate and one line for the paper. It's kept with table ${code}, so the chronicle can bind it. Players can write their own lines from their phones.`
+                  : `Write your character's line for the paper; the GM sets the rest. It's kept with table ${code}.`
+                : "Give each character a fate and one line for the paper. It saves on this device as you type."}
+              {saved && (
+                <span style={{ display: "block", fontSize: 13 }} role="status">
+                  {saved === "saving" ? "Saving…" : saved === "saved" ? "Saved with the table." : "Couldn't save; will retry when you type."}
+                </span>
+              )}
             </Typography>
             <Stack spacing={2}>
-              <TextField label="Headline" placeholder="BELL RINGS AGAIN; STORM BROKEN" value={ep.headline} onChange={(e) => setEp({ ...ep, headline: e.target.value })} sx={field} />
-              <TextField label="Subhead" placeholder="Five row out at midnight; four row back" value={ep.subhead} onChange={(e) => setEp({ ...ep, subhead: e.target.value })} sx={field} />
-              <TextField label="What happened" multiline minRows={3} value={ep.lead} onChange={(e) => setEp({ ...ep, lead: e.target.value })} sx={field} />
+              <TextField label="Headline" disabled={!all} placeholder="BELL RINGS AGAIN; STORM BROKEN" value={ep.headline} onChange={(e) => setEp({ ...ep, headline: e.target.value })} sx={field} />
+              <TextField label="Subhead" disabled={!all} placeholder="Five row out at midnight; four row back" value={ep.subhead} onChange={(e) => setEp({ ...ep, subhead: e.target.value })} sx={field} />
+              <TextField label="What happened" disabled={!all} multiline minRows={3} value={ep.lead} onChange={(e) => setEp({ ...ep, lead: e.target.value })} sx={field} />
               <TextField
-                label="Game night"
+                label="Game night" disabled={!all}
                 type="date"
                 value={ep.date}
                 onChange={(e) => /^\d{4}-\d{2}-\d{2}$/.test(e.target.value) && setEp({ ...ep, date: e.target.value })}
@@ -92,7 +107,7 @@ export default function EpiloguePage({ os }: { os: PublicAnyOneShot }) {
                 const e = ep.entries[c.id] ?? {};
                 return (
                   <Box key={c.id} sx={{ p: 2, border: 1, borderColor: "divider", borderRadius: 1 }}>
-                    <Typography variant="h6" sx={{ lineHeight: 1.2 }}>
+                    <Typography variant="h6" component="h2" sx={{ lineHeight: 1.2 }}>
                       {c.name}{" "}
                       <Typography component="span" color="text.secondary" sx={{ fontStyle: "italic" }}>
                         {c.poster.epithet}
@@ -104,6 +119,7 @@ export default function EpiloguePage({ os }: { os: PublicAnyOneShot }) {
                           select
                           size="small"
                           label="Fate"
+                          disabled={!all}
                           value={e.fate ?? ""}
                           onChange={(ev) => setEntry(c.id, { fate: (ev.target.value || undefined) as Fate | undefined })}
                           sx={{ minWidth: 150, ...field }}
@@ -115,12 +131,12 @@ export default function EpiloguePage({ os }: { os: PublicAnyOneShot }) {
                             </MenuItem>
                           ))}
                         </TextField>
-                        <TextField size="small" label="Played by" value={e.playedBy ?? ""} onChange={(ev) => setEntry(c.id, { playedBy: ev.target.value })} sx={{ flex: 1, ...field }} />
+                        <TextField size="small" label="Played by" disabled={!mayWrite(c.id)} value={e.playedBy ?? ""} onChange={(ev) => setEntry(c.id, { playedBy: ev.target.value })} sx={{ flex: 1, ...field }} />
                       </Stack>
-                      <TextField size="small" label="Their line for the paper" multiline value={e.line ?? ""} onChange={(ev) => setEntry(c.id, { line: ev.target.value })} slotProps={{ htmlInput: { maxLength: 280 } }} sx={field} />
+                      <TextField size="small" label="Their line for the paper" disabled={!mayWrite(c.id)} multiline value={e.line ?? ""} onChange={(ev) => setEntry(c.id, { line: ev.target.value })} slotProps={{ htmlInput: { maxLength: 280 } }} sx={field} />
                       <Stack direction="row" spacing={1}>
-                        <TextField size="small" label="Title earned" placeholder="Bell-thief" value={e.title ?? ""} onChange={(ev) => setEntry(c.id, { title: ev.target.value })} slotProps={{ htmlInput: { maxLength: 60 } }} sx={{ flex: 1, ...field }} />
-                        <TextField size="small" label="Scar" placeholder="rope-burned palms" value={e.scar ?? ""} onChange={(ev) => setEntry(c.id, { scar: ev.target.value })} slotProps={{ htmlInput: { maxLength: 140 } }} sx={{ flex: 1, ...field }} />
+                        <TextField size="small" label="Title earned" disabled={!all} placeholder="Bell-thief" value={e.title ?? ""} onChange={(ev) => setEntry(c.id, { title: ev.target.value })} slotProps={{ htmlInput: { maxLength: 60 } }} sx={{ flex: 1, ...field }} />
+                        <TextField size="small" label="Scar" disabled={!all} placeholder="rope-burned palms" value={e.scar ?? ""} onChange={(ev) => setEntry(c.id, { scar: ev.target.value })} slotProps={{ htmlInput: { maxLength: 140 } }} sx={{ flex: 1, ...field }} />
                       </Stack>
                     </Stack>
                   </Box>
@@ -133,7 +149,7 @@ export default function EpiloguePage({ os }: { os: PublicAnyOneShot }) {
                 <Button variant="outlined" startIcon={<FileDownloadIcon />} onClick={download} disabled={records.length === 0}>
                   Save to the shared world
                 </Button>
-                <Button onClick={() => setEp(emptyEpilogue())} sx={{ color: "text.secondary" }}>
+                <Button onClick={() => setEp(emptyEpilogue())} disabled={!all} sx={{ color: "text.secondary" }}>
                   Clear
                 </Button>
               </Stack>

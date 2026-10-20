@@ -83,28 +83,128 @@
       "to": "tobias-larke",
       "title": "A folded sheet of music from a masked hand",
       "when": "End of Act 2: as the lights die and the doors lock",
-      "text": "Darling. You kept the lid shut, and I have not forgotten who sang loudest. Here is the Waltz, in case your fingers have gone stiff with grief; whistle it in the gallery and the beast will heel. One favour, and then Old Marigold is yours with a new string: when the doors open on the boathouse, do not say my name. Let them squint at me a little longer. I promise the ending will be worth it. I promise you a great many things; I know. Burn this, or don't. C."
+      "text": "Darling. You kept the lid shut, and I have not forgotten who sang loudest. Here is the Waltz, in case your fingers have gone stiff with grief; whistle it in the gallery and the beast will heel. One favour, and then Old Marigold is yours with a new string: when the doors open on the boathouse, do not say my name. Let them squint at me a little longer. I promise the ending will be worth it. I promise you a great many things; I know. Burn this, or don't. C.",
+      "act": "lot-thirteen"
     },
     {
       "id": "the-magpie-retainer",
       "to": "dagny-brask",
       "title": "The retainer, on a silver tray",
       "when": "Act 3: in the kitchen challenge, left on the pass beside a wax magpie seal",
-      "text": "Captain Brask. Twenty gold a month was never charity; it was a retainer, and tonight I am calling it in. Stand at the boathouse door when the Watch comes and let no one pass until I have finished my speech. Do this and your pension bond is yours, the letter that ruined you is ash, and whoever's hand it was need never be named. Refuse, and the Watch will find a disgraced guard-captain at the scene of a dead man's thefts. You were always the best door I owned. The magpie."
+      "text": "Captain Brask. Twenty gold a month was never charity; it was a retainer, and tonight I am calling it in. Stand at the boathouse door when the Watch comes and let no one pass until I have finished my speech. Do this and your pension bond is yours, the letter that ruined you is ash, and whoever's hand it was need never be named. Refuse, and the Watch will find a disgraced guard-captain at the scene of a dead man's thefts. You were always the best door I owned. The magpie.",
+      "act": "the-house-wakes"
     },
     {
       "id": "the-lid-and-the-roof",
       "to": "anselm-pyke",
       "title": "A note under the coffin stone",
       "when": "Act 3: in the crypt, tucked beneath the stone of the coffin-trapdoor",
-      "text": "Brother Anselm. I know you lifted the lid at the vigil, because the oil keg was a hair off true when they carried it back. You closed it. You finished the rites. You kept the roof. I have rarely been so moved by a man's discretion. Saint Edda's reliquary is in the beast's belly, and you may have it, and my gratitude, for the price of one small testimony: that you saw a dead man in that coffin, to the Watch, with your hand on the book. A priest's word is worth more than gold. Spend it kindly. A grateful parishioner."
+      "text": "Brother Anselm. I know you lifted the lid at the vigil, because the oil keg was a hair off true when they carried it back. You closed it. You finished the rites. You kept the roof. I have rarely been so moved by a man's discretion. Saint Edda's reliquary is in the beast's belly, and you may have it, and my gratitude, for the price of one small testimony: that you saw a dead man in that coffin, to the Watch, with your hand on the book. A priest's word is worth more than gold. Spend it kindly. A grateful parishioner.",
+      "act": "the-house-wakes"
     },
     {
       "id": "the-ladys-midnight",
       "to": "nettle-tumbletoe",
       "title": "Marchbanks's last offer",
       "when": "Act 3: delivered by the Lady's maid in the portrait gallery, or found tucked in Nettle's glove",
-      "text": "Master Tumbletoe. My patience and my money both expire at midnight. There is a ledger bound in plum-red leather inside that creature's belly; fetch it, unread, and your burrow's note is forgotten. At the stroke of twelve I intend to ask the room who made Pell's relics, and I would prefer to name a name of my own choosing. You have been so kind to the girl. Be kind to yourself instead. If you cannot decide by then, I will decide for you, and the Tumbletoes will pay the difference. Y. Marchbanks."
+      "text": "Master Tumbletoe. My patience and my money both expire at midnight. There is a ledger bound in plum-red leather inside that creature's belly; fetch it, unread, and your burrow's note is forgotten. At the stroke of twelve I intend to ask the room who made Pell's relics, and I would prefer to name a name of my own choosing. You have been so kind to the girl. Be kind to yourself instead. If you cannot decide by then, I will decide for you, and the Tumbletoes will pay the difference. Y. Marchbanks.",
+      "act": "the-house-wakes"
+    }
+  ],
+  "acts": [
+    {
+      "id": "masks-on",
+      "title": "Masks On",
+      "subtitle": "Doors at eight. Anonymous bids, honest prices, and a dead man's best wine."
+    },
+    {
+      "id": "lot-thirteen",
+      "title": "Lot Thirteen",
+      "subtitle": "The Magpie's Chest rolls out to the block. Then the lights go."
+    },
+    {
+      "id": "the-house-wakes",
+      "title": "The House Wakes",
+      "subtitle": "Gallery, kitchen, cellar: everything in Pell House has an opinion, and something is loose."
+    },
+    {
+      "id": "the-unmasking",
+      "title": "The Unmasking",
+      "subtitle": "Rain on the boathouse roof, the Watch at the door, and one last bid."
+    }
+  ],
+  "rumors": [
+    {
+      "id": "marchbanks-asking",
+      "text": "Lady Marchbanks has been asking every dealer on Mallow Row who made Pell's relics, and she does not ask nicely.",
+      "truth": "true"
+    },
+    {
+      "id": "thursday-sausages",
+      "text": "Pell kept a pet in that house nobody ever saw. The butcher still leaves a string of sausages at the back door every Thursday.",
+      "truth": "true"
+    },
+    {
+      "id": "watch-tipped-off",
+      "text": "Somebody sent the Watch a note saying tonight's sale will be robbed blind. It was signed with a little drawing of a bird.",
+      "truth": "true"
+    },
+    {
+      "id": "sprotts-nephew",
+      "text": "Old Sprott's been poorly all month, they say, so tonight it's his nephew calling the bids. Nobody's met the nephew.",
+      "truth": "half"
+    },
+    {
+      "id": "pell-the-forger",
+      "text": "Half the relics in that catalogue are fakes, and Pell made them himself, in his dressing gown, after midnight.",
+      "truth": "half"
+    },
+    {
+      "id": "buried-twice",
+      "text": "Pell's grave down in the house crypt has fresh mortar on it, because the priest had to bury him twice.",
+      "truth": "half"
+    },
+    {
+      "id": "creditors-at-midnight",
+      "text": "Pell died owing so much that his creditors seize every lot at midnight, bids or no bids. Buy early or don't bother.",
+      "truth": "false"
+    },
+    {
+      "id": "cursed-sea-chest",
+      "text": "Lot Thirteen's a cursed chest off a sunken ship. Lift the lid and you're dead by morning, my cousin swears it.",
+      "truth": "false"
+    }
+  ],
+  "notices": [
+    {
+      "id": "additional-lot",
+      "kind": "poster",
+      "title": "Final Lot: The Magpie's Chest",
+      "text": "At the late Magister's request, Lot Thirteen will be offered last and unopened. Reserve undisclosed. Bidders must stay masked until the hammer falls."
+    },
+    {
+      "id": "lots-one-to-twelve-sold",
+      "kind": "settled",
+      "title": "Lots One to Twelve: Sold",
+      "text": "All lots up to twelve have been hammered down. Buyers may collect at the end of the evening. The house wishes them every joy of their purchases."
+    },
+    {
+      "id": "chest-on-legs",
+      "kind": "sighted",
+      "title": "A Chest Seen Walking",
+      "text": "A small wooden chest was seen crossing the portrait gallery on legs of its own, last heard heading for the kitchen. Do not offer it your hand."
+    },
+    {
+      "id": "marchbanks-offer",
+      "kind": "reward",
+      "title": "Lady Marchbanks Offers 200 gp",
+      "text": "For the name of whoever made the late Magister's relics, delivered to her privately before midnight. Discretion assured."
+    },
+    {
+      "id": "no-one-leaves",
+      "kind": "poster",
+      "title": "By Order of the Watch: No One Leaves",
+      "text": "Pell House is closed by order of the City Watch pending inquiry into the night's thefts. All guests remain on the premises, masks on, until questioned."
     }
   ],
   "content": {

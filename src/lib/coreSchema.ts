@@ -105,6 +105,36 @@ export const letterSchema = z.object({
   when: z.string().describe("Act / when to send it"),
   /** What the player reads after breaking the seal. */
   text: z.string().describe("What the player reads under the seal"),
+  /** The act card it belongs to; printed on the envelope in the box ("open at Act II"). */
+  act: id.optional().describe("Open at act (optional)"),
+});
+
+/** A theatrical title card the GM puts on the TV between scenes. GM-only until shown. */
+export const actSchema = z.object({
+  id,
+  title: z.string().max(60).describe("Title (e.g. The Beach at Midnight)"),
+  subtitle: z.string().max(120).optional().describe("Subtitle"),
+  /** Wiped in on the TV after the title. A URL, or leave it out for an engraved panel. */
+  image: z.string().optional().describe("Image URL (optional)"),
+});
+
+export const RUMOR_TRUTHS = ["true", "false", "half"] as const;
+
+/** Talk in the tavern. Each player draws two after claiming; only the GM knows which are true. */
+export const rumorSchema = z.object({
+  id,
+  text: z.string().min(10).max(200, "keep a rumor to a sentence or two").describe("What they heard"),
+  truth: z.enum(RUMOR_TRUTHS).describe("Truth (GM only)"),
+});
+
+export const NOTICE_KINDS = ["poster", "reward", "sighted", "settled"] as const;
+
+/** A notice the GM can pin to the shared town board mid-session. GM-only until pinned. */
+export const noticeSchema = z.object({
+  id,
+  kind: z.enum(NOTICE_KINDS).describe("Kind"),
+  title: z.string().max(60).describe("Headline"),
+  text: z.string().max(240).optional().describe("Notice text"),
 });
 
 /** What the GM does with a character nobody claims tonight. GM-only. */
@@ -181,6 +211,12 @@ export const coreOneShotFields = {
     .describe("Morning-after broadsheet"),
   sounds: soundsSchema.optional().describe("Soundboard"),
   letters: z.array(letterSchema).default([]).describe("Sealed letters"),
+  /** Title cards for the TV between scenes, in order. GM-only until shown. */
+  acts: z.array(actSchema).default([]).describe("Act cards"),
+  /** Rumors players draw after claiming. GM-only: players only ever get the two they drew, without the truth. */
+  rumors: z.array(rumorSchema).default([]).describe("Rumor mill"),
+  /** Notices the GM can pin to the town board mid-session. GM-only until pinned. */
+  notices: z.array(noticeSchema).default([]).describe("Town board notices"),
   content: z
     .object({
       sources: z.array(z.string()).default([]).describe("Sources and credits"),
@@ -195,6 +231,11 @@ export const coreOneShotFields = {
 export type Poster = z.infer<typeof posterSchema>;
 export type Tie = z.infer<typeof tieSchema>;
 export type Letter = z.infer<typeof letterSchema>;
+export type Act = z.infer<typeof actSchema>;
+export type Rumor = z.infer<typeof rumorSchema>;
+export type RumorTruth = (typeof RUMOR_TRUTHS)[number];
+export type Notice = z.infer<typeof noticeSchema>;
+export type NoticeKind = (typeof NOTICE_KINDS)[number];
 export type IfUnclaimed = z.infer<typeof ifUnclaimedSchema>;
 export type Sounds = z.infer<typeof soundsSchema>;
 export type Skin = (typeof SKINS)[number];

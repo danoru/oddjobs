@@ -49,3 +49,22 @@ describe("toPublic: Ten Candles", () => {
     }
   });
 });
+
+describe("toPublic: phase 6's GM-only extras", () => {
+  it("keeps act cards, rumors (and their truths) and town-board presets off player pages", () => {
+    const all = loadAll();
+    expect(all.every((os) => os.acts.length > 0 && os.rumors.length >= 6 && os.notices.length > 0)).toBe(true);
+    for (const os of all) {
+      const pub = toPublic(os);
+      for (const key of ["acts", "rumors", "notices"]) expect(key in pub).toBe(false);
+      const json = JSON.stringify(pub);
+      expect(json).not.toContain('"truth"');
+      for (const r of os.rumors) expect(json).not.toContain(r.text);
+      for (const n of os.notices) expect(json).not.toContain(n.title);
+      // Titles can echo the one-shot's own ("Lot Thirteen"); the subtitles are the acts' own words.
+      for (const a of os.acts) if (a.subtitle) expect(json).not.toContain(a.subtitle);
+      // Players only learn that there are rumors to draw.
+      expect(pub.hasRumors).toBe(true);
+    }
+  });
+});

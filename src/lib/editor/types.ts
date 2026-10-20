@@ -37,6 +37,8 @@ export type Widget =
   | "castRef"
   /** Pick cast members, in order. */
   | "castRefs"
+  /** Pick one of the one-shot's act cards (or none). */
+  | "actRef"
   /** The poster icon grid. */
   | "icon"
   /** A sound preset with a play button. */

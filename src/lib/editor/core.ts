@@ -39,8 +39,8 @@ export const coreTablePlay: EditorSection = {
   id: "table",
   title: "Table play",
   scope: "oneshot",
-  help: "Sealed letters the GM delivers mid-session, the soundboard, and the morning-after broadsheet.",
-  fields: ["letters", "sounds", "gazette"],
+  help: "Sealed letters the GM delivers mid-session, act cards for the TV, rumors players draw, notices for the town board, the soundboard and the morning-after broadsheet. Acts, rumors and notices stay off player pages until the GM shows, deals or pins them.",
+  fields: ["acts", "letters", "rumors", "notices", "sounds", "gazette"],
 };
 
 export const coreGm: EditorSection = {
@@ -85,7 +85,7 @@ export const coreHints: Record<string, FieldHint> = {
   "oneshot:coreRoles": { widget: "castRefs" },
   "oneshot:letters": {
     itemLabel: "letter",
-    fields: ["to", "when", "title", "text", "id"],
+    fields: ["to", "when", "act", "title", "text", "id"],
     newItem: (doc) => ({
       id: freshId("letter", ((doc.oneshot.letters as { id?: string }[] | undefined) ?? []).map((l) => l.id)),
       to: castIds(doc)[0],
@@ -95,6 +95,38 @@ export const coreHints: Record<string, FieldHint> = {
   "oneshot:letters.*.id": { widget: "text", help: "Any short kebab-case name; it's how deliveries are remembered." },
   "oneshot:letters.*.when": { widget: "text", placeholder: "Act 2: after the auction" },
   "oneshot:letters.*.title": { widget: "text" },
+  "oneshot:letters.*.act": { widget: "actRef", help: "Printed on the envelope in the box, and lights the letter on the GM's spotlight when that act is up." },
+  "oneshot:acts": {
+    itemLabel: "act",
+    help: "Title cards the GM puts on the TV between scenes, in order.",
+    fields: ["title", "subtitle", "image", "id"],
+    newItem: (doc) => ({ id: freshId("act", ((doc.oneshot.acts as { id?: string }[] | undefined) ?? []).map((a) => a.id)) }),
+    summary: (item) => (item as { subtitle?: string }).subtitle ?? null,
+  },
+  "oneshot:acts.*.id": { widget: "text" },
+  "oneshot:acts.*.title": { widget: "text", placeholder: "The Beach at Midnight" },
+  "oneshot:acts.*.subtitle": { widget: "text" },
+  "oneshot:acts.*.image": { widget: "text", placeholder: "https://… (leave empty for an engraved panel)" },
+  "oneshot:rumors": {
+    itemLabel: "rumor",
+    help: "Each player draws two after claiming; six to eight is plenty. Only the GM sees which are true.",
+    fields: ["text", "truth", "id"],
+    newItem: (doc) => ({ id: freshId("rumor", ((doc.oneshot.rumors as { id?: string }[] | undefined) ?? []).map((r) => r.id)), truth: "true" }),
+    summary: (item) => {
+      const t = (item as { truth?: string }).truth;
+      return t === "half" ? "half true" : (t ?? null);
+    },
+  },
+  "oneshot:rumors.*.id": { widget: "text" },
+  "oneshot:notices": {
+    itemLabel: "notice",
+    help: "Presets the GM pins to the shared board mid-session (the GM can also write one on the night).",
+    fields: ["kind", "title", "text", "id"],
+    newItem: (doc) => ({ id: freshId("notice", ((doc.oneshot.notices as { id?: string }[] | undefined) ?? []).map((n) => n.id)), kind: "poster" }),
+    summary: (item) => (item as { kind?: string }).kind ?? null,
+  },
+  "oneshot:notices.*.id": { widget: "text" },
+  "oneshot:notices.*.title": { widget: "text", placeholder: "REWARD DOUBLED" },
   "oneshot:sounds": { fields: ["beds", "stingers"] },
   "oneshot:sounds.beds": {
     itemLabel: "bed",

@@ -5,7 +5,7 @@ import { loadOneShot } from "@/lib/content";
 import { cryptoRng, type Actor, type Viewer } from "@/lib/game";
 import { db } from "@/lib/prisma";
 import { normalizeCode } from "@/lib/tables";
-import { isUniqueViolation, playerIdOf } from "@/lib/tables.server";
+import { appendEvents, currentActOf, isUniqueViolation, playerIdOf } from "@/lib/tables.server";
 import { GAMES } from "@/systems/games";
 
 /**
@@ -79,6 +79,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       } else {
         await db().game.create({ data: { tableId: table.id, system: os.system, state: json } });
       }
+      // What the move adds to the table's event log (rolls, deaths, candles out).
+      const lastAct = game.mirror ? await currentActOf(table.id) : -1;
+      const mirrored = game.mirror?.(row ? state : null, result.state, os, lastAct) ?? [];
+      if (mirrored.length) await appendEvents(table.id, mirrored);
       return reply(result.state);
     } catch (e) {
       if (!isUniqueViolation(e)) throw e;

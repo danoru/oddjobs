@@ -5,8 +5,8 @@ import type { z } from "zod";
  * a system's pure reducer, and read only through its projection, which
  * decides what each viewer may see. The API (/api/tables/<code>/game) stores
  * the state and checks who's asking; everything else is here and testable
- * without a database. Phase 5 table toys (dice trays, spotlight, coins) can
- * be another system's reducer, or actions added to an existing one.
+ * without a database. The table toys every system shares (dice, notes, the
+ * bell, coins…) live in the table's event log instead (src/lib/live.ts).
  */
 
 /** Who is acting: the GM (by cookie role) or a player (by their browser's made-up id). */
@@ -32,8 +32,8 @@ export interface GameRules<S, A, V> {
 
 /**
  * Seat order round the table, clockwise from the GM's left. Every system can
- * use it: Ten Candles passes cards by it, and phase 5's spotlight and
- * inspiration coins can go round it too. `playerId` never leaves the server.
+ * use it: Ten Candles passes cards by it, and its seats are who's at the
+ * table in the event log. `playerId` never leaves the server.
  */
 export interface Seat {
   playerId: string;

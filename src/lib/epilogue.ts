@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { PLAYER_HEADER } from "./tables";
 import { FATES, survivorSchema, type Survivor } from "./legacy";
 import type { Epilogue } from "@/components/gazette/Gazette";
 import type { PublicAnyOneShot } from "./public";
@@ -94,4 +95,79 @@ export function survivorsFrom(os: PublicAnyOneShot, ep: Epilogue): Survivor[] {
     });
     return rec.success ? [rec.data] : [];
   });
+}
+
+type Shared = { epilogue: Epilogue | null; canEdit: "all" | string[] };
+
+/**
+ * The epilogue for a one-shot: kept per table on the server when this browser
+ * is at a table (so the chronicle can gather it), else on this device. At a
+ * table the GM writes the whole front page and each player only their own
+ * character's line; edits save a moment after typing stops.
+ */
+export function useSharedEpilogue(slug: string, code: string | null, playerId: string | null) {
+  const local = useEpilogue(slug);
+  const [shared, setShared] = useState<Shared | null>(null);
+  const [draft, setDraft] = useState<Epilogue | null>(null);
+  const [saved, setSaved] = useState<"saved" | "saving" | "error" | null>(null);
+  const lastEdit = useRef(0);
+  const headers = useMemo(() => ({ "Content-Type": "application/json", ...(playerId ? { [PLAYER_HEADER]: playerId } : {}) }), [playerId]);
+
+  useEffect(() => {
+    if (!code) return;
+    let alive = true;
+    const poll = async () => {
+      if (Date.now() - lastEdit.current < 4000) return;
+      const res = await fetch(`/api/tables/${code}/epilogue`, { cache: "no-store", headers }).catch(() => null);
+      if (!alive || !res?.ok) return;
+      const json = (await res.json()) as Shared;
+      setShared(json);
+      setDraft(null);
+    };
+    void poll();
+    const t = window.setInterval(poll, 5000);
+    return () => {
+      alive = false;
+      window.clearInterval(t);
+    };
+  }, [code, headers]);
+
+  const ep = draft ?? shared?.epilogue ?? emptyEpilogue();
+  const canEdit = useMemo(() => shared?.canEdit ?? [], [shared]);
+
+  // Save a moment after the last keystroke.
+  useEffect(() => {
+    if (!code || !draft) return;
+    const t = window.setTimeout(async () => {
+      setSaved("saving");
+      let res: Response | null;
+      if (canEdit === "all") {
+        res = await fetch(`/api/tables/${code}/epilogue`, { method: "PUT", headers, body: JSON.stringify({ epilogue: draft }) }).catch(() => null);
+      } else {
+        res = null;
+        for (const id of canEdit) {
+          const e = draft.entries[id] ?? {};
+          res = await fetch(`/api/tables/${code}/epilogue`, {
+            method: "PATCH",
+            headers,
+            body: JSON.stringify({ characterId: id, entry: { line: e.line ?? "", playedBy: e.playedBy ?? "" } }),
+          }).catch(() => null);
+        }
+      }
+      setSaved(res?.ok ? "saved" : "error");
+    }, 700);
+    return () => window.clearTimeout(t);
+  }, [code, draft, canEdit, headers]);
+
+  if (!code) return { ep: local.ep, setEp: local.setEp, canEdit: "all" as const, shared: false, saved: null };
+  return {
+    ep,
+    setEp: (next: Epilogue) => {
+      lastEdit.current = Date.now();
+      setDraft(next);
+    },
+    canEdit,
+    shared: true,
+    saved,
+  };
 }

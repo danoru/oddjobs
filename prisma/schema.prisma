@@ -19,6 +19,8 @@ model Table {
   flashbacks Flashback[]
   game       Game?
   recordings Recording[]
+  events     TableEvent[]
+  epilogue   Epilogue?
   createdAt  DateTime   @default(now())
 }
 
@@ -96,4 +98,40 @@ model Recording {
   createdAt DateTime @default(now())
 
   @@unique([tableId, playerId])
+}
+
+/// Everything that happens at a table outside a system's own game state:
+/// dice rolls, notes passed under the table, the GM's bell, act cards,
+/// spotlight ticks, rumors drawn, notices pinned to the town board,
+/// inspiration coins. One append-only log per table, polled with a cursor
+/// (`id`); what each viewer may see is decided by `viewEvent` in
+/// src/lib/live.ts, never by the client.
+model TableEvent {
+  id        Int      @id @default(autoincrement())
+  tableId   String
+  table     Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  /// roll | note | bell | act | tick | rumor | notice | unpin | coin | spend | hide | death | candle
+  kind      String
+  /// The acting player's made-up browser id; null for the GM. Never sent to anyone.
+  byPlayer  String?
+  /// The player a note, bell, coin or rumor draw is for; null for the GM or everyone.
+  toPlayer  String?
+  /// A roll behind the screen: only the GM and the roller see it.
+  hidden    Boolean  @default(false)
+  data      Json
+  createdAt DateTime @default(now())
+
+  @@index([tableId, id])
+}
+
+/// The morning after, kept per table so the chronicle can bind every night
+/// into one book: the broadsheet (headline, lines, fates) and the GM's edits
+/// to the night's tapestry (panels dropped or renamed).
+model Epilogue {
+  id        String   @id @default(cuid())
+  tableId   String   @unique
+  table     Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  data      Json
+  tapestry  Json
+  updatedAt DateTime @updatedAt
 }

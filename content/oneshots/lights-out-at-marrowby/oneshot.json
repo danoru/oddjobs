@@ -36,7 +36,109 @@
       "to": "ida-kell",
       "title": "The last entry in the train register",
       "when": "When the paraffin runs low (about five candles)",
-      "text": "You find it in your own handwriting, in the train register, dated the second night: \"6:10 Saltcoats passed Marrowby, 2 min late, all lamps lit, no one at the windows.\" You don't remember writing it. You don't remember the train. The next line is in your hand too, and the ink is still wet: \"Line clear.\""
+      "text": "You find it in your own handwriting, in the train register, dated the second night: \"6:10 Saltcoats passed Marrowby, 2 min late, all lamps lit, no one at the windows.\" You don't remember writing it. You don't remember the train. The next line is in your hand too, and the ink is still wet: \"Line clear.\"",
+      "act": "what-will-burn"
+    }
+  ],
+  "acts": [
+    {
+      "id": "keep-the-lamp-lit",
+      "title": "Keep the Lamp Lit",
+      "subtitle": "Nineteen days dark. Strangers round a stove, and paraffin for three nights at most."
+    },
+    {
+      "id": "what-will-burn",
+      "title": "What Will Burn",
+      "subtitle": "Light is the only currency left on the moor. Spend it."
+    },
+    {
+      "id": "the-line-is-clear",
+      "title": "The Line Is Clear",
+      "subtitle": "The block bell rings the long code. Something is coming up from the coast."
+    },
+    {
+      "id": "through-the-tunnel",
+      "title": "Through the Tunnel",
+      "subtitle": "Gallows Hill. A mile and a quarter of dark, and one candle burning in the middle."
+    },
+    {
+      "id": "the-last-light",
+      "title": "The Last Light",
+      "subtitle": "One candle left. The train does not slow down."
+    }
+  ],
+  "rumors": [
+    {
+      "id": "chalk-marks",
+      "text": "Ida chalks the paraffin level on the lamp-room wall every night, and the marks are getting closer together.",
+      "truth": "true"
+    },
+    {
+      "id": "refuge-candle",
+      "text": "Somebody keeps a candle lit in the refuge halfway through Gallows Hill tunnel. Nobody at the junction will say who.",
+      "truth": "true"
+    },
+    {
+      "id": "crossing-batteries",
+      "text": "The cars at the crossing still have batteries under the bonnet. Two hundred yards of dark there, and two hundred back.",
+      "truth": "true"
+    },
+    {
+      "id": "stationmaster-came-back",
+      "text": "The stationmaster came back out of the tunnel on the seventh night, they say. His wife lets him in at the back door.",
+      "truth": "half"
+    },
+    {
+      "id": "the-610-went-through",
+      "text": "The 6:10 to Saltcoats went through on the second night, packed to the doors and every lamp lit.",
+      "truth": "half"
+    },
+    {
+      "id": "the-postwomans-sack",
+      "text": "The postwoman's got a letter in that sack for every one of us, and she's read them all.",
+      "truth": "half"
+    },
+    {
+      "id": "relief-train",
+      "text": "The army's running a relief train up from the coast with searchlights. It'll stop for anyone who waves a lamp.",
+      "truth": "false"
+    },
+    {
+      "id": "sun-over-saltcoats",
+      "text": "A man on the road swore the sun still comes up over Saltcoats. It's only dark up here on the moor.",
+      "truth": "false"
+    }
+  ],
+  "notices": [
+    {
+      "id": "missing-stationmaster",
+      "kind": "poster",
+      "title": "MISSING: The Stationmaster",
+      "text": "Went into Gallows Hill tunnel on the fifth day to look for the train. Cap and long coat. If you hear him on the line, do not answer."
+    },
+    {
+      "id": "curfew",
+      "kind": "poster",
+      "title": "Curfew: Stay Inside the Light",
+      "text": "By order of the signalwoman: no one leaves the lamplight once the stove is banked. No one opens the waiting-room door to a knock. No exceptions."
+    },
+    {
+      "id": "last-seen-edge-of-light",
+      "kind": "sighted",
+      "title": "Last Seen: The Edge of the Light",
+      "text": "A figure in a coat like the one missing from the hook, standing just past the lamplight, facing in. It did not answer to its name."
+    },
+    {
+      "id": "seat-on-the-last-train",
+      "kind": "reward",
+      "title": "Reward: A Seat on the Last Train",
+      "text": "Promised to whoever fetches the batteries from the crossing and carries them back into the light. There are fewer seats than there were this morning."
+    },
+    {
+      "id": "lamp-room-dry",
+      "kind": "settled",
+      "title": "Lamp Room: Dry",
+      "text": "Last drum of paraffin emptied and chalked off. The lamp room is closed. What still burns is all there is."
     }
   ],
   "content": {

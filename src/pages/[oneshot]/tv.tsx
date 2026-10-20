@@ -16,6 +16,7 @@ import { PosterIcon } from "@/components/PosterIcon";
 import { tiltFor } from "@/components/board/Poster";
 import s from "@/components/tv/Tv.module.css";
 import { onlyIfOnDisk } from "@/lib/onDisk";
+import { TvLive } from "@/components/tv/TvLive";
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: publishedSlugs().map((oneshot) => ({ params: { oneshot } })),
@@ -132,6 +133,7 @@ function PosterTv({ os }: { os: PublicOneShot }) {
             return (
               <article
                 key={c.id}
+                data-character={c.id}
                 className={[s.poster, claim ? s.claimed : "", torn.includes(c.id) ? s.justTorn : ""].join(" ")}
                 style={{ ["--tilt" as string]: `${tiltFor(c.id, 2)}deg` }}
               >
@@ -157,6 +159,8 @@ function PosterTv({ os }: { os: PublicOneShot }) {
             );
           })}
         </div>
+
+        <TvLive code={table} tray="full" icons={os.cast.map((c) => c.poster.icon)} sound={sound} />
 
         <div className={s.bottom}>
           <span>

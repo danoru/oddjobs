@@ -247,6 +247,20 @@ export const oneShotSchema = z.object({
     )
     .default([])
     .describe("Level variants"),
+  /**
+   * Inspiration coins at the table (src/systems/registry.ts maps them to
+   * Heroic Inspiration under 2024 and Inspiration under 2014).
+   */
+  coins: z
+    .object({
+      enabled: z.boolean().default(true).describe("Coins at this table"),
+      /** What the coin stands for, if not the ruleset's own name. */
+      name: z.string().max(40).optional().describe("Coin name (default: the ruleset's)"),
+      /** How many coins each player may toss to someone else per act. */
+      tossesPerAct: z.number().int().min(0).max(5).default(1).describe("Tosses per player per act"),
+    })
+    .optional()
+    .describe("Inspiration coins"),
 });
 
 /** A character's mechanics at another level: content/oneshots/<slug>/variants/<level>/<id>.json. */

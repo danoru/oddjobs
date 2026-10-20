@@ -56,7 +56,8 @@ export function Gazette({ os, ep }: { os: PublicAnyOneShot; ep: Epilogue }) {
       </div>
       <h1 className={s.masthead}>{g.name}</h1>
       <div className={s.dateline}>
-        <span>{nice}</span>
+        {/* A blank paper is dated today, which the server and the browser can see differently around midnight. */}
+        <span suppressHydrationWarning>{nice}</span>
         <span>Morning edition</span>
       </div>
       <h2 className={s.headline}>{ep.headline || os.title}</h2>

@@ -1,0 +1,385 @@
+/* The event log on the TV: act cards, the dice tray, the town board, notes and coins. */
+
+.board {
+  position: fixed;
+  right: 18px;
+  top: 150px;
+  width: min(22vw, 320px);
+  max-height: calc(100vh - 260px);
+  overflow: hidden;
+  z-index: 20;
+  display: grid;
+  gap: 10px;
+}
+
+.boardTitle {
+  justify-self: start;
+  font-family: var(--font-label);
+  letter-spacing: 0.18em;
+  font-size: clamp(12px, 1vw, 16px);
+  color: var(--brass);
+  background: rgba(28, 20, 14, 0.92);
+  border: 1px solid var(--brass);
+  padding: 3px 10px;
+}
+
+.notice {
+  position: relative;
+  background: var(--parchment);
+  color: var(--ink);
+  padding: 10px 12px 12px;
+  transform: rotate(var(--tilt, 0deg));
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+  animation: pinUp 600ms cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+
+.notice::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e46a5a, var(--wax));
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+}
+
+.noticeKind {
+  font-family: var(--font-label);
+  font-size: clamp(10px, 0.8vw, 13px);
+  letter-spacing: 0.14em;
+  color: var(--wax);
+  margin-top: 8px;
+}
+
+.noticeTitle {
+  font-family: var(--font-poster);
+  font-size: clamp(16px, 1.5vw, 24px);
+  line-height: 1.1;
+}
+
+.noticeText {
+  font-family: var(--font-print);
+  font-size: clamp(13px, 1vw, 17px);
+  margin-top: 4px;
+}
+
+.settled {
+  position: absolute;
+  right: 6px;
+  bottom: 10px;
+  font-family: var(--font-poster);
+  font-size: clamp(18px, 1.8vw, 28px);
+  color: var(--wax);
+  border: 3px solid var(--wax);
+  padding: 0 8px;
+  transform: rotate(-14deg);
+  background: rgba(243, 231, 203, 0.9);
+  animation: stamp 400ms ease-out both;
+}
+
+@keyframes pinUp {
+  from {
+    transform: translateY(-40px) rotate(-8deg);
+    opacity: 0;
+  }
+}
+
+@keyframes stamp {
+  from {
+    transform: scale(2.4) rotate(-14deg);
+    opacity: 0;
+  }
+}
+
+/* ---- Dice ---- */
+
+.tray {
+  position: fixed;
+  left: 18px;
+  bottom: 64px;
+  width: min(34vw, 460px);
+  z-index: 20;
+  background: linear-gradient(180deg, rgba(59, 38, 22, 0.95), rgba(36, 23, 13, 0.95));
+  border: 3px solid var(--brass);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7), 0 10px 24px rgba(0, 0, 0, 0.6);
+  color: var(--parchment);
+  padding: 10px 14px;
+}
+
+.trayLatest {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(210, 168, 90, 0.4);
+  margin-bottom: 6px;
+}
+
+.trayWho {
+  font-family: var(--font-label);
+  letter-spacing: 0.1em;
+  font-size: clamp(14px, 1.2vw, 20px);
+  color: var(--parchment-dark);
+}
+
+.trayTotal {
+  font-family: var(--font-poster);
+  font-size: clamp(36px, 4vw, 64px);
+  line-height: 1;
+  color: var(--brass);
+  animation: rise 700ms 500ms both;
+}
+
+.nat20 {
+  color: #ffd76a;
+  text-shadow: 0 0 22px rgba(255, 215, 106, 0.9);
+}
+
+.nat1 {
+  color: #e2675a;
+}
+
+.trayLabel {
+  font-family: var(--font-print);
+  font-size: clamp(14px, 1.2vw, 20px);
+  text-align: center;
+}
+
+.log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-print);
+  font-size: clamp(12px, 1vw, 16px);
+  color: var(--parchment-dark);
+  display: grid;
+  gap: 2px;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+
+/* ---- Act cards ---- */
+
+.actChip {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  font-family: var(--font-label);
+  letter-spacing: 0.14em;
+  font-size: clamp(12px, 1vw, 16px);
+  color: var(--brass);
+  border: 1px solid var(--brass);
+  padding: 4px 12px;
+  background: rgba(28, 20, 14, 0.85);
+}
+
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0 3%, transparent 3% 7%),
+    radial-gradient(ellipse at 50% 30%, #7a1d17, #3a0b08 70%, #1a0504);
+  animation: curtain 900ms ease-out both;
+}
+
+.card {
+  width: min(78vw, 1100px);
+  text-align: center;
+  color: var(--parchment);
+}
+
+.actNo {
+  font-family: var(--font-label);
+  letter-spacing: 0.5em;
+  font-size: clamp(16px, 1.8vw, 30px);
+  color: var(--brass);
+  animation: rise 800ms 400ms both;
+}
+
+.actTitle {
+  font-family: var(--font-poster);
+  font-weight: 400;
+  font-size: clamp(40px, 6.5vw, 110px);
+  line-height: 1.05;
+  margin: 10px 0 6px;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+  animation: rise 900ms 700ms both;
+}
+
+.actSub {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: clamp(18px, 2vw, 34px);
+  margin: 0 auto 24px;
+  max-width: 40ch;
+  color: var(--parchment-dark);
+  animation: rise 900ms 1100ms both;
+}
+
+.wipe {
+  height: clamp(140px, 30vh, 360px);
+  border: 4px double var(--brass);
+  overflow: hidden;
+  background: var(--parchment);
+  animation: wipe 1400ms 2400ms cubic-bezier(0.6, 0, 0.2, 1) both;
+}
+
+.wipe img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: sepia(0.35) contrast(1.05);
+}
+
+.engraving {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  color: var(--ink);
+  background:
+    repeating-linear-gradient(45deg, rgba(43, 29, 14, 0.18) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(-45deg, rgba(43, 29, 14, 0.12) 0 1px, transparent 1px 9px),
+    var(--parchment);
+}
+
+@keyframes wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes curtain {
+  from {
+    clip-path: inset(0 50% 0 50%);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* ---- Notes and coins ---- */
+
+.flutter {
+  position: fixed;
+  left: 50%;
+  bottom: 120px;
+  z-index: 30;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-print);
+  font-size: clamp(18px, 1.8vw, 30px);
+  color: var(--parchment);
+  background: rgba(28, 20, 14, 0.9);
+  border: 1px solid var(--brass);
+  padding: 10px 20px;
+  animation: slide 4.2s ease-in-out both;
+}
+
+.folded {
+  width: 46px;
+  height: 32px;
+  background: linear-gradient(135deg, #fbf3dc 50%, #e2cfa4 50%);
+  box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.4);
+  transform: rotate(-8deg);
+  animation: flap 0.6s ease-in-out 4 alternate;
+}
+
+@keyframes slide {
+  0% {
+    transform: translate(-120vw, 0);
+  }
+  18%,
+  82% {
+    transform: translate(-50%, 0);
+  }
+  100% {
+    transform: translate(120vw, 0);
+  }
+}
+
+@keyframes flap {
+  to {
+    transform: rotate(8deg) translateY(-4px);
+  }
+}
+
+.flyingCoin {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 40;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-poster);
+  font-size: 28px;
+  color: #5a3c0e;
+  background: radial-gradient(circle at 35% 30%, #fff1c2, #d2a85a 55%, #8a6326);
+  border: 3px solid #6b4a18;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6);
+  animation: toss 1.6s cubic-bezier(0.3, 0, 0.3, 1) both;
+}
+
+@keyframes toss {
+  0% {
+    transform: translate(var(--x0), var(--y0)) rotateY(0) scale(0.6);
+  }
+  50% {
+    transform: translate(calc((var(--x0) + var(--x1)) / 2), calc(min(var(--y0), var(--y1)) - 180px)) rotateY(900deg) scale(1.3);
+  }
+  100% {
+    transform: translate(var(--x1), var(--y1)) rotateY(1800deg) scale(1);
+  }
+}
+
+.coinCaption {
+  position: fixed;
+  left: 50%;
+  top: 70px;
+  transform: translateX(-50%);
+  z-index: 40;
+  font-family: var(--font-poster);
+  font-size: clamp(18px, 2vw, 32px);
+  color: var(--brass);
+  text-shadow: 0 2px 0 #000;
+  animation: rise 500ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notice,
+  .settled,
+  .curtain,
+  .actNo,
+  .actTitle,
+  .actSub,
+  .wipe,
+  .flutter,
+  .folded,
+  .flyingCoin,
+  .trayTotal {
+    animation: none;
+  }
+}

@@ -3,10 +3,14 @@ import { Button, Typography } from "@mui/material";
 import TvIcon from "@mui/icons-material/Tv";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import HistoryEduIcon from "@mui/icons-material/HistoryEdu";
+import PrintIcon from "@mui/icons-material/Print";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import ViewTimelineIcon from "@mui/icons-material/ViewTimeline";
 import type { OneShotWithCast } from "@/lib/schema";
 import { availableLetters } from "@/lib/letters";
 import { useFlashbacks, useLetters } from "@/lib/tableExtras";
 import { TonightCard } from "./TonightCard";
+import { GmLive } from "./GmLive";
 import s from "@/components/board/Board.module.css";
 
 const mono = { fontFamily: "var(--font-print)", fontSize: 16 } as const;
@@ -95,6 +99,8 @@ export function GmTablePanels({ os, table, present }: { os: OneShotWithCast; tab
         </div>
       </div>
 
+      <GmLive os={os} table={table} letters={sent} deliver={deliver} />
+
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 24 }}>
         <Button component={Link} href={`/${os.slug}/tv`} variant="contained" startIcon={<TvIcon />}>
           Board on the TV
@@ -104,6 +110,15 @@ export function GmTablePanels({ os, table, present }: { os: OneShotWithCast; tab
         </Button>
         <Button component={Link} href={`/${os.slug}/epilogue`} variant="contained" startIcon={<HistoryEduIcon />}>
           The morning after
+        </Button>
+        <Button component={Link} href={`/${os.slug}/tapestry`} variant="contained" startIcon={<ViewTimelineIcon />}>
+          The night&apos;s tapestry
+        </Button>
+        <Button component={Link} href={`/${os.slug}/box`} variant="contained" startIcon={<PrintIcon />}>
+          Print the whole box
+        </Button>
+        <Button component={Link} href="/chronicle" variant="contained" startIcon={<AutoStoriesIcon />}>
+          The chronicle
         </Button>
       </div>
     </>

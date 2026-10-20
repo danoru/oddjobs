@@ -1,7 +1,20 @@
 import { useState } from "react";
 import { ABILITIES, SKILLS, type Character, type Ruleset, type Skill, type Spell } from "@/systems/dnd5e/schema";
 import { ABILITY_NAMES, SKILL_NAMES, classLine, derive, ordinal, signed } from "@/systems/dnd5e/derive";
+import { attackRolls, checkRoll, initiativeRoll, saveRoll, skillRoll, type RollSpec } from "@/systems/dnd5e/rolls";
 import s from "./Sheet.module.css";
+import t from "@/components/table/Toys.module.css";
+
+/** A number on the sheet; a button that rolls it when the sheet is at a table. */
+function Rollable({ spec, onRoll, children }: { spec: RollSpec | null; onRoll?: (r: RollSpec) => void; children: React.ReactNode }) {
+  if (!onRoll || !spec) return <>{children}</>;
+  return (
+    <button type="button" className={t.rollable} onClick={() => onRoll(spec)}>
+      {children}
+      <span className={s.srOnly}> Roll {spec.label}</span>
+    </button>
+  );
+}
 
 function Boxes({ n }: { n: number }) {
   return (
@@ -21,12 +34,15 @@ export function SheetFront({
   ruleset,
   oneshotTitle,
   titleAs: Title = "h2",
+  onRoll,
 }: {
   c: Character;
   ruleset: Ruleset;
   oneshotTitle: string;
   /** The page's own heading on a single sheet; h2 when a page holds several. */
   titleAs?: "h1" | "h2";
+  /** At a table: tapping a number rolls it (src/components/table/DiceTray.tsx). */
+  onRoll?: (r: RollSpec) => void;
 }) {
   const d = derive(c);
   const m = c.mech;
@@ -60,7 +76,11 @@ export function SheetFront({
         {ABILITIES.map((a) => (
           <div key={a} className={s.ability}>
             <div className={s.label}>{ABILITY_NAMES[a]}</div>
-            <div className={s.abilityMod}>{signed(d.mods[a])}</div>
+            <div className={s.abilityMod}>
+              <Rollable spec={checkRoll(c, a)} onRoll={onRoll}>
+                {signed(d.mods[a])}
+              </Rollable>
+            </div>
             <span className={s.abilityScore}>{m.abilities[a]}</span>
           </div>
         ))}
@@ -85,7 +105,11 @@ export function SheetFront({
         </div>
         <div className={s.vital}>
           <div className={s.label}>Initiative</div>
-          <div className={s.vitalValue}>{signed(d.initiative)}</div>
+          <div className={s.vitalValue}>
+            <Rollable spec={initiativeRoll(c)} onRoll={onRoll}>
+              {signed(d.initiative)}
+            </Rollable>
+          </div>
         </div>
         <div className={s.vital}>
           <div className={s.label}>Speed</div>
@@ -112,7 +136,11 @@ export function SheetFront({
             {ABILITIES.map((a) => (
               <li key={a}>
                 <span className={d.saves[a].proficient ? s.dotOn : s.dot} aria-hidden="true" />
-                <span className={s.bonus}>{signed(d.saves[a].total)}</span>
+                <span className={s.bonus}>
+                  <Rollable spec={saveRoll(c, a)} onRoll={onRoll}>
+                    {signed(d.saves[a].total)}
+                  </Rollable>
+                </span>
                 {ABILITY_NAMES[a]}
                 {d.saves[a].proficient && <span className={s.srOnly}> (proficient)</span>}
               </li>
@@ -125,7 +153,11 @@ export function SheetFront({
               return (
                 <li key={k}>
                   <span className={sk.expertise ? s.dotX : sk.proficient ? s.dotOn : s.dot} aria-hidden="true" />
-                  <span className={s.bonus}>{signed(sk.total)}</span>
+                  <span className={s.bonus}>
+                    <Rollable spec={skillRoll(c, k)} onRoll={onRoll}>
+                      {signed(sk.total)}
+                    </Rollable>
+                  </span>
                   {SKILL_NAMES[k]} <span className={s.muted}>{sk.ability}</span>
                   {(sk.expertise || sk.proficient) && (
                     <span className={s.srOnly}> ({sk.expertise ? "expertise" : "proficient"})</span>
@@ -161,14 +193,23 @@ export function SheetFront({
                   </tr>
                 </thead>
                 <tbody>
-                  {d.attacks.map((a) => (
+                  {d.attacks.map((a) => {
+                    const r = onRoll ? attackRolls(c, a.name) : { hit: null, damage: null };
+                    return (
                     <tr key={a.name}>
                       <td>
                         <b>{a.name}</b>
                       </td>
-                      <td style={{ whiteSpace: "nowrap" }}>{a.toHit}</td>
                       <td style={{ whiteSpace: "nowrap" }}>
-                        {a.damage} {a.damageType}
+                        <Rollable spec={r.hit} onRoll={onRoll}>
+                          {a.toHit}
+                        </Rollable>
+                      </td>
+                      <td style={{ whiteSpace: "nowrap" }}>
+                        <Rollable spec={r.damage} onRoll={onRoll}>
+                          {a.damage}
+                        </Rollable>{" "}
+                        {a.damageType}
                       </td>
                       <td className={s.muted}>
                         {[a.range, ...a.properties, a.mastery && `Mastery: ${a.mastery}`, a.note]
@@ -176,7 +217,8 @@ export function SheetFront({
                           .join(" · ")}
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </>

@@ -7,6 +7,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { TableNote } from "@/components/board/TableNote";
 import { Poster } from "@/components/board/Poster";
 import { PlayerExtras } from "@/components/table/PlayerExtras";
+import { TableToys } from "@/components/table/TableToys";
+import { useLive } from "@/lib/useLive";
 import { PlayerTable } from "../components/PlayerTable";
 import b from "@/components/board/Board.module.css";
 import k from "@/components/board/Skins.module.css";
@@ -23,6 +25,8 @@ export function PlayPage({ os }: { os: PublicTcOneShot }) {
   const linkCode = typeof router.query.table === "string" ? router.query.table : undefined;
   const mine = Object.entries(claimedBy).find(([, c]) => c.mine)?.[0] ?? null;
   const premade = os.cast.find((c) => c.id === mine);
+  // The bell, notes and rumors (Ten Candles has no inspiration coins; its dice are the game's own).
+  const live = useLive(table && player ? table : null, "player", player?.id ?? null);
 
   return (
     <>
@@ -43,6 +47,8 @@ export function PlayPage({ os }: { os: PublicTcOneShot }) {
               <p className={s.prose}>Join the GM&apos;s table above with its code and your name. Then you&apos;ll take a seat.</p>
             )}
           </section>
+
+          {table && player && <TableToys live={live} coin={null} rumors={os.hasRumors} />}
 
           {table && player && premade?.flashback && mine && (
             <PlayerExtras code={table} playerId={player.id} characterId={mine} flashback={premade.flashback} />

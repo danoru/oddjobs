@@ -1,0 +1,169 @@
+/* The night's tapestry: woodcut panels on linen, as a strip or a poster. */
+
+.frieze {
+  background:
+    repeating-linear-gradient(0deg, rgba(43, 29, 14, 0.05) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(43, 29, 14, 0.05) 0 1px, transparent 1px 4px),
+    #efe2c2;
+  color: var(--ink);
+  padding: 18px 18px 22px;
+  border-top: 10px solid #7a1d17;
+  border-bottom: 10px solid #7a1d17;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-family: var(--font-poster);
+  font-size: clamp(22px, 3vw, 34px);
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.bannerTail {
+  flex: 1;
+  max-width: 160px;
+  height: 0;
+  border-top: 3px double var(--ink);
+}
+
+.panels {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.frieze[data-layout="strip"] .panels {
+  grid-auto-flow: column;
+  grid-auto-columns: 2.2in;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.frieze[data-layout="poster"] .panels {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 2.1in), 1fr));
+}
+
+.panel {
+  position: relative;
+  border: 3px double var(--ink);
+  background: var(--parchment);
+  padding: 10px 10px 12px;
+  text-align: center;
+  min-height: 2.4in;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  break-inside: avoid;
+}
+
+.panel[data-dropped] {
+  opacity: 0.4;
+  border-style: dashed;
+}
+
+.picture {
+  width: 100%;
+  height: 0.95in;
+  display: grid;
+  place-items: center;
+  border-bottom: 1px solid rgba(43, 29, 14, 0.4);
+  background: repeating-linear-gradient(45deg, rgba(43, 29, 14, 0.12) 0 1px, transparent 1px 5px);
+}
+
+.panel[data-kind="nat20"] .picture,
+.panel[data-kind="act"] .picture {
+  background: repeating-linear-gradient(45deg, rgba(210, 168, 90, 0.45) 0 1px, transparent 1px 5px);
+}
+
+.panel[data-kind="death"] .picture,
+.panel[data-kind="darkened"] .picture,
+.panel[data-kind="nat1"] .picture {
+  background: repeating-linear-gradient(-45deg, rgba(43, 29, 14, 0.3) 0 1px, transparent 1px 3px);
+}
+
+.number {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-family: var(--font-label);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.title {
+  font-family: var(--font-poster);
+  font-size: 15px;
+  line-height: 1.15;
+}
+
+.titleInput {
+  resize: none;
+  overflow: hidden;
+  line-height: 1.15;
+  font-family: var(--font-poster);
+  font-size: 15px;
+  text-align: center;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px dashed var(--ink-soft);
+  background: transparent;
+  color: var(--ink);
+}
+
+.titleInput:focus-visible,
+.toggle:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: 2px;
+}
+
+.caption {
+  font-family: var(--font-print);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.toggle {
+  margin-top: auto;
+  border: 1px solid var(--ink-soft);
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--font-label);
+  font-size: 12px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+@page tapestry-strip {
+  size: landscape;
+  margin: 0.3in;
+}
+
+@media print {
+  :global(body):has(.frieze[data-layout="strip"]) {
+    page: tapestry-strip;
+  }
+  .frieze {
+    box-shadow: none;
+  }
+  .frieze[data-layout="strip"] .panels {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(4, 1fr);
+    overflow: visible;
+  }
+  .frieze[data-layout="poster"] .panels {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .panel[data-dropped] {
+    display: none;
+  }
+}

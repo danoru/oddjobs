@@ -60,7 +60,7 @@ function labelFor(hint: FieldHint, node: SchemaNode, path: DocPath): string {
 function isWide(kind: Kind, hint: FieldHint): boolean {
   if (hint.widget === "castRefs" || hint.widget === "icon" || hint.widget === "tags") return true;
   if (kind === "string")
-    return !["text", "castRef", "readonly", "suggest", "sound", "spell"].includes(hint.widget ?? "");
+    return !["text", "castRef", "actRef", "readonly", "suggest", "sound", "spell"].includes(hint.widget ?? "");
   return kind === "object" || kind === "array" || kind === "union" || kind === "record" || kind === "other";
 }
 
@@ -132,6 +132,9 @@ export function Field({ path, label, wide }: { path: DocPath; label?: string; wi
       break;
     case "castRefs":
       input = <CastRefs path={path} label={text} help={hint.help} />;
+      break;
+    case "actRef":
+      input = <ActRef path={path} label={text} help={hint.help} />;
       break;
     case "icon":
       input = <IconPicker path={path} label={text} />;
@@ -755,6 +758,45 @@ function useOthers(path: DocPath) {
   return doc.cast
     .filter((c) => typeof c.id === "string" && c.id !== self)
     .map((c) => ({ id: String(c.id), name: typeof c.name === "string" && c.name ? c.name : String(c.id) }));
+}
+
+/** One of the one-shot's act cards, by id (or none). */
+function ActRef({ path, label, help }: { path: DocPath; label: string; help?: string }) {
+  const { doc, set, readOnly } = useEditor();
+  const value = getAt(doc, path);
+  const problems = useIssuesAt(path);
+  const acts = ((doc.oneshot.acts as { id?: unknown; title?: unknown }[] | undefined) ?? []).filter(
+    (a): a is { id: string; title?: unknown } => typeof a?.id === "string",
+  );
+  const known = acts.some((a) => a.id === value);
+  return (
+    <TextField
+      select
+      size="small"
+      fullWidth
+      label={label}
+      value={typeof value === "string" ? value : ""}
+      disabled={readOnly}
+      error={problems.length > 0}
+      helperText={problems[0] ?? help}
+      onChange={(e) => set(path, e.target.value || undefined)}
+      slotProps={{ htmlInput: { "data-field": pathKey(path) } }}
+    >
+      <MenuItem value="">
+        <em>No act</em>
+      </MenuItem>
+      {typeof value === "string" && value && !known && (
+        <MenuItem value={value}>
+          <em>{value} (no such act card)</em>
+        </MenuItem>
+      )}
+      {acts.map((a, i) => (
+        <MenuItem key={a.id} value={a.id}>
+          {`Act ${i + 1}: ${typeof a.title === "string" && a.title ? a.title : a.id}`}
+        </MenuItem>
+      ))}
+    </TextField>
+  );
 }
 
 function CastRef({ path, label }: { path: DocPath; label: string }) {

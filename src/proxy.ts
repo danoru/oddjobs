@@ -3,9 +3,10 @@ import { verifyToken, AUTH_COOKIE } from "@/lib/auth";
 
 /**
  * `/<oneshot>/gm` (the GM's view of one table), `/<oneshot>/kit` (the GM's
- * printable kit) and the one-shot builder under `/admin`.
+ * printable kit), `/<oneshot>/box` (the whole box, sealed letters and all)
+ * and the one-shot builder under `/admin`.
  */
-const GM_PAGE = /^\/(?:[^/]+\/(?:gm|kit)|admin(?:\/.*)?)\/?$/;
+const GM_PAGE = /^\/(?:[^/]+\/(?:gm|kit|box)|admin(?:\/.*)?)\/?$/;
 
 // Everything is behind the table password except the door itself, and the GM
 // pages also need the GM password. This is the convenience redirect; the GM

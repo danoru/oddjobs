@@ -12,7 +12,7 @@ import { crossCheck as crossCheckTc } from "@/systems/tencandles/content";
  */
 
 /** Character ids that would collide with pages under /<oneshot>/. */
-export const RESERVED_IDS = ["print", "flyer", "gm", "tv", "epilogue", "sounds", "cards", "tents", "play", "kit"];
+export const RESERVED_IDS = ["print", "flyer", "gm", "tv", "epilogue", "sounds", "cards", "tents", "play", "kit", "box", "tapestry"];
 
 /** Problems every system shares that Zod alone can't see. Returns human-readable messages. */
 export function coreCrossCheck(os: OneShot, cast: CoreCharacter[]): string[] {
@@ -39,9 +39,16 @@ export function coreCrossCheck(os: OneShot, cast: CoreCharacter[]): string[] {
         if (to === c.id || !ids.has(to)) errs.push(`${at} ifUnclaimed beat "${r.beat}" reassigns to bad id "${to}"`);
   }
 
+  const actIds = new Set(os.acts.map((a) => a.id));
+  if (actIds.size !== os.acts.length) errs.push("duplicate act ids");
+  if (new Set(os.rumors.map((r) => r.id)).size !== os.rumors.length) errs.push("duplicate rumor ids");
+  if (os.rumors.length === 1) errs.push("rumors: write at least two (each player draws two)");
+  if (new Set(os.notices.map((n) => n.id)).size !== os.notices.length) errs.push("duplicate notice ids");
+
   const letterIds = new Set<string>();
   for (const l of os.letters) {
     if (!ids.has(l.to)) errs.push(`letter "${l.id}" is addressed to unknown character "${l.to}"`);
+    if (l.act && !actIds.has(l.act)) errs.push(`letter "${l.id}" opens at unknown act "${l.act}"`);
     if (letterIds.has(l.id)) errs.push(`duplicate letter id "${l.id}"`);
     letterIds.add(l.id);
   }
