@@ -6,6 +6,8 @@ import type { useLive } from "@/lib/useLive";
 import { buzz, useShake } from "@/lib/shake";
 import type { CoinMeta } from "@/systems/registry";
 import type { RollSpec } from "@/systems/dnd5e/rolls";
+import { dualityWords, type DualityData } from "@/systems/daggerheart/live";
+import { DualityFaces } from "@/systems/daggerheart/components/Dice";
 import t from "./Toys.module.css";
 
 /**
@@ -22,7 +24,8 @@ const who = (p: LiveEvent["by"]) => (p === "gm" ? "the GM" : p === "all" ? "ever
 // ---- Dice faces (phone and TV) ----------------------------------------------------
 
 /** The dice of a roll, tumbling in. */
-export function DiceFaces({ data, size = 34 }: { data: RollData | PoolRollData; size?: number }) {
+export function DiceFaces({ data, size = 34 }: { data: RollData | PoolRollData | DualityData; size?: number }) {
+  if (data.system === "duality") return <DualityFaces data={data} size={size} />;
   const style = (i: number) => ({ ["--i" as string]: i, ["--size" as string]: `${size}px` });
   if (data.system === "pool") {
     const face = (v: number) => (v === 6 ? "six" : v === 1 ? "one" : undefined);
@@ -58,7 +61,8 @@ export function DiceFaces({ data, size = 34 }: { data: RollData | PoolRollData; 
 }
 
 /** "Stealth: 17 (natural 20!)" — a roll in words. */
-export function rollWords(data: RollData | PoolRollData): string {
+export function rollWords(data: RollData | PoolRollData | DualityData): string {
+  if (data.system === "duality") return dualityWords(data);
   if (data.system === "pool") {
     const sixes = data.dice.filter((d) => d === 6).length + (data.hope !== null && data.hope >= 5 ? 1 : 0);
     const fate = data.died ? "and dies" : data.darkened ? "and a candle goes dark" : "";

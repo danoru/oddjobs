@@ -1,25 +1,30 @@
 import type { GetStaticPaths, GetStaticProps } from "next";
-import { load5e, loadOneShot, publishedSlugs, spellBookFor } from "@/lib/content";
+import { loadOneShot, publishedSlugs, spellBookFor } from "@/lib/content";
 import { hasRoute } from "@/systems/registry";
-import { toPublic, type PublicOneShot } from "@/lib/public";
+import { toPublic, type PublicDhOneShot, type PublicOneShot } from "@/lib/public";
 import type { SpellInfo } from "@/systems/dnd5e/schema";
 import { CardsView } from "@/systems/dnd5e/components/cards/CardsView";
+import { DhCardsView } from "@/systems/daggerheart/pages/Printables";
 import { onlyIfOnDisk } from "@/lib/onDisk";
 
-type Props = { os: PublicOneShot; id: string; book: Record<string, SpellInfo> };
+type Props = ({ os: PublicOneShot; book: Record<string, SpellInfo> } | { os: PublicDhOneShot; book?: undefined }) & { id: string };
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: publishedSlugs()
-    .filter((slug) => hasRoute(loadOneShot(slug), "cards"))
-    .flatMap((slug) => load5e(slug).cast.map((c) => ({ params: { oneshot: slug, character: c.id } }))),
+    .map((slug) => loadOneShot(slug))
+    .filter((os) => hasRoute(os, "cards"))
+    .flatMap((os) => os.cast.map((c) => ({ params: { oneshot: os.slug, character: c.id } }))),
   fallback: false,
 });
 
-export const getStaticProps: GetStaticProps<Props> = onlyIfOnDisk(async ({ params }) => {
-  const os = load5e(String(params!.oneshot));
-  return { props: { os: toPublic(os), id: String(params!.character), book: spellBookFor(os) } };
+export const getStaticProps: GetStaticProps<Props> = onlyIfOnDisk<Props>(async ({ params }) => {
+  const os = loadOneShot(String(params!.oneshot));
+  const id = String(params!.character);
+  if (os.system === "daggerheart") return { props: { os: toPublic(os), id } };
+  if (os.system !== "dnd5e") return { notFound: true };
+  return { props: { os: toPublic(os), id, book: spellBookFor(os) } };
 });
 
-export default function CharacterCardsPage({ os, id, book }: Props) {
-  return <CardsView os={os} only={id} book={book} />;
+export default function CharacterCardsPage(props: Props) {
+  return props.os.system === "daggerheart" ? <DhCardsView os={props.os} only={props.id} /> : <CardsView os={props.os} only={props.id} book={props.book!} />;
 }

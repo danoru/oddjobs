@@ -1,0 +1,186 @@
+{
+  "id": "pell-nimblewick",
+  "name": "Pell Nimblewick",
+  "order": 2,
+  "poster": {
+    "header": "WANTED",
+    "epithet": "the Best Man",
+    "hook": "For smuggling ginger beer across the ford. Also holding the rings. Do not let him run.",
+    "reward": "Two handfuls, or the rings back",
+    "icon": "dagger"
+  },
+  "flashback": "What did you shout back over your shoulder when you ran out of the Hush at eight years old?",
+  "story": {
+    "pronouns": "he/him",
+    "appearance": "A wiry green goblin of twenty-eight with enormous ears, one notched, and a grin that arrives a moment before he does. Borrowed best-man's waistcoat two sizes too big, sleeves rolled, a dagger in each boot and the wedding rings on a string round his neck where he can feel them.",
+    "concept": "Pell runs the best little smuggling trade in Larkspur Ford: ginger beer and pepper upriver, gossip and lace down, all of it across the ford under the Warden's nose. Everyone likes him; nobody lends him anything. He has been Tobin's best friend since they were five, and the one thing he has never joked about is the three days they spent lost in the Hush.",
+    "stake": "He was meant to be watching Tobin tonight. He looked away to pour a drink, and when he looked back the lanterns were out and his best friend was walking into the same wood Pell ran out of twenty years ago.",
+    "goal": "Get Tobin to the Oak by dawn with the rings in his hand, and this time not run.",
+    "secret": "On the third night in the Hush, the Lady said one child could go home straight away. Pell didn't wait to hear the rest. He ran, all the way to the edge, and left Tobin and sleeping Juni behind. By the time Bram carried them out, Tobin had made the promise to get them home. Pell has told the story for twenty years as 'I ran for help'. He has never believed it.",
+    "voice": "Fast, warm, full of nicknames and bad deals ('tell you what I'll do'). Stops dead mid-sentence when the joke runs out, then starts a new one.",
+    "mannerisms": [
+      "Pats the rings under his shirt every few minutes",
+      "Offers anyone who looks upset a swig from a flask of ginger beer",
+      "Always knows exactly where the nearest exit is, and hates that he does"
+    ],
+    "background": [
+      {
+        "question": "Who in the Ford's back rooms owes you a favour, and what will you call it in for?",
+        "answer": "Old Mag Ferrow who runs the eel-boats owes him for a cask that 'fell off' a barge. He's saving it for something that matters. Tonight might be it."
+      },
+      {
+        "question": "What did you steal once that you gave back, and why?",
+        "answer": "Wren's grandmother's veil, when he was twelve, on a dare. He returned it the next morning, cleaned and folded, and nobody ever knew but Tobin."
+      }
+    ],
+    "ties": [
+      {
+        "to": "bram-mossgrave",
+        "text": "Bram carried Pell out of the Hush on his shoulders twenty years ago, after Pell came running out of the trees screaming for help. Pell has never thanked him, because thanking him would mean telling him what really happened.",
+        "public": "Carried out of the Hush on his shoulders, aged eight"
+      },
+      {
+        "to": "juni-hale",
+        "text": "Lost in the Hush together as children. Juni slept for most of it and doesn't remember him running. He's never been sure whether that makes it better or worse.",
+        "public": "Lost in the Hush together, twenty years ago"
+      },
+      {
+        "to": "wren-ashby",
+        "text": "The Warden has arrested him twice and let him go twice. He would walk into fire for her and has never once said so, because she'd only arrest him for arson.",
+        "public": "She's arrested him twice. He's grateful twice."
+      }
+    ],
+    "intro": "\"Pell Nimblewick, best man, ginger beer, no questions. I've got the rings. Probably. Yes. Got them.\""
+  },
+  "mech": {
+    "class": "Rogue",
+    "subclass": "Syndicate",
+    "level": 1,
+    "ancestry": "Goblin",
+    "community": "Slyborne",
+    "traits": {
+      "agility": 1,
+      "strength": -1,
+      "finesse": 2,
+      "instinct": 0,
+      "presence": 1,
+      "knowledge": 0
+    },
+    "evasion": 12,
+    "armor": {
+      "name": "Leather Armor",
+      "score": 3,
+      "major": 6,
+      "severe": 13,
+      "evasionMod": 0
+    },
+    "armorScore": 3,
+    "hp": 6,
+    "stress": 6,
+    "thresholds": { "major": 7, "severe": 14 },
+    "proficiency": 1,
+    "bonuses": {},
+    "experiences": [
+      { "name": "Ginger-Beer Smuggler", "bonus": 2 },
+      { "name": "Talk My Way Out of It", "bonus": 2 }
+    ],
+    "domainCards": [
+      { "name": "Pick and Pull", "where": "loadout" },
+      { "name": "Deft Deceiver", "where": "loadout" }
+    ],
+    "weapons": [
+      {
+        "name": "Dagger",
+        "slot": "primary",
+        "trait": "finesse",
+        "range": "Melee",
+        "die": "d8",
+        "mod": 1,
+        "damageType": "physical",
+        "burden": "one-handed"
+      },
+      {
+        "name": "Small Dagger",
+        "slot": "secondary",
+        "trait": "finesse",
+        "range": "Melee",
+        "die": "d8",
+        "mod": 0,
+        "damageType": "physical",
+        "burden": "one-handed",
+        "feature": "Paired: +2 to your primary weapon's damage against a target in Melee range."
+      }
+    ],
+    "features": [
+      {
+        "name": "Rogue's Dodge",
+        "source": "class",
+        "hope": true,
+        "text": "Spend 3 Hope for +2 Evasion until an attack next hits you or you rest."
+      },
+      {
+        "name": "Cloaked",
+        "source": "class",
+        "text": "Whenever you're Hidden, you're Cloaked too: nobody can see you until you step into plain view, attack, or do something loud. Then it drops."
+      },
+      {
+        "name": "Sneak Attack",
+        "source": "class",
+        "text": "When you hit while Cloaked, or while an ally is in Melee range of your target, add a d6 to the damage (one per tier)."
+      },
+      {
+        "name": "Well-Connected",
+        "source": "subclass",
+        "text": "Whenever you reach a notable town or place, you already know someone there. Name them, say how they might help, and pick how you know them: they owe you, you owe them, they'd like you dead, you learned the trade together, or you robbed them once. (In the Hush, it's a thornling called Burr.)"
+      },
+      {
+        "name": "Surefooted",
+        "source": "ancestry",
+        "text": "You never take disadvantage on an Agility roll."
+      },
+      {
+        "name": "Danger Sense",
+        "source": "ancestry",
+        "text": "Once a rest, mark a Stress to make an adversary reroll an attack against you or an ally in Very Close range.",
+        "uses": { "max": 1, "per": "rest" }
+      },
+      {
+        "name": "Scoundrel",
+        "source": "community",
+        "text": "You roll with advantage to haggle with crooks, catch a lie, or find somewhere safe to lie low."
+      }
+    ],
+    "equipment": [
+      { "name": "Torch", "qty": 1 },
+      { "name": "Rope", "qty": 1, "note": "Knotted every foot, for climbing out of windows" },
+      { "name": "Grappling hook", "qty": 1, "note": "Smuggler's, wrapped in rag so it doesn't clink" },
+      { "name": "The wedding rings", "qty": 2, "note": "Keepsake, on a string round his neck. River-gold, made from Tobin's mother's ring" },
+      { "name": "Minor Stamina Potion", "qty": 1, "note": "Tastes suspiciously like ginger beer" }
+    ],
+    "gold": { "handfuls": 1, "bags": 0, "chests": 0 }
+  },
+  "ifUnclaimed": {
+    "npc": "Pell lunges after Tobin at midnight and the thornlings drag him into the Vow-Oak's roots, rings and all. The party finds him in Act 4 in the Lady's hall, wound in roses beside Tobin, clutching the rings and telling the thornlings bad jokes to keep them from taking them. Freed, he follows the party out and tells his secret only to Tobin.",
+    "reassign": [
+      {
+        "beat": "The rings",
+        "to": ["juni-hale", "wren-ashby"],
+        "text": "You're holding the rings tonight; Pell pressed them on you at the vigil 'in case I do something stupid'. The thornlings want them badly."
+      },
+      {
+        "beat": "The note under the flat stone in the hollow beech (Act 2)",
+        "to": ["juni-hale", "bram-mossgrave"],
+        "text": "You remember the hollow beech where the three children sheltered, and a flat stone Tobin always put his hand on. Lift it in Act 2."
+      },
+      {
+        "beat": "A friend in the Hush (Well-Connected)",
+        "to": ["bram-mossgrave"],
+        "text": "A thornling called Burr has been stealing your lunch on the woodland paths for years. It likes you anyway. It might show you a shortcut."
+      }
+    ],
+    "cuts": [
+      "Pell's confession at the Briar Gate about running.",
+      "The thornling contact, Burr, and the shortcut through the hedges in Act 3."
+    ]
+  }
+}

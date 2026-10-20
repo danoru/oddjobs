@@ -14,6 +14,10 @@ import { SheetBack, SheetFront } from "@/systems/dnd5e/components/sheet/Sheet";
 import { CardSheets } from "@/systems/dnd5e/components/cards/CardSheets";
 import { Tent } from "@/systems/dnd5e/components/tents/TentsView";
 import { TableKit } from "@/systems/tencandles/components/TableKit";
+import type * as daggerheart from "@/systems/daggerheart/schema";
+import { SheetBack as DhSheetBack, SheetFront as DhSheetFront } from "@/systems/daggerheart/components/Sheet";
+import { cardsFor as dhCardsFor } from "@/systems/daggerheart/cards";
+import { DhTent } from "@/systems/daggerheart/pages/Printables";
 import { SiteHeader } from "@/components/SiteHeader";
 import { FlyerSheet } from "@/components/flyer/FlyerSheet";
 import { ActCards, BlankGazette, LetterEnvelopes, RumorSlips } from "@/components/box/BoxPrints";
@@ -48,9 +52,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
 
 export default function BoxPage({ os, pub, book }: Props) {
   const fiveE = os.system === "dnd5e" ? (os as dnd5e.OneShotWithCast) : null;
+  const dh = os.system === "daggerheart" ? (os as daggerheart.OneShotWithCast) : null;
   const names = Object.fromEntries(os.cast.map((c) => [c.id, c.name]));
   const contents = [
-    ...(fiveE ? ["The tear-off flyer", `${os.cast.length} character sheets`, "Spell, item and feature cards", "Name tents"] : ["The table kit: module, candle tracker, index cards, missing posters and flyer"]),
+    ...(fiveE
+      ? ["The tear-off flyer", `${os.cast.length} character sheets`, "Spell, item and feature cards", "Name tents"]
+      : dh
+        ? ["The tear-off flyer", `${os.cast.length} character sheets`, "Domain cards, weapons, armor and features", "Name tents"]
+        : ["The table kit: module, candle tracker, index cards, missing posters and flyer"]),
     ...(os.letters.length ? [`${os.letters.length} sealed letters, as fold-and-seal envelopes`] : []),
     ...(os.acts.length ? [`${os.acts.length} act cards`] : []),
     ...(os.rumors.length ? [`${os.rumors.length} rumor slips`] : []),
@@ -105,6 +114,35 @@ export default function BoxPage({ os, pub, book }: Props) {
                   <div key={i} className={tentCss.page}>
                     {pair.map((c) => (
                       <Tent key={c.id} c={c} ruleset={fiveE.ruleset} />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : dh ? (
+            <>
+              <div className={b.section} data-box="flyer">
+                <FlyerSheet os={pub} level={dh.level} base={pub} />
+              </div>
+              <div className={`${b.section} ${sheet.sheet}`} data-box="sheets">
+                {dh.cast.map((c) => (
+                  <Fragment key={c.id}>
+                    <DhSheetFront c={c} oneshotTitle={os.title} />
+                    <DhSheetBack c={c} oneshotTitle={os.title} names={names} />
+                  </Fragment>
+                ))}
+              </div>
+              <div className={`${b.section} ${cardCss.root}`} data-box="cards">
+                {dh.cast.map((c) => {
+                  const cards = dhCardsFor(c);
+                  return cards.length ? <CardSheets key={c.id} cards={cards} large={false} label={`${c.name}'s cards`} /> : null;
+                })}
+              </div>
+              <div className={`${b.section} ${tentCss.root}`} data-box="tents">
+                {paginate(dh.cast, 2).map((pair, i) => (
+                  <div key={i} className={tentCss.page}>
+                    {pair.map((c) => (
+                      <DhTent key={c.id} c={c} />
                     ))}
                   </div>
                 ))}

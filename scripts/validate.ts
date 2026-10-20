@@ -5,12 +5,14 @@
  *   pnpm validate <slug>     — just one
  *
  * Every 5e level variant is checked too, and its key numbers printed under the base.
+ * Daggerheart casts print Evasion, HP, Stress, Armor, thresholds and the domain cards.
  *
  * Exits 1 on the first broken one-shot, printing every problem found in it.
  */
 import { listSlugs, loadOneShot } from "../src/lib/content";
 import { derive, classLine } from "../src/systems/dnd5e/derive";
 import { levelsOf, withVariant } from "../src/systems/dnd5e/variants";
+import { derive as deriveDh, signed } from "../src/systems/daggerheart/derive";
 
 const slugs = process.argv.slice(2).length ? process.argv.slice(2) : listSlugs();
 let failed = false;
@@ -23,6 +25,19 @@ for (const slug of slugs) {
         `ok  ${slug} (Ten Candles, ${m.areas.length} areas, ${m.stages.length} stages, ${base.cast.length} pre-mades, ${base.suggestedTruths.length} suggested truths, ${base.skin})`,
       );
       for (const c of base.cast) console.log(`    ${c.name.padEnd(22)} ${c.poster.header.padEnd(10)} ${c.story.concept.slice(0, 60)}`);
+      continue;
+    }
+    if (base.system === "daggerheart") {
+      console.log(`ok  ${slug} (Daggerheart, level ${base.level}, ${base.cast.length} characters, ${base.adversaries.length} adversaries, ${base.skin})`);
+      for (const c of base.cast) {
+        const m = c.mech;
+        const d = deriveDh(c);
+        const traits = Object.entries(m.traits).map(([k, v]) => `${k.slice(0, 3)} ${signed(v)}`).join(" ");
+        console.log(
+          `    ${c.name.padEnd(22)} ${`${m.class} (${m.subclass})`.padEnd(32)} Ev ${m.evasion}  HP ${m.hp}  St ${m.stress}  Arm ${m.armorScore}  ${m.thresholds.major}/${m.thresholds.severe}  ${traits}`,
+        );
+        console.log(`    ${"".padEnd(22)} cards: ${[...d.loadout, ...d.vault].map((x) => `${x.name} (${x.domain})`).join(", ")}`);
+      }
       continue;
     }
     const levels = levelsOf(base);

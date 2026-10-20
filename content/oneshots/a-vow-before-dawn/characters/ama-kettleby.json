@@ -1,0 +1,189 @@
+{
+  "id": "ama-kettleby",
+  "name": "Mother Ama Kettleby",
+  "order": 4,
+  "poster": {
+    "header": "NOTICE",
+    "epithet": "the Priestess of the Oak",
+    "hook": "Has married half the village under the Vow-Oak. Will marry the other half by dawn.",
+    "reward": "Blessings, free of charge; cake, by arrangement",
+    "icon": "candle"
+  },
+  "flashback": "Which wedding under the Vow-Oak made you cry, and why?",
+  "story": {
+    "pronouns": "she/her",
+    "appearance": "A small, ancient galapa, a hundred and forty years old, with a moss-flecked shell painted with tiny gold acorns, one for every wedding she has blessed. Spectacles on a chain, a green priest's stole, a pruning axe hung from her belt like a rosary, and a round shield she calls 'the lid'.",
+    "concept": "Mother Ama keeps the shrine of the Vow-Oak, the great tree on Larkspur green where every marriage in the Ford is made and written into the ledger. She has married grandparents and their grandchildren, buried most of them, and still remembers everyone's favourite hymn. She is slow, kind, deaf when it suits her, and absolutely immovable once she has decided something.",
+    "stake": "Every vow in the Oak's ledger is in her keeping. If a promise written in it is broken under the Oak tonight, she believes every marriage in the Ford goes with it.",
+    "goal": "Marry Wren and Tobin at dawn with every vow in her ledger still whole, and set right what she set wrong twenty years ago.",
+    "secret": "Ama was at the treeline when Bram carried the children out, and she heard eight-year-old Tobin say he had promised to come back and keep the Lady. Following the old custom, she wrote it in the Oak's ledger, smiling, as a sweet joke. A promise in that ledger binds. And that same year, at the mill-master's sneering, she stopped the oldest custom of all: setting an empty chair at every wedding for the Lady of the Hush. She has suspected for twenty years that both were mistakes.",
+    "voice": "Slow and creaky, full of 'my dear' and 'in my day', with a sudden iron edge. Quotes scripture that she may be making up.",
+    "mannerisms": [
+      "Blesses anything she's about to hit with her axe",
+      "Pulls her head halfway into her shell when she hears something she disapproves of",
+      "Licks a finger and turns the pages of the ledger in the air, even when she isn't holding it"
+    ],
+    "background": [
+      {
+        "question": "What does the Oak ask of the one who keeps it, and what have you given?",
+        "answer": "Patience, and witness: to hear every vow and remember it. She has given it her whole life, a husband who died young, and her eyesight, squinting at the ledger by candlelight."
+      },
+      {
+        "question": "Which promise of your own have you never kept?",
+        "answer": "She swore to her predecessor, old Father Linden, that she'd keep every custom of the Oak. She dropped one. She knows exactly which."
+      },
+      {
+        "question": "What do you believe happens to a vow that's broken?",
+        "answer": "It doesn't vanish. It sinks somewhere, into the ground, and waits. She used to think that was just a sermon."
+      }
+    ],
+    "ties": [
+      {
+        "to": "wren-ashby",
+        "text": "She married Wren's parents, named Wren at the font, and taught her to swim in the ford. She has noticed Wren avoiding her all week, and the smell of burnt honey on the green.",
+        "public": "Named her at the font; will marry her at dawn"
+      },
+      {
+        "to": "juni-hale",
+        "text": "She wrapped seven-year-old Juni in her stole at the treeline and sat with them for the three days they wouldn't wake. She taught them every herb in the shrine garden.",
+        "public": "Sat with them for three days when they wouldn't wake"
+      },
+      {
+        "to": "bram-mossgrave",
+        "text": "Bram keeps the shrine in firewood. This winter's cord was heartwood, grain as tight as a fingerprint, and she knows where only that comes from.",
+        "public": "He keeps her shrine in firewood every winter"
+      }
+    ],
+    "intro": "\"Mother Ama, my dears. I keep the Oak. Now, which of you has my ink? We have a wedding to save.\""
+  },
+  "mech": {
+    "class": "Seraph",
+    "subclass": "Divine Wielder",
+    "level": 1,
+    "ancestry": "Galapa",
+    "community": "Loreborne",
+    "traits": {
+      "agility": -1,
+      "strength": 2,
+      "finesse": 0,
+      "instinct": 1,
+      "presence": 1,
+      "knowledge": 0
+    },
+    "evasion": 9,
+    "armor": {
+      "name": "Leather Armor",
+      "score": 3,
+      "major": 6,
+      "severe": 13,
+      "evasionMod": 0
+    },
+    "armorScore": 4,
+    "hp": 7,
+    "stress": 6,
+    "thresholds": { "major": 8, "severe": 15 },
+    "proficiency": 1,
+    "bonuses": {
+      "armor": 1,
+      "thresholds": 1,
+      "note": "Round Shield: +1 Armor Score. Galapa Shell: Proficiency (1) added to both thresholds."
+    },
+    "experiences": [
+      { "name": "Keeper of the Vow-Oak", "bonus": 2 },
+      { "name": "Married Half the Village", "bonus": 2 }
+    ],
+    "domainCards": [
+      { "name": "Mending Touch", "where": "loadout" },
+      { "name": "Reassurance", "where": "loadout", "note": "'Try that again, dear, with feeling.'" }
+    ],
+    "weapons": [
+      {
+        "name": "Hallowed Axe",
+        "slot": "primary",
+        "trait": "strength",
+        "range": "Melee",
+        "die": "d8",
+        "mod": 1,
+        "damageType": "magic",
+        "burden": "one-handed"
+      },
+      {
+        "name": "Round Shield",
+        "slot": "secondary",
+        "trait": "strength",
+        "range": "Melee",
+        "die": "d4",
+        "mod": 0,
+        "damageType": "physical",
+        "burden": "one-handed",
+        "feature": "Protective: +1 to Armor Score."
+      }
+    ],
+    "features": [
+      {
+        "name": "Life Support",
+        "source": "class",
+        "hope": true,
+        "text": "Spend 3 Hope to clear a Hit Point on an ally within Close range."
+      },
+      {
+        "name": "Prayer Dice",
+        "source": "class",
+        "text": "At the start of each session, roll d4s equal to your Spellcast trait (Strength, so two) and keep them. Spend one any time to knock its number off damage an ally in Far range takes, add it to a roll, or gain that much Hope. Unspent dice go at session's end."
+      },
+      {
+        "name": "Spirit Weapon",
+        "source": "subclass",
+        "text": "Your Melee or Very Close weapon can fly from your hand to strike a foe within Close range and then come back. Mark a Stress to have it hit a second foe in range on the same attack."
+      },
+      {
+        "name": "Sparing Touch",
+        "source": "subclass",
+        "text": "Once a long rest, lay a hand on someone and clear 2 of their Hit Points or 2 of their Stress.",
+        "uses": { "max": 1, "per": "long rest" }
+      },
+      {
+        "name": "Shell",
+        "source": "ancestry",
+        "text": "Your shell adds your Proficiency to both damage thresholds (already on your sheet)."
+      },
+      {
+        "name": "Retract",
+        "source": "ancestry",
+        "text": "Mark a Stress to pull into your shell. While you're in, physical damage against you is halved (resistance), you can't move, and anything else you try is at disadvantage."
+      },
+      {
+        "name": "Well-Read",
+        "source": "community",
+        "text": "You roll with advantage on anything to do with the history, customs or politics of a notable person or place."
+      }
+    ],
+    "equipment": [
+      { "name": "Torch", "qty": 1 },
+      { "name": "Rope", "qty": 1, "note": "Silk bell-rope, knotted with blessing knots" },
+      { "name": "The Vow-Oak ledger", "qty": 1, "note": "Class item: the shrine's holy book. Heavy. A page is missing" },
+      { "name": "Pot of green ink and a quill", "qty": 1, "note": "Keepsake: Father Linden's quill. She never goes anywhere without ink" },
+      { "name": "Minor Health Potion", "qty": 1, "note": "Labelled 'Tonic. For Weddings.'" }
+    ],
+    "gold": { "handfuls": 1, "bags": 0, "chests": 0 }
+  },
+  "ifUnclaimed": {
+    "npc": "Mother Ama stays at the Vow-Oak to keep the lanterns lit and the villagers calm, and sends the party off with her blessing, a pot of green ink and a blank page torn from the ledger: 'Bring it back with something written on it.' At dawn she is waiting under the Oak with the empty chair already set.",
+    "reassign": [
+      {
+        "beat": "The ledger page (Act 4)",
+        "to": ["juni-hale", "wren-ashby"],
+        "text": "Ama gave you a pot of green ink and a blank ledger page. When the Lady speaks of the promise, a page in Ama's handwriting drifts down from the roof of the hall: it's the record of Tobin's promise, and it can be answered on the blank page."
+      },
+      {
+        "beat": "The empty chair custom",
+        "to": ["bram-mossgrave", "wren-ashby"],
+        "text": "You remember your grandmother talking about the empty chair: every wedding under the Vow-Oak used to set a place for the Lady of the Hush, until about twenty years ago."
+      }
+    ],
+    "cuts": [
+      "Ama's confession about writing the promise down and dropping the custom.",
+      "The ledger as the way to settle the vow; it is settled by speaking it aloud in the Lady's hall instead."
+    ]
+  }
+}

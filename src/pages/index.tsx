@@ -99,7 +99,7 @@ export default function BoardPage({ jobs, survivors }: { jobs: Summary[]; surviv
               <ToggleButtonGroup
                 size="small"
                 exclusive
-                disabled={system === "tencandles"}
+                disabled={system !== "dnd5e" && system !== "all"}
                 value={ruleset}
                 onChange={(_, v) => v && setRuleset(v)}
                 aria-label="Ruleset"

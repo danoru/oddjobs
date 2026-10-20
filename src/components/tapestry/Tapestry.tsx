@@ -9,6 +9,7 @@ const ENGRAVING: Record<PanelKind, Poster["icon"]> = {
   letter: "book",
   nat20: "star",
   nat1: "skull",
+  crit: "star",
   darkened: "candle",
   death: "skull",
   act: "crown",

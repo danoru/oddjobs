@@ -4,6 +4,7 @@ import path from "node:path";
 import { oneShotSchema, type CoreCharacter, type OneShotWithCast } from "./schema";
 import * as dnd5e from "@/systems/dnd5e/schema";
 import * as tencandles from "@/systems/tencandles/schema";
+import * as daggerheart from "@/systems/daggerheart/schema";
 import { checkParsed, type SpellBook } from "./oneShotCheck";
 import { spellNames } from "@/systems/dnd5e/cards";
 
@@ -82,6 +83,11 @@ export function loadOneShot(slug: string, root = CONTENT_ROOT, spells: SpellBook
   };
   if (os.system === "tencandles") {
     const cast = readCast(slug, dir, tencandles.characterSchema);
+    fail(checkParsed(os, cast, [], spells).map((e) => e.message));
+    return { ...os, cast };
+  }
+  if (os.system === "daggerheart") {
+    const cast = readCast(slug, dir, daggerheart.characterSchema);
     fail(checkParsed(os, cast, [], spells).map((e) => e.message));
     return { ...os, cast };
   }

@@ -1,18 +1,20 @@
 import type { Epilogue } from "@/components/gazette/Gazette";
 import { FATE_LABEL } from "./legacy";
 import type { ActData, LiveEvent, NoteData, PoolRollData, RollData } from "./live";
+import type { DualityData } from "@/systems/daggerheart/live";
 import type { TapestryEdits } from "./epilogueSchema";
 
 /**
  * The night's tapestry: a frieze of panels woven from what happened at the
- * table. Posters torn down, letters opened, natural 20s and 1s (or candles
+ * table. Posters torn down, letters opened, natural 20s and 1s (Daggerheart
+ * critical successes; or candles
  * going dark and the dead, in Ten Candles), each act card, how many notes
  * passed under the table, and the fates from the morning after. Built only
  * from what the table could see (the TV's view of the log), so hidden rolls
  * and note texts never reach it. The GM can drop or rename panels.
  */
 
-export type PanelKind = "claim" | "letter" | "nat20" | "nat1" | "darkened" | "death" | "act" | "notes" | "coins" | "fate";
+export type PanelKind = "claim" | "letter" | "nat20" | "nat1" | "crit" | "darkened" | "death" | "act" | "notes" | "coins" | "fate";
 
 export interface Panel {
   /** Stable, so the GM's edits stick: "claim:rook", "roll:42", "fate:rook"… */
@@ -59,11 +61,13 @@ export function buildTapestry(input: TapestryInput): Panel[] {
   let coins = 0;
   for (const e of input.events) {
     if (e.kind === "roll" && e.data && !e.redacted) {
-      const d = e.data as RollData | PoolRollData;
+      const d = e.data as RollData | PoolRollData | DualityData;
       if (d.system === "d20" && d.nat === 20)
         timed.push({ id: `roll:${e.id}`, kind: "nat20", title: `A natural 20 for ${d.who}`, caption: d.label, at: e.at, characterId: d.characterId });
       else if (d.system === "d20" && d.nat === 1)
         timed.push({ id: `roll:${e.id}`, kind: "nat1", title: `A natural 1 for ${d.who}`, caption: d.label, at: e.at, characterId: d.characterId });
+      else if (d.system === "duality" && d.outcome === "crit")
+        timed.push({ id: `roll:${e.id}`, kind: "crit", title: `A critical success for ${d.who}`, caption: d.label, at: e.at, characterId: d.characterId });
       else if (d.system === "pool" && d.died)
         timed.push({ id: `roll:${e.id}`, kind: "death", title: `${d.who} is lost to the dark`, caption: "the Last Stand fails", at: e.at, characterId: d.characterId });
       else if (d.system === "pool" && d.darkened)

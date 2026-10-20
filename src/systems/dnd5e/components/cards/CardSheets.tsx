@@ -21,7 +21,7 @@ function KindMark({ kind }: { kind: Card["kind"] }) {
 
 function CardFace({ card }: { card: Card }) {
   return (
-    <article className={s.card} data-kind={card.kind} data-fit={card.fit}>
+    <article className={s.card} data-kind={card.kind} data-fit={card.fit} style={card.accent ? { ["--accent" as string]: card.accent } : undefined}>
       <header className={s.head}>
         <KindMark kind={card.kind} />
         <h3 className={s.title}>{card.title}</h3>

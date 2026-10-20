@@ -3,6 +3,8 @@ import { Button, MenuItem, Tab, Tabs, TextField } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import * as dnd5e from "@/systems/dnd5e/schema";
 import * as tencandles from "@/systems/tencandles/schema";
+import * as daggerheart from "@/systems/daggerheart/schema";
+import { SheetBack as DhSheetBack, SheetFront as DhSheetFront } from "@/systems/daggerheart/components/Sheet";
 import { SKINS, type Skin } from "@/lib/schema";
 import { SYSTEMS } from "@/systems/registry";
 import { SKIN_WORDS } from "@/lib/skins";
@@ -29,7 +31,7 @@ class PreviewBoundary extends Component<{ children: ReactNode; resetKey: string 
   }
 }
 
-type Parsed = { index: number; c: PublicCharacter | PublicTcCharacter };
+type Parsed = { index: number; c: PublicCharacter | PublicTcCharacter | daggerheart.Character };
 
 /**
  * What players will get, drawn with the real components as you type: the
@@ -43,13 +45,13 @@ export function Preview({ slug, selected, level }: { slug: string; selected: num
   const [pick, setPick] = useState<number | null>(null);
   const skin: Skin = (SKINS as readonly unknown[]).includes(doc.oneshot.skin) ? (doc.oneshot.skin as Skin) : "noticeboard";
   const words = SKIN_WORDS[skin];
-  const charSchema = system === "dnd5e" ? dnd5e.characterSchema : tencandles.characterSchema;
+  const charSchema = system === "dnd5e" ? dnd5e.characterSchema : system === "daggerheart" ? daggerheart.characterSchema : tencandles.characterSchema;
 
   const parsed: Parsed[] = useMemo(
     () =>
       doc.cast.flatMap((raw, index) => {
         const r = charSchema.safeParse(raw);
-        return r.success ? [{ index, c: r.data as PublicCharacter | PublicTcCharacter }] : [];
+        return r.success ? [{ index, c: r.data as Parsed["c"] }] : [];
       }),
     [doc.cast, charSchema],
   );
@@ -76,7 +78,7 @@ export function Preview({ slug, selected, level }: { slug: string; selected: num
       >
         <Tab value="board" label="Board" />
         <Tab value="yarn" label="Who knows whom" />
-        <Tab value="sheet" label={system === "dnd5e" ? "Sheet" : "Pre-made"} />
+        <Tab value="sheet" label={system === "tencandles" ? "Pre-made" : "Sheet"} />
       </Tabs>
       <div className={s.previewBody}>
         {missing > 0 && (
@@ -149,7 +151,7 @@ export function Preview({ slug, selected, level }: { slug: string; selected: num
                   Full page
                 </Button>
               )}
-              {system === "dnd5e" && (
+              {system !== "tencandles" && (
                 <Button size="small" endIcon={<OpenInNewIcon />} href={`/admin/preview/${slug}/print`} target="_blank">
                   Print view
                 </Button>
@@ -167,6 +169,19 @@ function SheetPreview({ index, parsed, level }: { index: number | null; parsed: 
   const { doc, system } = useEditor();
   const found = parsed.find((p) => p.index === index);
   if (!found) return <p className={s.paused}>Pick a character that parses to see their sheet.</p>;
+  if (system === "daggerheart") {
+    const c = found.c as daggerheart.Character;
+    const names = Object.fromEntries(parsed.map((p) => [p.c.id, p.c.name]));
+    const title = typeof doc.oneshot.title === "string" ? doc.oneshot.title : "";
+    return (
+      <PreviewBoundary resetKey={JSON.stringify(c).length + ""}>
+        <div className={s.sheetScale}>
+          <DhSheetFront c={c} oneshotTitle={title} />
+          <DhSheetBack c={c} oneshotTitle={title} names={names} />
+        </div>
+      </PreviewBoundary>
+    );
+  }
   if (system !== "dnd5e") {
     const c = found.c as PublicTcCharacter;
     return (

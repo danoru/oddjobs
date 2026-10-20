@@ -34,6 +34,8 @@ export interface Card {
   owner: string;
   /** Size step so long text still fits a 2.5 × 3.4 in card. */
   fit: "roomy" | "snug" | "tight";
+  /** The header's ink, when it isn't the kind's (a Daggerheart domain's colour). */
+  accent?: string;
 }
 
 /** Paraphrased weapon properties (2014 and 2024 agree closely enough for a card). */
@@ -81,7 +83,7 @@ export function fitFor(chars: number): Card["fit"] {
 const textLength = (c: Pick<Card, "text" | "more" | "stats">) =>
   c.text.length + (c.more?.length ?? 0) + c.stats.reduce((n, s) => n + s.value.length + 10, 0);
 
-const withFit = (c: Omit<Card, "fit">): Card => ({ ...c, fit: fitFor(textLength(c)) });
+export const withFit = (c: Omit<Card, "fit">): Card => ({ ...c, fit: fitFor(textLength(c)) });
 
 export function spellKicker(sp: Pick<ResolvedSpell, "level" | "school" | "ritual" | "concentration">): string {
   const school = sp.school[0].toUpperCase() + sp.school.slice(1);

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useState } from "react";
 import ContentCutIcon from "@mui/icons-material/ContentCut";
 import type { Skin } from "@/lib/schema";
-import type { PublicCharacter, PublicTcCharacter } from "@/lib/public";
+import type { PublicCharacter, PublicDhCharacter, PublicTcCharacter } from "@/lib/public";
 import { posterTag, SYSTEMS } from "@/systems/registry";
 import type { ClaimInfo } from "@/lib/storage";
 import { roman, SKIN_WORDS } from "@/lib/skins";
@@ -34,7 +34,7 @@ export function Poster({
   tilt,
 }: {
   slug: string;
-  character: PublicCharacter | PublicTcCharacter;
+  character: PublicCharacter | PublicTcCharacter | PublicDhCharacter;
   core?: boolean;
   /** Who tore it, if anyone. */
   claim?: ClaimInfo;

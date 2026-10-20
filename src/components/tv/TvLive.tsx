@@ -5,6 +5,8 @@ import { DiceFaces, rollWords } from "@/components/table/TableToys";
 import { PosterIcon } from "@/components/PosterIcon";
 import type { Poster } from "@/lib/coreSchema";
 import { roman } from "@/lib/box";
+import type { DualityData } from "@/systems/daggerheart/live";
+import { OutcomeWord } from "@/systems/daggerheart/components/Dice";
 import v from "./Live.module.css";
 
 /**
@@ -19,6 +21,7 @@ export function TvLive({
   tray,
   icons,
   sound,
+  live: shared,
 }: {
   code: string | null;
   /** "full": the big tray plus the log (d20 systems); "log": just the log (the game shows its own dice). */
@@ -26,8 +29,11 @@ export function TvLive({
   /** Poster icons for the engraved panel behind an act card without an image. */
   icons: Poster["icon"][];
   sound: boolean;
+  /** The page's own poll of the log, when it reads it too (Daggerheart's Fear and marks); otherwise the TV polls here. */
+  live?: ReturnType<typeof useLive>;
 }) {
-  const live = useLive(code, "table", null);
+  const own = useLive(shared ? null : code, "table", null);
+  const live = shared ?? own;
   const { fold, events, baseline } = live;
   const fresh = (e: LiveEvent) => baseline !== null && e.id > baseline;
 
@@ -101,11 +107,16 @@ export function TvLive({
           {tray === "full" && latest?.data ? (
             <div key={latest.id} className={v.trayLatest}>
               <div className={v.trayWho}>{(latest.data as RollData).who}</div>
-              <DiceFaces data={latest.data as RollData | PoolRollData} size={54} />
+              <DiceFaces data={latest.data as RollData | PoolRollData | DualityData} size={54} />
               <div className={`${v.trayTotal} ${(latest.data as RollData).nat === 20 ? v.nat20 : (latest.data as RollData).nat === 1 ? v.nat1 : ""}`}>
-                {(latest.data as RollData).system === "d20" ? (latest.data as RollData).total : ""}
+                {(latest.data as RollData | PoolRollData | DualityData).system !== "pool" ? (latest.data as RollData).total : ""}
               </div>
-              <div className={v.trayLabel}>{rollWords(latest.data as RollData | PoolRollData)}</div>
+              {(latest.data as DualityData).system === "duality" && (
+                <div className={v.trayTotal} style={{ fontSize: "clamp(20px, 2.4vw, 36px)" }} data-testid="tv-duality-outcome">
+                  <OutcomeWord data={latest.data as DualityData} />
+                </div>
+              )}
+              <div className={v.trayLabel}>{rollWords(latest.data as RollData | PoolRollData | DualityData)}</div>
             </div>
           ) : null}
           {rolls.length > 0 && (
@@ -116,7 +127,7 @@ export function TvLive({
                     <i>A die rattles behind the screen.</i>
                   ) : (
                     <>
-                      <b>{(e.data as RollData).who}</b> · {rollWords(e.data as RollData | PoolRollData)}
+                      <b>{(e.data as RollData).who}</b> · {rollWords(e.data as RollData | PoolRollData | DualityData)}
                     </>
                   )}
                 </li>

@@ -11,7 +11,8 @@
  *   sheets  — each face on one page (2 per character); with large print, at most 2 pages a face
  *   cards   — 9 to a page (4 in large print), each character from a fresh page, and no card's text overflows
  *   tents   — 2 to a page
- * Sheets and cards are also checked in high-contrast and dyslexia-friendly modes.
+ * Sheets and cards are also checked in high-contrast and dyslexia-friendly modes,
+ * for 5e (every level variant) and Daggerheart one-shots.
  * Exits 1 on any failure.
  */
 import { chromium, type Page } from "playwright";
@@ -20,6 +21,7 @@ import path from "node:path";
 import { loadOneShot, loadSpellBook, publishedSlugs } from "../src/lib/content";
 import { cardsFor, paginate } from "../src/systems/dnd5e/cards";
 import { levelsOf, withVariant } from "../src/systems/dnd5e/variants";
+import { cardsFor as dhCardsFor } from "../src/systems/daggerheart/cards";
 
 const ROOT = path.join(import.meta.dirname, "..");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
@@ -80,10 +82,17 @@ for (const mode of MODES) {
   for (const slug of targets) {
     const base = loadOneShot(slug);
     // The Ten Candles table kit has no per-character layout promises to check.
-    if (base.system !== "dnd5e") continue;
-    for (const { level } of levelsOf(base)) {
-      const os = withVariant(base, level);
-      const n = os.cast.length;
+    if (base.system === "tencandles") continue;
+    const large = Boolean(mode.reading.large);
+    const perPage = large ? 4 : 9;
+    const layouts =
+      base.system === "daggerheart"
+        ? [{ level: base.level, n: base.cast.length, cardPages: base.cast.reduce((sum, c) => sum + paginate(dhCardsFor(c), perPage).length, 0) }]
+        : levelsOf(base).map(({ level }) => {
+            const os = withVariant(base, level);
+            return { level, n: os.cast.length, cardPages: os.cast.reduce((sum, c) => sum + paginate(cardsFor(c, os.ruleset, book), perPage).length, 0) };
+          });
+    for (const { level, n, cardPages } of layouts) {
       await context.addInitScript(
         ([s, l, r]) => {
           localStorage.setItem(`tearoff:level:${s}`, String(l));
@@ -91,9 +100,6 @@ for (const mode of MODES) {
         },
         [slug, level, mode.reading] as const,
       );
-      const large = Boolean(mode.reading.large);
-      const perPage = large ? 4 : 9;
-      const cardPages = os.cast.reduce((sum, c) => sum + paginate(cardsFor(c, os.ruleset, book), perPage).length, 0);
 
       for (const format of ["Letter", "A4"] as const) {
         const tag = `${slug} L${level} ${format} ${mode.name}`;

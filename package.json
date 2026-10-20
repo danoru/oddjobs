@@ -19,6 +19,7 @@
     "e2e:candles": "tsx scripts/e2e-tencandles.mts",
     "e2e:builder": "tsx scripts/e2e-builder.mts",
     "e2e:toys": "tsx scripts/e2e-table-toys.mts",
+    "e2e:daggerheart": "tsx scripts/e2e-daggerheart.mts",
     "validate": "tsx scripts/validate.ts",
     "db:dev": "prisma dev --name tearoff --detach",
     "db:migrate": "prisma migrate dev",

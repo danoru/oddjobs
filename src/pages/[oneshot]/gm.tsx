@@ -9,6 +9,7 @@ import type { OneShotWithCast } from "@/lib/schema";
 import { useClaims, useLevel } from "@/lib/storage";
 import { posterTag } from "@/systems/registry";
 import { GmTable } from "@/systems/tencandles/components/GmTable";
+import { Adversaries } from "@/systems/daggerheart/components/GmPanels";
 import { LevelPicker } from "@/components/board/LevelPicker";
 import { SiteHeader } from "@/components/SiteHeader";
 import { GmTablePanels } from "@/components/gm/GmTablePanels";
@@ -151,6 +152,13 @@ export default function GmPage({ os: base }: Props) {
           {os.system === "tencandles" && <GmTable os={os} code={table} />}
 
           <GmTablePanels os={os} table={table} present={Object.keys(claimedBy)} />
+
+          {/* At a table they're with the live tools, where their attacks roll. */}
+          {os.system === "daggerheart" && !table && os.adversaries.length > 0 && (
+            <div className={s.grid} style={{ marginTop: 32 }}>
+              <Adversaries os={os} live={null} />
+            </div>
+          )}
 
           {os.gmNotes && (
             <div className={s.note} style={{ ["--tilt" as string]: "-0.3deg", marginTop: 32 }}>

@@ -2,9 +2,11 @@ import type { z } from "zod";
 import { oneShotSchema, SYSTEM_IDS, type CoreCharacter, type OneShotWithCast } from "./schema";
 import * as dnd5e from "@/systems/dnd5e/schema";
 import * as tencandles from "@/systems/tencandles/schema";
+import * as daggerheart from "@/systems/daggerheart/schema";
 import { crossCheck } from "./crossCheck";
 import { crossCheck as crossCheck5e } from "@/systems/dnd5e/content";
 import { crossCheck as crossCheckTc } from "@/systems/tencandles/content";
+import { crossCheck as crossCheckDh } from "@/systems/daggerheart/content";
 import { withVariant } from "@/systems/dnd5e/variants";
 import { spellNames } from "@/systems/dnd5e/cards";
 
@@ -109,7 +111,7 @@ export function checkDoc(doc: OneShotDoc, spells: SpellBook | null): { issues: D
   const osRes = oneShotSchema.safeParse(doc.oneshot);
   schemaIssues(osRes, ["oneshot"]);
 
-  const charSchema = system === "dnd5e" ? dnd5e.characterSchema : tencandles.characterSchema;
+  const charSchema = system === "dnd5e" ? dnd5e.characterSchema : system === "daggerheart" ? daggerheart.characterSchema : tencandles.characterSchema;
   const castRes = (doc.cast ?? []).map((c, i) => {
     const r = charSchema.safeParse(c);
     schemaIssues(r, ["cast", i]);
@@ -130,14 +132,19 @@ export function checkDoc(doc: OneShotDoc, spells: SpellBook | null): { issues: D
     const ok = castRes.flatMap((r) => (r.success ? [r.data as CoreCharacter] : []));
     const raw = doc.oneshot;
     const level5e = dnd5e.oneShotSchema.pick({ level: true, ruleset: true }).safeParse(raw);
+    const levelDh = daggerheart.oneShotSchema.pick({ level: true }).safeParse(raw);
     const own = safely(() =>
       system === "dnd5e"
         ? level5e.success
           ? crossCheck5e(level5e.data, ok as dnd5e.Character[])
           : []
-        : osRes.success && osRes.data.system === "tencandles"
-          ? crossCheckTc(osRes.data, ok as tencandles.Character[])
-          : [],
+        : system === "daggerheart"
+          ? levelDh.success
+            ? crossCheckDh(levelDh.data, ok as daggerheart.Character[])
+            : []
+          : osRes.success && osRes.data.system === "tencandles"
+            ? crossCheckTc(osRes.data, ok as tencandles.Character[])
+            : [],
     );
     const forLocate = (osRes.success ? osRes.data : { ...raw, letters: [] }) as z.infer<typeof oneShotSchema>;
     for (const message of own)
@@ -170,7 +177,9 @@ export function checkDoc(doc: OneShotDoc, spells: SpellBook | null): { issues: D
   const parsed: OneShotWithCast =
     os.system === "tencandles"
       ? { ...os, cast: cast as tencandles.Character[] }
-      : { ...os, cast: cast as dnd5e.Character[], variants: declared.map((v, i) => ({ ...v, cast: variantCasts[i] })) };
+      : os.system === "daggerheart"
+        ? { ...os, cast: cast as daggerheart.Character[] }
+        : { ...os, cast: cast as dnd5e.Character[], variants: declared.map((v, i) => ({ ...v, cast: variantCasts[i] })) };
   return { issues, parsed };
 }
 
@@ -209,6 +218,8 @@ function remapCast(path: DocPath, cast: CoreCharacter[], doc: OneShotDoc): DocPa
 
 /** Character-level messages ("rook: HP 43, but…") → the field they're about. */
 function charField(rest: string, c: Partial<dnd5e.Character> & Partial<tencandles.Character>): DocPath {
+  const dh = dhField(rest, c as unknown as Partial<daggerheart.Character>);
+  if (dh) return dh;
   if (/^level \d+ but one-shot is level/.test(rest) || /hit die/.test(rest)) return ["mech", "classes"];
   if (/^HP /.test(rest)) return ["mech", "hp"];
   if (/^spell slots/.test(rest)) return ["mech", "spellcasting", "slots"];
@@ -239,6 +250,31 @@ function charField(rest: string, c: Partial<dnd5e.Character> & Partial<tencandle
   return [];
 }
 
+/** Daggerheart character messages ("vell: Evasion 11, but…") → the field they're about. */
+function dhField(rest: string, c: Partial<daggerheart.Character>): DocPath | null {
+  const m = c.mech as Partial<daggerheart.Mech> | undefined;
+  if (!m || !("traits" in m)) return null;
+  if (/^level \d+ but the one-shot/.test(rest)) return ["mech", "level"];
+  if (/^subclass /.test(rest)) return ["mech", "subclass"];
+  if (/^traits /.test(rest)) return ["mech", "traits"];
+  if (/^Proficiency /.test(rest)) return ["mech", "proficiency"];
+  if (/^experiences/.test(rest)) return ["mech", "experiences"];
+  if (/^Evasion /.test(rest)) return ["mech", "evasion"];
+  if (/^HP /.test(rest)) return ["mech", "hp"];
+  if (/^Stress /.test(rest)) return ["mech", "stress"];
+  if (/^Armor Score /.test(rest)) return ["mech", "armorScore"];
+  if (/^thresholds/.test(rest)) return ["mech", "thresholds"];
+  const card = rest.match(/^domain card "([^"]+)"/);
+  if (card) {
+    const i = (m.domainCards ?? []).findIndex((x) => x.name === card[1]);
+    return i < 0 ? ["mech", "domainCards"] : ["mech", "domainCards", i, "name"];
+  }
+  if (/^domain cards|^loadout/.test(rest)) return ["mech", "domainCards"];
+  if (/^weapons/.test(rest)) return ["mech", "weapons"];
+  if (/^features/.test(rest)) return ["mech", "features"];
+  return null;
+}
+
 /**
  * Where a check message points. Character messages start with the id
  * ("rook: …"); variant ones with "level 3: ". `variant` is the declared-level
@@ -266,6 +302,12 @@ function locate(message: string, os: z.infer<typeof oneShotSchema>, cast: CoreCh
   if (/^module: .*area/.test(rest)) return ["oneshot", "module", "areas"];
   if (/^module/.test(rest)) return ["oneshot", "module", "stages"];
   if (/^players/.test(rest)) return ["oneshot", "players"];
+  const adv = rest.match(/^adversary "([^"]+)"/);
+  if (adv && os.system === "daggerheart") {
+    const i = (os.adversaries ?? []).findIndex((a) => a.id === adv[1]);
+    return i < 0 ? ["oneshot", "adversaries"] : ["oneshot", "adversaries", i, "thresholds"];
+  }
+  if (/adversary ids/.test(rest)) return ["oneshot", "adversaries"];
   const letter = rest.match(/letter (?:id )?"([^"]+)"/);
   if (letter) {
     const i = os.letters.findIndex((l) => l.id === letter[1]);

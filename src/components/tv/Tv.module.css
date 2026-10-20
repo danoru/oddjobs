@@ -208,3 +208,51 @@
     animation: none;
   }
 }
+
+/* Daggerheart: the GM's Fear across the top, and each claimed poster's Hope and marks. */
+.fear {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 14px 0 0;
+  padding: 8px 18px;
+  background: rgba(20, 12, 30, 0.75);
+  border: 1px solid #5b4580;
+  border-radius: 999px;
+  width: fit-content;
+}
+.fearLabel {
+  font-family: var(--font-label);
+  letter-spacing: 0.3em;
+  color: #c9b8ea;
+  font-size: clamp(13px, 1.2vw, 18px);
+}
+.fearCount {
+  font-family: var(--font-poster);
+  font-size: clamp(24px, 2.4vw, 40px);
+  color: #e4d8ff;
+  min-width: 1.5em;
+}
+.marks {
+  font-family: var(--font-label);
+  font-size: clamp(11px, 0.9vw, 15px);
+  color: var(--ink);
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.hopeRow {
+  display: inline-flex;
+  gap: 4px;
+}
+.hopePip {
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg);
+  border: 1.5px solid #8a6a1f;
+}
+.hopePip[data-on="true"] {
+  background: radial-gradient(circle at 35% 35%, #fff3b8, #d4a63a 55%, #8a6a1f);
+}

@@ -2,7 +2,8 @@ import { z } from "zod";
 import type { Viewer } from "./game";
 import { SOUND_STINGERS, type Act, type NoticeKind, type Rumor, type RumorTruth } from "./coreSchema";
 import { NOTICE_KINDS } from "./coreSchema";
-import type { CoinMeta } from "@/systems/registry";
+import type { CoinMeta, DiceKind } from "@/systems/registry";
+import { foldTallies, rollDuality, rollTallies, type DualityData, type SheetLimits, type TallyData } from "@/systems/daggerheart/live";
 
 /**
  * The table's event log: everything that happens at a table outside a
@@ -25,6 +26,9 @@ import type { CoinMeta } from "@/systems/registry";
  *   - a bell for one player rings only on that player's phone;
  *   - nobody but the server ever sees a player's browser id: people are
  *     known to each other by an opaque handle.
+ * Daggerheart's duality rolls and the Hope, Fear and slots they move are
+ * rows here too (src/systems/daggerheart/live.ts); they're the whole table's,
+ * so they're never hidden.
  */
 
 // ---- People --------------------------------------------------------------------
@@ -67,6 +71,7 @@ export const LIVE_KINDS = [
   "hide",
   "death",
   "candle",
+  "tally",
 ] as const;
 export type LiveKind = (typeof LIVE_KINDS)[number];
 
@@ -193,6 +198,30 @@ export const liveAction = z.discriminatedUnion("type", [
   z.object({ type: z.literal("coin"), to: handle }),
   z.object({ type: z.literal("spend"), who: handle.optional() }),
   z.object({ type: z.literal("hide"), roll: z.number().int().positive(), hidden: z.boolean() }),
+  /** Daggerheart: roll the Hope and Fear dice from your sheet. `mod` is the trait; Experiences are looked up on your sheet and cost a Hope each. */
+  z.object({
+    type: z.literal("duality"),
+    label,
+    mod: z.number().int().min(-10).max(20),
+    adv: z.union([z.literal(-1), z.literal(0), z.literal(1)]).default(0),
+    experiences: z.array(z.string().trim().min(1).max(40)).max(3).default([]),
+    reaction: z.boolean().default(false),
+    difficulty: z.number().int().min(1).max(40).optional(),
+  }),
+  /** Daggerheart: change your own Hope or marked Stress, Hit Points or Armor Slots (the GM: anyone's, by `to`). */
+  z.object({
+    type: z.literal("mark"),
+    track: z.enum(["hope", "stress", "hp", "armor"]),
+    delta: z.number().int().min(-12).max(12).refine((n) => n !== 0, "no change"),
+    to: handle.optional(),
+  }),
+  /** Daggerheart: the GM gains or spends Fear. */
+  z.object({
+    type: z.literal("fear"),
+    delta: z.number().int().min(-12).max(12).refine((n) => n !== 0, "no change"),
+    /** The Fear a new story opens with, one per player. */
+    opening: z.boolean().optional(),
+  }),
 ]);
 export type LiveAction = z.infer<typeof liveAction>;
 
@@ -207,8 +236,10 @@ export interface LiveContext {
   rumors: Rumor[];
   notices: { id: string; kind: NoticeKind; title: string; text?: string }[];
   coin: CoinMeta | null;
-  /** Whether this system's phones roll their own dice through the log (d20 systems). */
-  dice: "d20" | "pool";
+  /** Whether this system's phones roll their own dice through the log (d20 and duality systems). */
+  dice: DiceKind;
+  /** Daggerheart: each character's slots and Experiences, by character id. */
+  sheets?: Record<string, SheetLimits>;
   rng: () => number;
 }
 
@@ -308,7 +339,7 @@ export function applyLive(a: LiveAction, actor: LiveActor, ctx: LiveContext): Li
     case "roll": {
       const denied = atTable();
       if (denied) return denied;
-      if (ctx.dice !== "d20" && !gm) return fail("At this table the game rolls the dice");
+      if (ctx.dice === "pool" && !gm) return fail("At this table the game rolls the dice");
       if (a.hidden && !gm) return fail("Only the GM rolls behind the screen");
       if (a.mode !== "normal" && !(a.sides === 20 && a.count === 1)) return fail("Advantage is for a single d20");
       if (a.reroll) {
@@ -428,8 +459,44 @@ export function applyLive(a: LiveAction, actor: LiveActor, ctx: LiveContext): Li
     }
     case "hide": {
       if (!gm) return fail("Only the GM hides rolls");
-      if (!ctx.rows.some((r) => r.id === a.roll && r.kind === "roll")) return fail("No such roll");
+      const target = ctx.rows.find((r) => r.id === a.roll && r.kind === "roll");
+      if (!target) return fail("No such roll");
+      if ((target.data as { system?: string }).system === "duality") return fail("A duality roll moves Hope and Fear in the open, so it can't go behind the screen");
       return row("hide", { roll: a.roll, hidden: a.hidden }, null);
+    }
+    case "duality": {
+      if (ctx.dice !== "duality") return fail("This table doesn't roll duality dice");
+      if (gm) return fail("The GM rolls a d20 for adversaries");
+      if (!me?.characterId) return fail("Tear a poster before you roll");
+      const sheet = ctx.sheets?.[me.characterId];
+      if (!sheet) return fail("Your character isn't in this one-shot");
+      const exps = [];
+      for (const n of new Set(a.experiences)) {
+        const x = sheet.experiences.find((e) => e.name.toLowerCase() === n.toLowerCase());
+        if (!x) return fail(`No Experience called "${n}" on your sheet`);
+        exps.push({ name: x.name, bonus: x.bonus });
+      }
+      const hope = foldTallies(ctx.rows, ctx.sheets ?? {}).marks[me.characterId]?.hope ?? 0;
+      if (exps.length > hope) return fail(exps.length === 1 ? "You need a Hope to add an Experience" : `You need ${exps.length} Hope for those Experiences`);
+      const r = rollDuality(ctx.rng, { mod: a.mod, adv: a.adv, experiences: exps, reaction: a.reaction, difficulty: a.difficulty ?? null });
+      const name = me.character ?? me.name;
+      const data: DualityData = { system: "duality", who: name, characterId: me.characterId, label: a.label, ...r };
+      return { ok: true, rows: [newRow("roll", data, by), ...rollTallies(r, me.characterId, name).map((t) => newRow("tally", t, by))] };
+    }
+    case "mark": {
+      if (ctx.dice !== "duality") return fail("Nothing to mark at this table");
+      const who = gm ? (a.to ? person(a.to) : null) : me;
+      if (gm && !who) return fail("Mark whose sheet?");
+      if (!gm && a.to && a.to !== me?.handle) return fail("You can only mark your own sheet");
+      if (!who?.characterId) return fail("Tear a poster first");
+      if (!ctx.sheets?.[who.characterId]) return fail("That character isn't in this one-shot");
+      const name = who.character ?? who.name;
+      return row("tally", { characterId: who.characterId, track: a.track, delta: a.delta, why: gm ? "the GM" : "ticked", name } satisfies TallyData, by, who.playerId);
+    }
+    case "fear": {
+      if (ctx.dice !== "duality") return fail("No Fear at this table");
+      if (!gm) return fail("Only the GM holds Fear");
+      return row("tally", { characterId: null, track: "fear", delta: a.delta, why: a.opening ? "the opening Fear" : a.delta < 0 ? "spent" : "gained", name: "the GM" } satisfies TallyData, null);
     }
   }
 }

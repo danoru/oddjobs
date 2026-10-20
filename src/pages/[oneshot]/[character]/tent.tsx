@@ -1,23 +1,27 @@
 import type { GetStaticPaths, GetStaticProps } from "next";
-import { load5e, loadOneShot, publishedSlugs } from "@/lib/content";
+import { loadOneShot, publishedSlugs } from "@/lib/content";
 import { hasRoute } from "@/systems/registry";
-import { toPublic, type PublicOneShot } from "@/lib/public";
+import { toPublic, type PublicDhOneShot, type PublicOneShot } from "@/lib/public";
 import { TentsView } from "@/systems/dnd5e/components/tents/TentsView";
+import { DhTentsView } from "@/systems/daggerheart/pages/Printables";
 import { onlyIfOnDisk } from "@/lib/onDisk";
 
-type Props = { os: PublicOneShot; id: string };
+type Props = { os: PublicOneShot | PublicDhOneShot; id: string };
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: publishedSlugs()
-    .filter((slug) => hasRoute(loadOneShot(slug), "tents"))
-    .flatMap((slug) => load5e(slug).cast.map((c) => ({ params: { oneshot: slug, character: c.id } }))),
+    .map((slug) => loadOneShot(slug))
+    .filter((os) => hasRoute(os, "tents"))
+    .flatMap((os) => os.cast.map((c) => ({ params: { oneshot: os.slug, character: c.id } }))),
   fallback: false,
 });
 
-export const getStaticProps: GetStaticProps<Props> = onlyIfOnDisk(async ({ params }) => ({
-  props: { os: toPublic(load5e(String(params!.oneshot))), id: String(params!.character) },
-}));
+export const getStaticProps: GetStaticProps<Props> = onlyIfOnDisk<Props>(async ({ params }) => {
+  const os = loadOneShot(String(params!.oneshot));
+  if (os.system === "tencandles") return { notFound: true };
+  return { props: { os: toPublic(os) as PublicOneShot | PublicDhOneShot, id: String(params!.character) } };
+});
 
 export default function CharacterTentPage({ os, id }: Props) {
-  return <TentsView os={os} only={id} />;
+  return os.system === "daggerheart" ? <DhTentsView os={os} only={id} /> : <TentsView os={os} only={id} />;
 }

@@ -23,6 +23,7 @@ import { TownBoard } from "@/components/board/TownBoard";
 import { LevelPicker } from "@/components/board/LevelPicker";
 import { cameoHook, type Survivor } from "@/lib/legacy";
 import s from "@/components/board/Board.module.css";
+import { SrdNotice } from "@/systems/daggerheart/components/Sheet";
 import k from "@/components/board/Skins.module.css";
 
 /**
@@ -85,7 +86,7 @@ export function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Su
               {os.premise}
             </p>
             <div className={s.meta} data-part="meta">
-              {os.system === "dnd5e" && <span>Level {os.level}</span>}
+              {os.system !== "tencandles" && <span>Level {os.level}</span>}
               <span>
                 {os.players.min}–{os.players.max} players
               </span>
@@ -101,7 +102,7 @@ export function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Su
               </div>
             )}
             <LevelPicker levels={levels} level={level} onChange={setLevel} />
-            {os.system === "dnd5e" ? (
+            {os.system !== "tencandles" ? (
               <Box
                 component="nav"
                 aria-label="Printables and table tools"
@@ -112,7 +113,7 @@ export function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Su
                   Print every sheet
                 </Button>
                 <Button component={Link} href={`/${os.slug}/cards`} variant="outlined" size="small" startIcon={<StyleIcon />} sx={inkButton}>
-                  Spell &amp; item cards
+                  {os.system === "daggerheart" ? "Domain & item cards" : "Spell & item cards"}
                 </Button>
                 <Button component={Link} href={`/${os.slug}/tents`} variant="outlined" size="small" startIcon={<BadgeIcon />} sx={inkButton}>
                   Name tents &amp; tokens
@@ -237,6 +238,11 @@ export function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Su
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+          {os.system === "daggerheart" && (
+            <div className={s.note} data-part="note" style={{ ["--tilt" as string]: "0.4deg", marginTop: 36 }}>
+              <SrdNotice />
             </div>
           )}
         </main>

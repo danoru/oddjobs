@@ -1,0 +1,335 @@
+{
+  "slug": "a-vow-before-dawn",
+  "title": "A Vow Before Dawn",
+  "pitch": "The wedding is at first light. At midnight the groom walked into the old wood in his sleep, to keep a promise he made at eight years old. His wedding party has until sunrise to bring him home.",
+  "premise": "In Larkspur Ford, the night before a wedding, the couple's friends keep vigil under the Vow-Oak so nothing steals the luck. Tonight Wren Ashby marries Tobin Mossgrave at dawn, and at midnight every lantern in the Oak went out at once. Tobin stood up from the bonfire with his eyes open and his mind asleep, the old thorn in his palm glowing like an ember, and walked into the Hush. Twenty years ago Tobin and two other children were lost in that wood for three days, and he only got them home by promising the Lady of the Hush that he would come back and keep her. Now the wood is dying at its edges, something hungry is waking under it, and the promise has come due. You are the five people at the vigil with a reason to follow him in: the bride who will not be left at the Oak, the best man who ran, the brother who carried them out, the priestess who wrote the promise down, and the friend who slept through it and still hears the trees.",
+  "system": "daggerheart",
+  "level": 1,
+  "players": { "min": 3, "max": 5 },
+  "durationHrs": 4,
+  "tone": ["fairy-tale peril", "found family", "hopeful"],
+  "setting": "Larkspur Ford, a river village on the edge of an old, half-felled wood called the Hush; drops into any setting with a deep forest and a mill that wants it.",
+  "posting": {
+    "header": "WEDDING PARTY WANTED BEFORE SUNRISE",
+    "reward": "A seat at the feast, the first slice of cake, and the groom back in one piece"
+  },
+  "coreRoles": ["wren-ashby", "pell-nimblewick", "juni-hale"],
+  "gmNotes": "THE SHAPE OF IT. The Lady of the Hush is not a villain. She is the old, slow heart of the wood, and for three hundred years she has kept the Hollow (a rot of lost, broken and forgotten things that sleeps under the forest floor) from spreading. Twenty years ago she found three lost children, Tobin, Pell and Juni, kept them safe for three days and asked a question on the way out: 'Will you come back and keep me?' She meant keep the wood, keep me company, keep me remembered. Eight-year-old Tobin heard a marriage proposal, said yes, and Ama wrote it in the Vow-Oak's ledger as 'come back and keep her'. A vow in that ledger binds. Tonight Tobin is about to swear a contrary vow under the same Oak, the mill has felled the Hush's edge with Bram's help, Wren burned the Lady's blessing-roses off the Oak three nights ago, and the Lady is too weak to hold the Hollow. The Hollow wants the old promise broken in her own hall: a broken vow at her heart cracks her open, and it gets out. The happy ending is that the promise is KEPT rather than broken: someone (Tobin and Wren together, Juni as heir, Bram as warden, or the whole party in the ledger) vows to keep the wood, the Lady is invited to the wedding, and the empty chair is set again. Nobody has to die, and nobody should be forced to stay. Offer the costly paths; reward the kind ones.\n\nRUNNING DAGGERHEART HERE. Start with the Fear the rules give you for your headcount and spend it freely in Acts 1 and 2; that is where the players learn the wood bites. Put a DAWN countdown on the table at 8. Tick it at the end of each act, and whenever you spend a Fear on a move that costs the party time (a path that loops, a tree across the way, a thornling stealing something they must chase). When it hits 0 the sun rises: if the promise has not been answered by then, the Hollow takes its shot at the Lady with advantage and Tobin starts to root where he stands. Most Act 3 and Act 4 obstacles should be talked or tricked past; reward Experiences, ancestry gifts and true confessions with Hope. When a player rolls with Fear on a heartfelt moment, take the Fear but let the moment land; spend it later on the Hollow, not on their feelings.\n\nACT 1, THE VIGIL UNDER THE OAK (30 min). Open on the bonfire, cake on a trestle, Ama blessing the lanterns, Pell guarding the rings. Ask each player their flashback question. At midnight play the snuff stinger: every lantern goes out. Tobin walks into the dark; thornlings (two per player) boil out of the Oak's roots, snatch the rings from Pell, Wren's veil, and the cake knife, and tangle anyone who grabs Tobin. Goal is not a kill count: get the rings back, keep someone on Tobin's trail. Spend a Fear to have a thornling vanish into the Oak with an item so they must reach into the roots (Agility or Finesse, 12). Tobin crosses the treeline. The veil comes back pinned with one thorn: hand Wren her letter. Pin the 'Groom Seen Walking Into the Hush' notice.\n\nACT 2, THE FELLED EDGE (45 min). Moonlit clearing of fresh stumps in neat rows, sap running dark; Bram's guide-blazes on the trunks. Six mill woodcutters who went in two nights ago are still swinging, hollow-eyed (use three or four at a small table, plus a lantern-moth swarm). They are not dead: anyone who speaks to who they were (a name, a wife, the pub) can shake one awake (Presence 13), and that is the best result. Spend a Fear for Timber! when the fight stalls. Bram finds his blaze on the oldest stump: give him his letter. If the party wakes the men, pin the mill's reward notice and tick DAWN back up by 1. Pell knows the hollow beech where the three children hid; under a flat stone there: give Pell his letter. Juni can feel the Hollow moving under the stumps here; let their Fungril senses and Nature-reading tell them it is NOT the Lady.\n\nACT 3, THE BRIAR GATE (40 min). A wall of roses ten feet high and a gate of living briar. Ser Hollin Marsh, the Briar Knight, guards it: two hundred years ago he promised to stay with the Lady and he did, and the roses grew through his armor. He lets in only those who give a true thing. This is the confession scene: let each player volunteer one true thing (a secret, a fear, a hope) and give a Hope for each; the Knight marks a Stress for each true answer, and at 0 Stress he steps aside in tears. Players may lie (Deft Deceiver), fight (Knight plus two briar hounds), or sneak (the hounds hunt the hedges). If they fight and win, he yields at his last Hit Point and asks them to save her anyway. He knows the Hollow is under the hall and that the Lady never wanted a husband. Pin 'Lights in the Hush'.\n\nACT 4, THE LADY'S HALL (45 min). Inside a hollow tree vast as a chapel, honey-lamps and moths, roots like pews. Tobin stands at the far end being dressed in a coat of leaves by giggling thornlings, still asleep. The Lady is tall, antlered with roses, grey rot climbing from her roots where the axe and the fire have hurt her. She is gentle and tired. She did not call him; the promise did, and something under the floor is pulling on it. When she first speaks of the promise, give Ama the ledger page. Let the party talk it out: what did 'keep' mean, who might keep it, what a wedding could look like that keeps everyone. Waking Tobin is a group action (each PC calls him back with a memory; one success per PC who has a tie to him, or any Hope spent). Do NOT let them settle the vow here: just as they have the answer, the floor cracks.\n\nACT 5, BEFORE DAWN (40 min). The Hollow Groom rises: a figure of dead leaves, lost buttons and unkept promises, wearing a wedding coat and Tobin's face, and it reaches for the Lady to wed her in his place and break her. Give Juni their letter now. Run it as a fight with a Vow progress countdown of 6 beside it: any PC can spend their action saying the vow out loud and rolling (Presence, Instinct or an Experience, 13); a success ticks Vow by 1, a critical by 2, and Tobin awake and vowing with Wren ticks it by 2. When Vow fills, the Hollow has nothing left to eat and the Groom unravels into leaves no matter its HP. Thornlings and the moth swarm can turn on the Groom if the party has been kind to them. Spend Fear on Every Broken Promise and Relentless; this is where the last of it goes. If DAWN hits 0 first, the Lady offers to hold the Hollow alone at the cost of herself; let a player take that bargain or refuse it. Then run back through the waking wood to the Vow-Oak as the sun comes up: play the dawn bell and the crowd. Set the empty chair. The Lady comes, small as a girl, roses in her hair, and sits in it. Pin 'An Empty Chair Set at the Wedding'. Cake.\n\nIF YOU'RE SHORT ON TIME: fold Act 3 into Act 2 (the Knight meets them at the stumps) and run the wake-Tobin action as the opening of Act 5.",
+  "gazette": {
+    "name": "The Larkspur Crier",
+    "town": "Larkspur Ford",
+    "price": "One penny, or a slice of wedding cake"
+  },
+  "sounds": {
+    "beds": [
+      { "id": "vigil-bonfire", "label": "The vigil bonfire under the Vow-Oak", "preset": "fire" },
+      { "id": "wind-in-the-stumps", "label": "Wind over the felled edge", "preset": "wind" },
+      { "id": "deep-in-the-hush", "label": "Deep in the Hush", "preset": "dark" },
+      { "id": "the-ladys-hall", "label": "Honey-light in the Lady's hall", "preset": "drone" },
+      { "id": "dawn-wedding", "label": "The village gathers for a dawn wedding", "preset": "crowd" }
+    ],
+    "stingers": [
+      { "id": "lanterns-go-out", "label": "Every lantern in the Oak goes out", "preset": "snuff" },
+      { "id": "moths-take-wing", "label": "The lantern-moths take wing", "preset": "whoosh" },
+      { "id": "timber", "label": "Timber! A tree comes down", "preset": "thunder" },
+      { "id": "briar-gate-opens", "label": "The Briar Gate creaks open", "preset": "door" },
+      { "id": "the-hollow-stirs", "label": "Something stirs under the floor", "preset": "heartbeat" },
+      { "id": "dawn-bell", "label": "The dawn bell rings in the Ford", "preset": "bell" },
+      { "id": "wedding-cheer", "label": "The wedding cheer", "preset": "cheer" }
+    ]
+  },
+  "letters": [
+    {
+      "id": "thorn-on-the-veil",
+      "to": "wren-ashby",
+      "title": "The thorn-pinned veil",
+      "when": "End of Act 1: the stolen veil drifts back down out of the dark, pinned with a single thorn",
+      "text": "Bride. Three nights gone you came to my oak with a hatchet and cut away the roses I grew to bless you, and burned them. I am not angry. I am only old, and it hurt, and I am weaker for it. Your groom is not stolen. He is walking to keep a word he gave me when he was smaller than my thorns, and the word pulls harder now that my wood is thin. Come after him. Bring the ones who were lost with him. Bring the one who wrote it down. Walk softly over the stumps; there is something under them that is not me. She Who Keeps the Hush.",
+      "act": "the-vigil-under-the-oak"
+    },
+    {
+      "id": "under-the-flat-stone",
+      "to": "pell-nimblewick",
+      "title": "What's under the flat stone",
+      "when": "Act 2: in the hollow beech where the three children sheltered, under the flat stone only Pell remembers",
+      "text": "A curl of birchbark, the charcoal smudged but readable, in big uneven letters: 'PELL RAN TO GET HELP. HE IS THE FASTEST. HE WILL BRING BRAM. JUNI IS ASLEEP. I AM NOT SCARED. I SAID A PROMISE SO WE CAN GO HOME. IT IS OK. TOBIN.' Under it, newer, in ink, in the hand that signs your smuggling tallies when you're too drunk to: 'Came back every midsummer to check it was still here. Still true. You never ran away from me, Pell. You ran for me. Best man. T.'",
+      "act": "the-felled-edge"
+    },
+    {
+      "id": "under-the-blaze",
+      "to": "bram-mossgrave",
+      "title": "Something carved beneath the blaze",
+      "when": "Act 2: on the oldest felled stump, where Bram cut the first guide-blaze for the mill crew",
+      "text": "Your blaze is still there, the notch you cut so the mill men could find the heartwood, the one you were paid a bag of gold for, the gold that is paying for your brother's feast. Beneath it someone has carved, slowly, with a thorn: 'Woodsman. You showed them the way in. I know what the coin was for and I know you meant to stop. Show them the way out now. They are not dead, only hollowed. Wake them by their names and we will call it even. Then walk the path you know to my door; you have always known it.' The grain around the words is still wet with sap.",
+      "act": "the-felled-edge"
+    },
+    {
+      "id": "the-ledger-page",
+      "to": "ama-kettleby",
+      "title": "A page from the Vow-Oak ledger",
+      "when": "Act 4: when the Lady first speaks of the promise, a ledger page drifts down from the roof of the hall",
+      "text": "Your own hand, twenty years younger: 'Midsummer, the third morning. Three children come home out of the Hush at dawn: Tobin Mossgrave, Pell Nimblewick, Juniper Hale. The boy says he promised the Lady he would come back and keep her. Witnessed and entered, as the old custom asks. A.K.' Beneath it, in green ink that was never yours: 'Priestess. You wrote it as a husband's vow. A child said it as a child does: keep me, keep my wood, keep me company. A word in your ledger is answered by a word in your ledger, and any hand that keeps the wood keeps the promise. You stopped setting my chair. Set it again. Bring ink.'",
+      "act": "the-ladys-hall"
+    },
+    {
+      "id": "a-seed-in-the-dark",
+      "to": "juni-hale",
+      "title": "The Lady's seed",
+      "when": "Act 5: as the Hollow Groom rises, the Lady presses something small and warm into Juni's hand",
+      "text": "A seed the size of a fingernail, and a voice you have heard every night of your life, finally close: 'Little seed. You were the one who slept, so you were the one I could talk to. I never wanted a husband. I wanted someone to keep the wood when I am done keeping it. Plant this in your own heart and say I will keep the Hush, and the Hollow will have no broken word left to eat, and you will become what I am: slow, rooted, old, loved by moths. It is not the only way. If enough of them swear to keep the wood with you, no one has to stay. Choose as you like. I have been proud of you for twenty years.'",
+      "act": "before-dawn"
+    }
+  ],
+  "acts": [
+    {
+      "id": "the-vigil-under-the-oak",
+      "title": "The Vigil Under the Oak",
+      "subtitle": "Midnight, the lanterns, and a groom who walks in his sleep."
+    },
+    {
+      "id": "the-felled-edge",
+      "title": "The Felled Edge",
+      "subtitle": "Fresh stumps, dark sap, and axes still swinging in the moonlight."
+    },
+    {
+      "id": "the-briar-gate",
+      "title": "The Briar Gate",
+      "subtitle": "A wall of roses, a tired knight, and the price of a true thing."
+    },
+    {
+      "id": "the-ladys-hall",
+      "title": "The Lady's Hall",
+      "subtitle": "Honey-light in a hollow tree, and a promise heard wrong for twenty years."
+    },
+    {
+      "id": "before-dawn",
+      "title": "Before Dawn",
+      "subtitle": "The Hollow wears the groom's face. The sun is coming. Say the words."
+    }
+  ],
+  "rumors": [
+    {
+      "id": "mill-crew-unpaid",
+      "text": "The mill crew that went into the Hush on Tuesday never came back for their pay, and the mill-master has stopped asking after them.",
+      "truth": "true"
+    },
+    {
+      "id": "thorn-in-his-palm",
+      "text": "Tobin Mossgrave has a thorn in his palm that's never healed in twenty years, and he won't let the herbalist cut it out.",
+      "truth": "true"
+    },
+    {
+      "id": "extra-guest",
+      "text": "The Vow-Oak grew from a seed of the Hush itself, and every wedding under it used to have one guest nobody invited.",
+      "truth": "true"
+    },
+    {
+      "id": "hatchet-on-the-roses",
+      "text": "Somebody took a hatchet to the roses that grew on the Vow-Oak overnight. Folk blame the mill boys, out of spite.",
+      "truth": "half"
+    },
+    {
+      "id": "lanterns-in-the-deep",
+      "text": "Bram Mossgrave's been seen walking the mill men into the deep wood after dark, a lantern in one hand and an axe in the other.",
+      "truth": "half"
+    },
+    {
+      "id": "steals-husbands",
+      "text": "The Lady of the Hush steals husbands. That's why no one in the Ford marries in midsummer, and why the groom's door is always left open.",
+      "truth": "half"
+    },
+    {
+      "id": "missing-shadow",
+      "text": "Of the three children who came back out of the Hush, one came back without a shadow. Watch them at noon if you don't believe me.",
+      "truth": "false"
+    },
+    {
+      "id": "burn-the-briar",
+      "text": "Burn a briar and the Hush can't follow you home. Every woodcutter knows it; carry a coal in a tin.",
+      "truth": "false"
+    }
+  ],
+  "notices": [
+    {
+      "id": "wedding-at-dawn",
+      "kind": "poster",
+      "title": "Wedding at Dawn Under the Vow-Oak",
+      "text": "Wren Ashby and Tobin Mossgrave will be wed at first light. All of Larkspur Ford is welcome. Bring a lantern and a song. Cake after, by order of the priestess."
+    },
+    {
+      "id": "groom-seen-walking",
+      "kind": "sighted",
+      "title": "Groom Seen Walking Into the Hush",
+      "text": "Tobin Mossgrave seen at midnight crossing the treeline past the mill road, eyes open, not answering to his name. Do not follow lights into the wood."
+    },
+    {
+      "id": "mill-reward",
+      "kind": "reward",
+      "title": "Mill Pays for Word of Its Crew",
+      "text": "The Larkspur Mill offers two handfuls of gold for news of the six woodcutters missing since Tuesday. No questions asked about where they were cutting."
+    },
+    {
+      "id": "lights-in-the-hush",
+      "kind": "sighted",
+      "title": "Lights in the Hush",
+      "text": "Moth-lanterns moving deep in the wood, all toward the old heart. If something in the trees asks you to promise it anything, say nothing and walk home."
+    },
+    {
+      "id": "empty-chair",
+      "kind": "settled",
+      "title": "An Empty Chair Set at the Wedding",
+      "text": "By the priestess's order an empty chair is set beneath the Vow-Oak at the head of the feast, as in the old days. Do not sit in it. Leave it a slice of cake."
+    }
+  ],
+  "content": {
+    "sources": [
+      "Daggerheart System Reference Document 1.0 (Darrington Press Community Gaming License); all rules text paraphrased"
+    ],
+    "warnings": [
+      "children lost in the woods (backstory)",
+      "childhood guilt and abandonment",
+      "mild body horror (hollow-eyed, puppeted woodcutters)",
+      "an optional self-sacrifice that is never required"
+    ]
+  },
+  "skin": "noticeboard",
+  "adversaries": [
+    {
+      "id": "thornling",
+      "name": "Thornling",
+      "type": "Minion",
+      "tier": 1,
+      "description": "A giggling knee-high sprite of twigs, rosehips and thorns that lives in the Vow-Oak's roots and steals anything shiny.",
+      "motives": "Snatch, scatter, tangle ankles, run away laughing; turn on the Hollow if someone was kind to them.",
+      "difficulty": 10,
+      "hp": 1,
+      "stress": 1,
+      "attack": { "name": "Prickle", "mod": 0, "range": "Melee", "damage": "2", "damageType": "physical" },
+      "features": [
+        {
+          "name": "Little Thing (3)",
+          "text": "Any damage drops a thornling. For every 3 damage a single hit deals, drop one more thornling within range of the attack."
+        },
+        {
+          "name": "All Together Now",
+          "text": "Spend a Fear to pick a target: every thornling within Close range of it scrambles in for one shared attack. On a hit, they deal 1 physical damage apiece, added together."
+        }
+      ]
+    },
+    {
+      "id": "briar-hound",
+      "name": "Briar Hound",
+      "type": "Skulk",
+      "tier": 1,
+      "description": "A lean dog of woven bramble with rose-red eyes, one of the Lady's hunting pack, now jumpy and half-sick with the rot.",
+      "motives": "Guard the hedges, circle, drag one intruder away from the rest; back off from anyone who smells of the Lady.",
+      "difficulty": 12,
+      "thresholds": { "major": 6, "severe": 11 },
+      "hp": 4,
+      "stress": 3,
+      "attack": { "name": "Thorned Bite", "mod": 1, "range": "Melee", "damage": "1d6+2", "damageType": "physical" },
+      "features": [
+        {
+          "name": "One With the Hedge",
+          "text": "While standing in undergrowth the hound is Hidden. It stays that way until it attacks or someone beats Difficulty 13 searching for it."
+        },
+        {
+          "name": "Snag and Drag",
+          "text": "On a hit, mark a Stress: the target is pulled into the hedge and Restrained until they break free with a Strength or Agility roll (12)."
+        }
+      ]
+    },
+    {
+      "id": "lantern-moth-swarm",
+      "name": "Lantern-Moth Swarm",
+      "type": "Horde",
+      "tier": 1,
+      "description": "A cloud of pale moths whose wings glow like candle flames, drawn out of the Hush by the smell of rot and the sound of promises.",
+      "motives": "Dazzle, lead people astray, swirl around whoever is bleeding or lying.",
+      "difficulty": 11,
+      "thresholds": { "major": 5, "severe": 10 },
+      "hp": 5,
+      "stress": 2,
+      "attack": { "name": "Burning Wings", "mod": 0, "range": "Very Close", "damage": "1d8+2", "damageType": "magic" },
+      "features": [
+        {
+          "name": "Thinning Cloud",
+          "text": "Once the swarm has marked at least half its Hit Points, its attack only deals 1d4+1."
+        },
+        {
+          "name": "Follow the Light",
+          "text": "Spend a Fear: everyone within Close range makes an Instinct reaction roll (12). Anyone who fails drifts toward the swarm into Melee range and marks a Stress."
+        }
+      ]
+    },
+    {
+      "id": "hollow-woodcutter",
+      "name": "Hollowed Woodcutter",
+      "type": "Standard",
+      "tier": 1,
+      "description": "One of the mill crew who went into the Hush on Tuesday, still swinging an axe by moonlight with leaves where his eyes should be.",
+      "motives": "Fell the next tree, then the next; cut down anyone who stands between the axe and the heartwood.",
+      "difficulty": 11,
+      "thresholds": { "major": 7, "severe": 13 },
+      "hp": 4,
+      "stress": 2,
+      "attack": { "name": "Hollow Axe", "mod": 1, "range": "Melee", "damage": "1d8+2", "damageType": "physical" },
+      "features": [
+        {
+          "name": "Still In There",
+          "text": "A PC who speaks to who the woodcutter was (a name, his family, his pint) can make a Presence roll (13). On a success he drops the axe, falls asleep and is out of the fight, unharmed."
+        },
+        {
+          "name": "Timber!",
+          "text": "Spend a Fear: the woodcutter drops a tree in a line out to Close range. Everyone in the line makes an Agility reaction roll (12) or takes 1d10+2 physical damage."
+        }
+      ]
+    },
+    {
+      "id": "briar-knight",
+      "name": "Ser Hollin Marsh, the Briar Knight",
+      "type": "Bruiser",
+      "tier": 1,
+      "description": "A knight who promised two hundred years ago to stay with the Lady, and did; roses have grown through every joint of his armor.",
+      "motives": "Keep the gate, test every visitor for honesty, protect the Lady even from her own guests; secretly, be relieved of the watch.",
+      "difficulty": 13,
+      "thresholds": { "major": 9, "severe": 16 },
+      "hp": 7,
+      "stress": 4,
+      "attack": { "name": "Rosewood Greatblade", "mod": 2, "range": "Melee", "damage": "1d10+4", "damageType": "physical" },
+      "features": [
+        {
+          "name": "Ask Me True",
+          "text": "Once per PC, the knight asks them a question. A true answer gives that player a Hope and makes the knight mark a Stress; a lie gives him advantage on his next attack against the liar. At 0 Stress left, he lets everyone pass."
+        },
+        {
+          "name": "The Gate Holds",
+          "text": "While he stands in the Briar Gate no one slips past him: anyone who tries makes an Agility roll (14) or takes 1d6 physical damage and is thrown back to Close range."
+        }
+      ]
+    },
+    {
+      "id": "hollow-groom",
+      "name": "The Hollow Groom",
+      "type": "Solo",
+      "tier": 1,
+      "description": "The Hollow wearing a wedding coat of dead leaves and Tobin's face, stitched from lost buttons, cracked rings and every promise the village ever broke.",
+      "motives": "Wed the Lady in Tobin's place and break her; drive a wedge between anyone who made each other promises; stall until dawn.",
+      "difficulty": 14,
+      "thresholds": { "major": 8, "severe": 15 },
+      "hp": 10,
+      "stress": 5,
+      "attack": { "name": "Withering Embrace", "mod": 3, "range": "Very Close", "damage": "1d10+3", "damageType": "magic" },
+      "features": [
+        {
+          "name": "Every Broken Promise",
+          "text": "Spend a Fear: the Groom speaks, in the voice of someone the target loves, a promise the target once broke. They make a Presence reaction roll (14) or mark 2 Stress and become Vulnerable until they act to make it right or the scene ends."
+        },
+        {
+          "name": "Won't Wait for Dawn (2)",
+          "text": "The Groom can take the spotlight up to twice per GM turn, paying Fear each time as usual. If the Vow countdown fills, it unravels into leaves whatever its Hit Points."
+        }
+      ]
+    }
+  ]
+}

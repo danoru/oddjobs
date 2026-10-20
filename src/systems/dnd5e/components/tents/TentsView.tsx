@@ -86,7 +86,7 @@ function Stat({ label, value, note }: { label: string; value: string | number; n
 }
 
 /** A live preview of the token PNG, with its download button. */
-export function TokenPreview({ slug, c }: { slug: string; c: Character }) {
+export function TokenPreview({ slug, c }: { slug: string; c: Pick<Character, "id" | "name" | "portrait" | "poster"> }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const [art, setArt] = useState<string>("");
   useEffect(() => {

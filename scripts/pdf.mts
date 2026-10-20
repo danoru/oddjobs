@@ -58,7 +58,7 @@ for (const slug of targets) {
     // The page reads its level from ?level= (and remembers it), like a GM's link.
     const tag = level === null || (base.system === "dnd5e" && level === base.level) ? "" : `-l${level}`;
     const kinds =
-      base.system === "dnd5e"
+      base.system !== "tencandles"
         ? ([
             ["sheets", "print"],
             ["cards", "cards"],

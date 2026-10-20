@@ -1,0 +1,170 @@
+{
+  "id": "bram-mossgrave",
+  "name": "Bram Mossgrave",
+  "order": 3,
+  "poster": {
+    "header": "HIRING",
+    "epithet": "the Woodsman",
+    "hook": "Guide for the Hush. Knows every path in. Won't say how he knows the way to the heart.",
+    "reward": "Pays in honey and silence",
+    "icon": "bow"
+  },
+  "flashback": "What did you promise yourself on the third day of searching the Hush for your little brother?",
+  "story": {
+    "pronouns": "he/him",
+    "appearance": "Eight feet of mossy-blue firbolg, thirty-eight, with a drooping cow's nose, a beard full of burrs and hands like spades. Wears oiled leathers patched with bark, a shortbow wrapped in deer-hide and a felling-axe he insists is 'only for kindling'. Smells of pine smoke.",
+    "concept": "Bram is Tobin's big brother and the only woodsman in Larkspur Ford who goes deep into the Hush and comes back. When he was eighteen he searched the wood for three days without sleeping and carried three lost children out of it at dawn. Since then he has walked it every week, more at home under the trees than in the village. He talks to the wood more than he talks to people.",
+    "stake": "His little brother has walked back into the wood Bram pulled him out of, and the wood is angry, and Bram knows exactly why.",
+    "goal": "Find the path to the heart before dawn, bring Tobin out again, and make amends with the wood.",
+    "secret": "This spring the mill-master paid Bram a full bag of gold to blaze a path to the Hush's heartwood, the oldest, finest timber in the valley. Bram needed the coin to pay for his brother's wedding feast, and told himself they'd only take the edge. The mill crew he guided in on Tuesday never came out. He knows the way to the Lady's hall because his blazes lead most of the way there.",
+    "voice": "Slow and low, long pauses, short words. Talks about the wood as 'she' and the village as 'them lot'. Hums when he's thinking.",
+    "mannerisms": [
+      "Puts his palm flat on a tree trunk before he walks past it, like greeting someone",
+      "Answers questions with a grunt that means yes, a grunt that means no, and a third one nobody's decoded",
+      "Picks burrs out of his beard and sets them down carefully, never drops them"
+    ],
+    "background": [
+      {
+        "question": "What did you take from the wild that you wish you could give back?",
+        "answer": "The heartwood. A path, really, cut with his own blazes for a bag of gold. He'd give back the gold in a heartbeat if it would grow the trees back."
+      },
+      {
+        "question": "Who taught you to walk quietly, and where are they now?",
+        "answer": "His mother, who walked the Hush before him. She's buried under a yew at the wood's edge, and he still tells her the news."
+      }
+    ],
+    "ties": [
+      {
+        "to": "pell-nimblewick",
+        "text": "Twenty years ago a screaming eight-year-old goblin came tearing out of the treeline, and Bram followed his tracks back in and found Tobin and Juni. He carried Pell home on his shoulders afterwards. He has always been quietly proud of the boy for running for help.",
+        "public": "Carried him out of the Hush on his shoulders, years ago"
+      },
+      {
+        "to": "wren-ashby",
+        "text": "His brother's bride. They get on wonderfully by grunting at each other. He has already decided that if it comes to it, he'll go in Tobin's place.",
+        "public": "His brother's bride; they get on by grunting"
+      },
+      {
+        "to": "ama-kettleby",
+        "text": "He brings Ama a cord of firewood every winter for the shrine. This year the wood came from the heartwood clearing, and she noticed the grain.",
+        "public": "Keeps the shrine in firewood every winter"
+      }
+    ],
+    "intro": "\"Bram. Groom's brother. I know the paths. Keep up, keep quiet, and don't pick the flowers.\""
+  },
+  "mech": {
+    "class": "Ranger",
+    "subclass": "Wayfinder",
+    "level": 1,
+    "ancestry": "Firbolg",
+    "community": "Wildborne",
+    "traits": {
+      "agility": 2,
+      "strength": 1,
+      "finesse": 0,
+      "instinct": 1,
+      "presence": -1,
+      "knowledge": 0
+    },
+    "evasion": 12,
+    "armor": {
+      "name": "Leather Armor",
+      "score": 3,
+      "major": 6,
+      "severe": 13,
+      "evasionMod": 0
+    },
+    "armorScore": 3,
+    "hp": 6,
+    "stress": 6,
+    "thresholds": { "major": 7, "severe": 14 },
+    "proficiency": 1,
+    "bonuses": {},
+    "experiences": [
+      { "name": "Knows Every Path in the Hush", "bonus": 2 },
+      { "name": "Patient as Winter", "bonus": 2 }
+    ],
+    "domainCards": [
+      { "name": "Gifted Tracker", "where": "loadout", "note": "He's followed Tobin's trail before." },
+      { "name": "I See It Coming", "where": "loadout" }
+    ],
+    "weapons": [
+      {
+        "name": "Shortbow",
+        "slot": "primary",
+        "trait": "agility",
+        "range": "Far",
+        "die": "d6",
+        "mod": 3,
+        "damageType": "physical",
+        "burden": "two-handed"
+      }
+    ],
+    "features": [
+      {
+        "name": "Hold Them Off",
+        "source": "class",
+        "hope": true,
+        "text": "Spend 3 Hope when a weapon attack hits to use the same roll against two more adversaries in range."
+      },
+      {
+        "name": "Ranger's Focus",
+        "source": "class",
+        "text": "Spend a Hope and attack a target. On a hit, it becomes your Focus until you choose another or rest: you always know which way it is, every time you damage it it also marks a Stress, and if you miss it you can end the Focus to roll the attack again."
+      },
+      {
+        "name": "Ruthless Predator",
+        "source": "subclass",
+        "text": "Mark a Stress to roll your damage with one extra Proficiency. When you deal Severe damage, the target also marks a Stress."
+      },
+      {
+        "name": "Path Forward",
+        "source": "subclass",
+        "text": "Heading somewhere you've already been, or carrying something from there, you always know the shortest and most direct way. (He has been to the Lady's door. He has never said so.)"
+      },
+      {
+        "name": "Charge",
+        "source": "ancestry",
+        "text": "When an Agility roll carries you from Far or Very Far range into Melee with one or more foes, you can mark a Stress to slam into them: 1d12 physical damage to each one in Melee range."
+      },
+      {
+        "name": "Unshakable",
+        "source": "ancestry",
+        "text": "Whenever you'd mark a Stress, roll a d6. On a 6, you don't."
+      },
+      {
+        "name": "Lightfoot",
+        "source": "community",
+        "text": "You move without a sound, and roll with advantage whenever you're trying to pass unheard."
+      }
+    ],
+    "equipment": [
+      { "name": "Torch", "qty": 1 },
+      { "name": "Rope", "qty": 1, "note": "Hemp, mossy, older than Pell" },
+      { "name": "A compass that only points into the wood", "qty": 1, "note": "His mother's. He thought it was broken until tonight" },
+      { "name": "Three children's hair ribbons", "qty": 1, "note": "Keepsake. Found on the brambles on the third day, twenty years ago; he kept them" },
+      { "name": "Felling-axe", "qty": 1, "note": "Only for kindling, he says" },
+      { "name": "Minor Health Potion", "qty": 1 }
+    ],
+    "gold": { "handfuls": 1, "bags": 0, "chests": 0 }
+  },
+  "ifUnclaimed": {
+    "npc": "Bram is already in the wood when the lanterns go out, checking his snares; he meets the party at the felled edge in Act 2, silent and ashamed, and walks ahead of them leaving fresh blazes on the trees. He goes no further than the Briar Gate, where he sits down beside the Knight and says he'll wait.",
+    "reassign": [
+      {
+        "beat": "The way to the Lady's hall (Path Forward)",
+        "to": ["juni-hale", "pell-nimblewick"],
+        "text": "You've been to the Lady's door before, as a child. Some part of you remembers the way; follow the moths and the smell of honey and you can find the Briar Gate without getting lost."
+      },
+      {
+        "beat": "The blaze and waking the woodcutters by name (Act 2)",
+        "to": ["wren-ashby", "ama-kettleby"],
+        "text": "You know the six missing mill men by name: Coll Darrow, Hesper Wainright, Dunny and Fen Oakes, old Sallow, and young Tib. Speak to them as who they are and they may wake."
+      }
+    ],
+    "cuts": [
+      "Bram's letter under the blaze and his confession about guiding the mill crew.",
+      "The heartwood clearing as the cause of the Lady's sickness; it's simply the mill's doing."
+    ]
+  }
+}

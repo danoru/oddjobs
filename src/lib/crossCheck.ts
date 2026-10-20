@@ -1,8 +1,10 @@
 import type { CoreCharacter, OneShot } from "./schema";
 import type * as dnd5e from "@/systems/dnd5e/schema";
 import type * as tencandles from "@/systems/tencandles/schema";
+import type * as daggerheart from "@/systems/daggerheart/schema";
 import { crossCheck as crossCheck5e } from "@/systems/dnd5e/content";
 import { crossCheck as crossCheckTc } from "@/systems/tencandles/content";
+import { crossCheck as crossCheckDh } from "@/systems/daggerheart/content";
 
 /**
  * Checks Zod alone can't see, for any system. Pure (no file I/O), so they run
@@ -21,7 +23,7 @@ export function coreCrossCheck(os: OneShot, cast: CoreCharacter[]): string[] {
   if (ids.size !== cast.length) errs.push("duplicate character ids");
   if (new Set(cast.map((c) => c.order)).size !== cast.length) errs.push("duplicate character order values");
   // Ten Candles characters are made at the table, so its pre-mades are optional.
-  if (os.system === "dnd5e" && cast.length < os.players.min) errs.push(`only ${cast.length} characters for min ${os.players.min} players`);
+  if (os.system !== "tencandles" && cast.length < os.players.min) errs.push(`only ${cast.length} characters for min ${os.players.min} players`);
   if (os.players.min > os.players.max) errs.push("players.min > players.max");
 
   for (const r of os.coreRoles) if (!ids.has(r)) errs.push(`coreRoles: no character "${r}"`);
@@ -61,6 +63,7 @@ export function coreCrossCheck(os: OneShot, cast: CoreCharacter[]): string[] {
 export function crossCheck(os: OneShot, cast: CoreCharacter[]): string[] {
   const errs = coreCrossCheck(os, cast);
   if (os.system === "dnd5e") errs.push(...crossCheck5e(os, cast as dnd5e.Character[]));
+  else if (os.system === "daggerheart") errs.push(...crossCheckDh(os, cast as daggerheart.Character[]));
   else errs.push(...crossCheckTc(os, cast as tencandles.Character[]));
   return errs;
 }

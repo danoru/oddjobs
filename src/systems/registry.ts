@@ -1,9 +1,11 @@
 import type { SystemId } from "@/lib/schema";
 import type * as dnd5e from "./dnd5e/schema";
 import type * as tencandles from "./tencandles/schema";
+import type * as daggerheart from "./daggerheart/schema";
 import type { SystemEditor } from "@/lib/editor/types";
 import { editor as dnd5eEditor } from "./dnd5e/editor";
 import { editor as tencandlesEditor } from "./tencandles/editor";
+import { editor as daggerheartEditor } from "./daggerheart/editor";
 
 /**
  * What each game system brings, in one place. Shared pages ask this which
@@ -40,9 +42,11 @@ export interface SpotlightBeat {
  * How a system rolls dice at the table. `d20`: the phone rolls checks, saves
  * and attacks from the sheet (server-side dice, logged to the table's event
  * log); `pool`: the system's own reducer rolls (Ten Candles' d6 pool), and the
- * phone only adds shake-to-roll and the TV's tray.
+ * phone only adds shake-to-roll and the TV's tray; `duality`: the phone rolls
+ * Daggerheart's Hope and Fear dice from the sheet through the log (and plain
+ * damage dice), and each roll moves the Hope and Fear it earns.
  */
-export type DiceKind = "d20" | "pool";
+export type DiceKind = "d20" | "pool" | "duality";
 
 /** What an inspiration coin stands for at this table, or null when the system has none. */
 export interface CoinMeta {
@@ -109,17 +113,42 @@ export const SYSTEMS: Record<SystemId, SystemMeta> = {
     // Ten Candles has no inspiration: hope comes from living your Moment.
     coins: false,
   },
+  daggerheart: {
+    id: "daggerheart",
+    label: "Daggerheart",
+    badge: "Daggerheart",
+    publisher: "Darrington Press",
+    routes: { print: true, cards: true, tents: true, play: false, kit: false },
+    editor: daggerheartEditor,
+    dice: "duality",
+    spotlight: [
+      { id: "stake", label: "Stake" },
+      { id: "secret", label: "Secret" },
+      { id: "ties", label: "Ties" },
+      { id: "experience", label: "Experience" },
+      { id: "letters", label: "Letters" },
+      { id: "flashback", label: "Flashback" },
+    ],
+    // Hope is the Daggerheart coin, but it's earned by your own rolls and spent
+    // on yourself, so it lives in the Hope tracker rather than a purse to toss.
+    coins: false,
+  },
 };
 
 type AnyOneShotLike =
   | (Pick<dnd5e.OneShot, "system" | "ruleset" | "level"> & { variants?: { level: number }[]; homebrew?: boolean })
-  | Pick<tencandles.OneShot, "system">;
+  | Pick<tencandles.OneShot, "system">
+  | Pick<daggerheart.OneShot, "system" | "level">;
 
-/** The line under a poster: class and level in 5e; in Ten Candles, what's in their pockets (traits come at the table). */
+/** The line under a poster: class and level in 5e and Daggerheart; in Ten Candles, what's in their pockets (traits come at the table). */
 export function posterTag(
-  c: Pick<dnd5e.Character, "mech"> | Pick<tencandles.Character, "story">,
+  c: Pick<dnd5e.Character, "mech"> | Pick<tencandles.Character, "story"> | Pick<daggerheart.Character, "mech">,
 ): string {
-  if ("mech" in c) return c.mech.classes.map((k) => `${k.name} ${k.level}`).join(" / ");
+  if ("mech" in c) {
+    const m = c.mech;
+    if ("class" in m) return `${m.class} ${m.level} · ${m.subclass}`;
+    return m.classes.map((k) => `${k.name} ${k.level}`).join(" / ");
+  }
   return c.story.carrying.length ? `Carrying ${c.story.carrying[0]}` : "A pre-made concept";
 }
 

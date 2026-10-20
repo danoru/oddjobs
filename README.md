@@ -2,7 +2,13 @@
 
 A tavern notice board of ready-made one-shot **casts**. Each one-shot is a job posting; its characters are posters with a hook, ties to each other, a stake in *this* adventure and a private secret. Players tear a poster off to claim a character, then print it, send it to Foundry, rebuild it in D&D Beyond, or tweak it.
 
-One-shots come in more than one game system. **D&D 5e** (2014 and 2024) is the original; **Ten Candles** is a play aid for tables that own the game, with candles, dice, cards, truths and last words run from everyone's phones. See [docs/SYSTEMS.md](docs/SYSTEMS.md) for how systems plug in, the Ten Candles rules and their sources, and sketches for Daggerheart and Paranoia.
+One-shots come in more than one game system:
+
+- **D&D 5e** (2014 and 2024) is the original.
+- **Ten Candles** is a play aid for tables that own the game, with candles, dice, cards, truths and last words run from everyone's phones.
+- **Daggerheart** is built on its SRD, with level-1 casts, domain cards and duality dice rolled from the phone.
+
+See [docs/SYSTEMS.md](docs/SYSTEMS.md) for how systems plug in, the Ten Candles rules and their sources, the Daggerheart licence and rules and their sources, and a sketch for Paranoia.
 
 Next 16 (Pages Router) · React 19 · MUI 9 · CSS Modules · Zod · Vitest · Prisma 6 + Postgres · pnpm · Vercel. Content is JSON in git, validated at build time, and written through the **builder** at `/admin` (see [The builder](#the-builder)); the database only holds table sessions (who tore which poster).
 
@@ -29,8 +35,8 @@ Without a database the site still works: claims just stay in each browser, as in
 
 | Script | What it does |
 |---|---|
-| `pnpm validate [slug]` | Parse and cross-check content; prints each character's key numbers |
-| `pnpm test` | Rules math (HP, slots, pact magic), level variants, cards, tokens, reading modes, customization, exporters, auth roles, table codes, `gmNotes` stays off player pages; the event log's rules and privacy (notes, hidden rolls, rumor truths, ticks, targeted bells, no browser ids), the tapestry, the Ten Candles mirror and its act cards, shake detection, and the builder's new fields |
+| `pnpm validate [slug]` | Parse and cross-check content; prints each character's key numbers (Daggerheart: Evasion, HP, Stress, Armor, thresholds, traits and domain cards) |
+| `pnpm test` | Rules math (HP, slots, pact magic), level variants, cards, tokens, reading modes, customization, exporters, auth roles, table codes, `gmNotes` stays off player pages; the event log's rules and privacy (notes, hidden rolls, rumor truths, ticks, targeted bells, no browser ids), the tapestry, the Ten Candles mirror and its act cards, shake detection, and the builder's new fields. Daggerheart: the derived numbers, every check, the SRD tables and errata, duality dice, Hope/Fear/slot tallies and who may move them, its privacy rules, and its checks pointing at their builder fields |
 | `pnpm build` | `prisma generate`, validate, then `next build` (fails on any broken one-shot) |
 | `pnpm db:dev` | Start a local Postgres server in the background (`prisma dev --name tearoff --detach`); stop it with `pnpm exec prisma dev stop tearoff` |
 | `pnpm db:migrate` | `prisma migrate dev`: make a new migration after editing `prisma/schema.prisma` |
@@ -38,9 +44,10 @@ Without a database the site still works: claims just stay in each browser, as in
 | `pnpm pdf [slug] [--a4]` | **Local only.** Render `public/pdf/<slug>-sheets`, `-cards`, `-tents` and `-flyer` PDFs (and `<slug>-l<N>-…` for each level variant; `<slug>-kit` and `-flyer` for Ten Candles) from a running server with Playwright. Never runs on Vercel. |
 | `pnpm a11y-check [route…]` | **Local only.** Run axe-core over the main pages (signed in as GM) and Tab through each, checking every focus stop shows a ring. Exits 1 on any problem. |
 | `pnpm parity snap <dir>` / `pnpm parity diff <a> <b>` | **Local only.** Snapshot every 5e page's visible text, every printable's PDF page count and a few screenshots, then compare two snapshots. Run it before and after a refactor: phase 4 used it to prove moving 5e into `src/systems/dnd5e/` changed nothing. |
-| `pnpm e2e:builder` | **Local only.** Builds a 5e one-shot (three characters) and a Ten Candles module from nothing in the builder, in headless Chromium against a running dev server: trips and fixes the checks, publishes both, reads them back on the board and their sheets, duplicates, edits and unpublishes one, checks players can't reach `/admin` or its API, then deletes every test one-shot. `SHOTS=dir` saves screenshots, `KEEP=1` leaves the test one-shots. |
+| `pnpm e2e:builder` | **Local only.** Builds a 5e one-shot (three characters), a Ten Candles module and a Daggerheart one-shot (two characters, with the rules help) from nothing in the builder, in headless Chromium against a running dev server: trips and fixes the checks, publishes both, reads them back on the board and their sheets, duplicates, edits and unpublishes one, checks players can't reach `/admin` or its API, then deletes every test one-shot. `SHOTS=dir` saves screenshots, `KEEP=1` leaves the test one-shots. |
 | `pnpm e2e:candles` | **Local only.** Plays a whole Ten Candles night in headless Chromium against a running server with a database: a GM and three phones with fake microphones, creation, recordings, truths, rolls, the Last Stand and the end. Checks along the way that nobody sees another player's cards or recordings. `SHOTS=dir` saves screenshots. |
 | `pnpm e2e:toys` | **Local only.** Phase 6's table toys end to end in headless Chromium against a running server with a database: a GM, two phones and the TV on a 5e table (The Drowned Bell) and a Ten Candles one (Lights Out at Marrowby). Dice and the tray, notes, the bell, act cards, the spotlight (with a fast-forwarded clock), rumors, the town board, coins, the epilogue per table, the tapestry and the chronicle; it page-checks the printed box on Letter and A4, the tapestry and the chronicle, and checks over HTTP and on screen that players never see GM-only data, other players' notes, hidden rolls or rumor truths. `SHOTS=dir` saves screenshots. |
+| `pnpm e2e:daggerheart` | **Local only.** A Daggerheart night (A Vow Before Dawn) in headless Chromium, against a running server with a database: a GM, two phones and the TV. It covers the opening Fear, duality rolls from the sheet until both Hope and Fear have come up (checked against the server's fold and on the TV), an Experience and advantage, damage dice, slots and the damage helper, the GM correcting a mark and spending Fear, adversary attacks behind the screen, and phase 6's toys at a Daggerheart table. It also checks the box's page count on Letter and A4, the tapestry and the chronicle, axe on the new screens, and over HTTP that players never see the adversaries, GM notes, letters, hidden rolls or browser ids. `SHOTS=dir` saves screenshots. |
 | `pnpm print-check [slug]` | **Local only.** Render every printable at every level, on Letter and A4, in each reading mode, count the PDF pages and look for card text that overflows. Exits 1 if anything doesn't fit. |
 
 ## Pages
@@ -69,6 +76,13 @@ Ten Candles one-shots have no sheets, cards or tents. Instead:
 - `/<oneshot>/tv` — ten flickering candles (steady for viewers who prefer less motion), the join QR, truths as they're said, every roll, and the last words in the dark.
 - `/<oneshot>/kit` — **GM password only.** The printable table kit: the module, a candle and scene tracker, 3 × 5 in index cards, MISSING posters and the flyer.
 
+Daggerheart one-shots have the 5e pages, with Daggerheart's own content:
+
+- `/<oneshot>/<character>` — the two-page Daggerheart sheet. At a table it's the phone in play (see below).
+- `/print`, `/cards`, `/tents` — the printables. The cards are the domain cards (in each domain's ink), weapons, armor and features.
+- `/<oneshot>/gm` — adds the Fear pool, everyone's Hope and marks, and the GM-only adversaries.
+- `/<oneshot>/tv` — adds the Fear pool, each claimed poster's Hope, Stress and HP, and the Hope and Fear dice.
+
 ## Ten Candles at the table
 
 A play aid, not the game: you need [Ten Candles](https://cavalrygames.com/ten-candles-info) (Cavalry Games). Every rule and prompt is in our own words. We couldn't check the rules against the book, so each rule carries a confidence grade, and the UI marks any rule our sources disagree on or that we couldn't confirm. The GM picks the house reading for the disputed ones before play. The details and sources are in [docs/SYSTEMS.md](docs/SYSTEMS.md).
@@ -77,6 +91,23 @@ A play aid, not the game: you need [Ten Candles](https://cavalrygames.com/ten-ca
 - **Candles on the screen** behave like real ones, for tables without real candles (or smoke detectors that object). Each candle gets a burn time when it's lit (2 to 3 hours by default, random within the range so they don't all go out together), shrinks on the TV as it burns, gutters in its last minutes and goes out when it's spent, which ends the scene like any candle going out. **Drafts** come at random (about once an hour by default): a candle sputters on the TV and the GM gets a prompt they can't miss (a dialog, a gust of sound, a buzz, a flashing tab title and, if allowed, a system notification) to decide whether it goes out. The GM page keeps the candles, so keep it open; both are set on the GM page under the candles, at any time, and "real candles" turns burning off.
 - **Seat order** is clockwise from the GM's left. The GM sets it in the lobby; cards pass by it and truths go round it.
 - **Last words.** Each phone records up to 45 s with MediaRecorder and keeps it in the browser's IndexedDB. It goes to the server (`Recording`, capped at 450 KB, one per player) **only if the GM ticks "keep recordings"**. Players hear only their own until the end, the GM hears all kept ones, and anyone can download their own. **Microphones need https or localhost:** phones joining a dev server by its plain-http LAN address get a written-message fallback instead.
+
+## Daggerheart at the table
+
+Built on the Daggerheart SRD 1.0 under the Darrington Press Community Gaming License. Every Daggerheart page carries the licence's notice, and all rules text is in our own words. A private table falls outside the licence's sharing rules, but a public site wouldn't (websites aren't a permitted format); see [docs/SYSTEMS.md](docs/SYSTEMS.md#daggerheart-daggerheart).
+
+- **Duality dice from the sheet.** Tap a trait or a weapon's attack on the phone.
+  - The server rolls the Hope and Fear d12s.
+  - The tray adds advantage or disadvantage (±d6), Experiences (a Hope each) and reaction rolls.
+  - The phone and the TV show both dice and "with Hope", "with Fear" or "Critical success!".
+  - Damage rolls Proficiency dice.
+- **Hope, Fear and harm.**
+  - A roll with Hope gives the roller a Hope; with Fear, the GM a Fear; a critical gives a Hope and clears a Stress. These land on their own.
+  - Players tap the slots on their sheet for Hit Points, Stress, Armor and Hope, or use the damage helper, which knows the thresholds and the Armor Slot.
+  - The GM takes the opening Fear, spends it and corrects anyone's marks from the GM page.
+  - It all runs on the table's event log as `tally` rows, so the TV, the phones and the GM page agree.
+- **Adversaries** are GM-only stat blocks, with their attacks and damage rolled behind the screen.
+- **No inspiration coins:** Hope does that job, on the sheet.
 
 ## Table play
 
@@ -158,7 +189,7 @@ content/oneshots/<slug>/oneshot.json
 content/oneshots/<slug>/characters/<id>.json   # filename == id
 ```
 
-Every `oneshot.json` says its `"system"`: `"dnd5e"` or `"tencandles"`. The shared parts of the schema are in `src/lib/coreSchema.ts`, and each system's own are in `src/systems/<system>/schema.ts`.
+Every `oneshot.json` says its `"system"`: `"dnd5e"`, `"tencandles"` or `"daggerheart"`. The shared parts of the schema are in `src/lib/coreSchema.ts`, and each system's own are in `src/systems/<system>/schema.ts`.
 
 A **Ten Candles** one-shot has a `module`, which is GM-only:
 
@@ -170,6 +201,8 @@ A **Ten Candles** one-shot has a `module`, which is GM-only:
 - `lastStand`.
 
 Optional `suggestedTruths` are also GM-only. Its `characters/*.json` are optional pre-made concepts (`story`: `concept`, `look`, `namePrompts`, `carrying`, `stake`, `ties`), with MISSING / LAST SEEN posters. `content/oneshots/lights-out-at-marrowby` is the reference.
+
+A **Daggerheart** one-shot has a `level` (1 for now) and GM-only `adversaries`. Its characters' `mech` follows `src/systems/daggerheart/schema.ts` and is checked against the SRD tables in `src/systems/daggerheart/srd.ts`: class, subclass, the trait spread, Evasion, HP, Stress, Armor, thresholds, Experiences, domain cards and weapons. Extras from a subclass, ancestry or shield go in `mech.bonuses` with a note. `content/oneshots/a-vow-before-dawn` is the reference.
 
 For **5e**, the schema is `src/systems/dnd5e/schema.ts`; extra checks are in `crossCheck` in `src/systems/dnd5e/content.ts` (levels add up, ties point at real characters, ruleset-specific fields, customization options tag exactly one entry…) and `src/systems/dnd5e/rules.ts`. That file checks HP against the fixed-average rule (with Tough and dwarf bonuses), spell slots against the class tables (half casters by edition, multiclass caster levels), warlock pact slots, and that no spell is above the highest slot. `content/oneshots/the-drowned-bell` is the reference.
 

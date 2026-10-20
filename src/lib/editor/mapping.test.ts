@@ -190,7 +190,7 @@ describe("schema lookup for the form", () => {
 
 describe("live checks on a draft", () => {
   it("passes every real one-shot", () => {
-    for (const slug of ["the-drowned-bell", "lot-thirteen", "the-cooling-concord", "lights-out-at-marrowby"]) {
+    for (const slug of ["the-drowned-bell", "lot-thirteen", "the-cooling-concord", "lights-out-at-marrowby", "a-vow-before-dawn"]) {
       const { issues, parsed } = checkDoc(realDoc(slug), spells);
       expect([slug, issues]).toEqual([slug, []]);
       expect(parsed?.slug).toBe(slug);
@@ -238,6 +238,27 @@ describe("live checks on a draft", () => {
     const keys = checkDoc(doc, spells).issues.map((i) => i.path.join("."));
     expect(keys).toContain("cast.2.mech.hp");
     expect(keys.some((k) => k.startsWith("cast.4.poster"))).toBe(true);
+  });
+});
+
+describe("Daggerheart checks in the builder", () => {
+  it("points each rules problem at its field", () => {
+    const doc = realDoc("a-vow-before-dawn");
+    const keyOf = (d: OneShotDoc) => checkDoc(d, spells).issues.map((i) => i.path.join("."));
+    expect(keyOf(setAt(doc, ["cast", 1, "mech", "evasion"], 3))).toEqual(["cast.1.mech.evasion"]);
+    expect(keyOf(setAt(doc, ["cast", 1, "mech", "hp"], 11))).toEqual(["cast.1.mech.hp"]);
+    expect(keyOf(setAt(doc, ["cast", 1, "mech", "thresholds", "major"], 2))).toEqual(["cast.1.mech.thresholds"]);
+    expect(keyOf(setAt(doc, ["cast", 1, "mech", "traits", "agility"], 2))).toEqual(["cast.1.mech.traits"]);
+    expect(keyOf(setAt(doc, ["cast", 1, "mech", "domainCards", 0, "name"], "Rune Ward"))).toEqual(["cast.1.mech.domainCards.0.name"]);
+    expect(keyOf(setAt(doc, ["cast", 1, "mech", "subclass"], "Troubadour"))).toEqual(["cast.1.mech.subclass"]);
+  });
+
+  it("checks a half-written Daggerheart character as it's typed", () => {
+    const doc = realDoc("a-vow-before-dawn");
+    const broken = setAt(setAt(doc, ["cast", 0, "poster", "hook"], undefined), ["cast", 1, "mech", "stress"], 9);
+    const keys = checkDoc(broken, spells).issues.map((i) => i.path.join("."));
+    expect(keys).toContain("cast.0.poster.hook");
+    expect(keys).toContain("cast.1.mech.stress");
   });
 });
 

@@ -7,7 +7,7 @@ import { Box, Button, Typography } from "@mui/material";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import { loadOneShot, publishedSlugs } from "@/lib/content";
-import { toPublic, type PublicAnyOneShot, type PublicOneShot } from "@/lib/public";
+import { toPublic, type PublicAnyOneShot, type PublicDhOneShot, type PublicOneShot } from "@/lib/public";
 import { SYSTEMS } from "@/systems/registry";
 import { CandlesTv } from "@/systems/tencandles/components/CandlesTv";
 import { useClaims, useLevel } from "@/lib/storage";
@@ -17,6 +17,10 @@ import { tiltFor } from "@/components/board/Poster";
 import s from "@/components/tv/Tv.module.css";
 import { onlyIfOnDisk } from "@/lib/onDisk";
 import { TvLive } from "@/components/tv/TvLive";
+import { useLive } from "@/lib/useLive";
+import type { Character as DhCharacter } from "@/systems/daggerheart/schema";
+import { FearPool, noMarks, useTallies } from "@/systems/daggerheart/components/Table";
+import { MAX_HOPE } from "@/systems/daggerheart/srd";
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: publishedSlugs().map((oneshot) => ({ params: { oneshot } })),
@@ -36,15 +40,19 @@ export default function TvPage({ os }: { os: PublicAnyOneShot }) {
   return os.system === "tencandles" ? <CandlesTv os={os} /> : <PosterTv os={os} />;
 }
 
-function PosterTv({ os }: { os: PublicOneShot }) {
+function PosterTv({ os }: { os: PublicOneShot | PublicDhOneShot }) {
   const { table, claimedBy, error } = useClaims(os.slug);
+  // Daggerheart: the GM's Fear and everyone's Hope and marks, from the same poll as the dice.
+  const dh = os.system === "daggerheart";
+  const live = useLive(dh ? table : null, "table", null);
+  const tallies = useTallies(live.events, dh ? (os.cast as DhCharacter[]) : NO_CAST);
   const { level } = useLevel(os);
   const [qr, setQr] = useState("");
   const [sound, setSound] = useState(false);
   const [torn, setTorn] = useState<string[]>([]);
   const seen = useRef<Set<string> | null>(null);
 
-  const joinUrl = table && typeof window !== "undefined" ? `${window.location.origin}/${os.slug}?table=${table}${level === os.level ? "" : `&level=${level}`}` : "";
+  const joinUrl = table && typeof window !== "undefined" ? `${window.location.origin}/${os.slug}?table=${table}${os.system !== "dnd5e" || level === os.level ? "" : `&level=${level}`}` : "";
 
   useEffect(() => {
     if (!joinUrl) return;
@@ -97,6 +105,15 @@ function PosterTv({ os }: { os: PublicOneShot }) {
             <Typography sx={{ fontFamily: "var(--font-print)", fontSize: "clamp(16px, 1.4vw, 24px)", color: "var(--parchment-dark)", mt: 1 }}>
               {os.posting.header}
             </Typography>
+            {dh && table && (
+              <div className={s.fear} aria-label="The GM's Fear">
+                <span className={s.fearLabel}>FEAR</span>
+                <FearPool n={tallies.fear} size={26} />
+                <span className={s.fearCount} data-testid="tv-fear">
+                  {tallies.fear}
+                </span>
+              </div>
+            )}
           </div>
           {table ? (
             <div className={s.join}>
@@ -138,6 +155,7 @@ function PosterTv({ os }: { os: PublicOneShot }) {
                 style={{ ["--tilt" as string]: `${tiltFor(c.id, 2)}deg` }}
               >
                 <div className={s.header}>{c.poster.header}</div>
+                {dh && claim && <PosterMarks c={c as DhCharacter} marks={tallies.marks[c.id] ?? noMarks} />}
                 <div className={s.icon}>
                   {c.portrait ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -160,7 +178,7 @@ function PosterTv({ os }: { os: PublicOneShot }) {
           })}
         </div>
 
-        <TvLive code={table} tray="full" icons={os.cast.map((c) => c.poster.icon)} sound={sound} />
+        <TvLive code={table} tray="full" icons={os.cast.map((c) => c.poster.icon)} sound={sound} live={dh ? live : undefined} />
 
         <div className={s.bottom}>
           <span>
@@ -185,5 +203,23 @@ function PosterTv({ os }: { os: PublicOneShot }) {
         </div>
       </main>
     </>
+  );
+}
+
+const NO_CAST: DhCharacter[] = [];
+
+/** Under a claimed Daggerheart poster: Hope held, Stress and Hit Points marked. */
+function PosterMarks({ c, marks }: { c: DhCharacter; marks: typeof noMarks }) {
+  return (
+    <div className={s.marks} data-testid={`tv-marks-${c.id}`} data-hope={marks.hope} data-stress={marks.stress} data-hp={marks.hp}>
+      <span className={s.hopeRow} role="img" aria-label={`Hope ${marks.hope} of ${MAX_HOPE}`}>
+        {Array.from({ length: MAX_HOPE }, (_, i) => (
+          <span key={i} className={s.hopePip} data-on={i < marks.hope} />
+        ))}
+      </span>
+      <span>
+        Stress {marks.stress}/{c.mech.stress} · HP {c.mech.hp - marks.hp}/{c.mech.hp}
+      </span>
+    </div>
   );
 }

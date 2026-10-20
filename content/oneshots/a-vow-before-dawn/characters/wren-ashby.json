@@ -1,0 +1,192 @@
+{
+  "id": "wren-ashby",
+  "name": "Wren Ashby",
+  "order": 1,
+  "poster": {
+    "header": "SEEKING",
+    "epithet": "the Bride",
+    "hook": "One groom, missing since midnight. Answers to Tobin. Last seen walking into the trees.",
+    "reward": "A slice of cake and a lifelong debt",
+    "icon": "shield"
+  },
+  "flashback": "What did Tobin say when he asked you to marry him, and what did you say back?",
+  "story": {
+    "pronouns": "she/her",
+    "appearance": "Broad-shouldered and sun-browned, twenty-seven, with a nose broken twice and freckles everywhere. Her hair is braided up for tomorrow with river-daisies already wilting in it. Wears the Ford Warden's mail shirt over her good linen, a dented round shield on her back, and her grandmother's lace veil stuffed in her belt.",
+    "concept": "Wren is the Warden of Larkspur Ford: she keeps the crossing, settles the fights, hauls the drunks out of the shallows and tells the mill-master no. She has never once in her life been late for anything. She fell for Tobin Mossgrave because he was the only person in the Ford who could make her laugh while she was furious, and she is marrying him at dawn whether the wood likes it or not.",
+    "stake": "It's her groom walking into the Hush, on the night before her wedding, and the whole village saw him go.",
+    "goal": "Bring Tobin home and stand under the Vow-Oak beside him at sunrise. Not one minute late.",
+    "secret": "Three nights ago, after the banns were read, a tangle of wild roses grew up the Vow-Oak overnight, and Tobin started talking in his sleep about 'her'. Wren went out with a hatchet and a lantern, cut every rose off the Oak and burned them in the ford. It smelled of burnt honey until morning. She told no one. She is starting to suspect that was a blessing, not a threat, and that she is the reason the Lady came for him tonight.",
+    "voice": "Short, flat, practical sentences; gives orders without noticing. Goes very quiet, not loud, when she's scared.",
+    "mannerisms": [
+      "Counts heads every time the group stops, out loud, including herself",
+      "Taps the rim of her shield twice before she steps into anything",
+      "Keeps touching the veil in her belt to make sure it's still there"
+    ],
+    "background": [
+      {
+        "question": "Who in Larkspur Ford did you once fail to protect, and what did you change because of it?",
+        "answer": "Mother Gale's boy, swept off the ford stones in the spring melt when Wren was nineteen and new to the job. Since then there's a rope across the crossing every flood season, and Wren checks the knots herself."
+      },
+      {
+        "question": "What does Tobin do that nobody else can, that you'd never tell him?",
+        "answer": "He can get her to sit down. Just sit, and do nothing, and watch the river. She's never managed it with anyone else."
+      },
+      {
+        "question": "What is the one rule you will not bend, even tonight?",
+        "answer": "Nobody gets left on the wrong side of the water. Not a stranger, not a smuggler, not a groom."
+      }
+    ],
+    "ties": [
+      {
+        "to": "pell-nimblewick",
+        "text": "Tobin's best man and the Ford's most cheerful smuggler. Wren has arrested him twice and let him go twice, and she has never trusted him with anything, which is why it stings that Tobin trusted him with the rings.",
+        "public": "She's arrested him twice. Let him go twice."
+      },
+      {
+        "to": "juni-hale",
+        "text": "Her maid of honour and best friend since they were six. Juni was one of the children lost in the Hush with Tobin, and Wren sat outside the herbalist's door for the three days Juni didn't wake up after.",
+        "public": "Her maid of honour and best friend since they were six"
+      },
+      {
+        "to": "ama-kettleby",
+        "text": "Ama married Wren's parents under the Vow-Oak, named Wren at the font and is meant to marry her at dawn. Wren has never been able to lie to her, so she has been avoiding her all week.",
+        "public": "Ama named her at the font and will marry her at dawn"
+      }
+    ],
+    "intro": "\"Wren Ashby. Warden of the Ford. I'm getting married in six hours, and my groom has gone for a walk.\""
+  },
+  "mech": {
+    "class": "Guardian",
+    "subclass": "Stalwart",
+    "level": 1,
+    "ancestry": "Human",
+    "community": "Orderborne",
+    "traits": {
+      "agility": 1,
+      "strength": 2,
+      "finesse": -1,
+      "instinct": 0,
+      "presence": 1,
+      "knowledge": 0
+    },
+    "evasion": 8,
+    "armor": {
+      "name": "Chainmail Armor",
+      "score": 4,
+      "major": 7,
+      "severe": 15,
+      "evasionMod": -1,
+      "feature": "Heavy: −1 to Evasion."
+    },
+    "armorScore": 5,
+    "hp": 7,
+    "stress": 7,
+    "thresholds": { "major": 9, "severe": 17 },
+    "proficiency": 1,
+    "bonuses": {
+      "stress": 1,
+      "armor": 1,
+      "thresholds": 1,
+      "note": "Human High Stamina: +1 Stress. Round Shield: +1 Armor Score. Stalwart's Unwavering: +1 to both thresholds."
+    },
+    "experiences": [
+      { "name": "Warden of the Ford", "bonus": 2 },
+      { "name": "Stubborn as River Stone", "bonus": 2 }
+    ],
+    "domainCards": [
+      { "name": "I Am Your Shield", "where": "loadout" },
+      { "name": "Forceful Push", "where": "loadout", "note": "Shield first, then the rest of her." }
+    ],
+    "weapons": [
+      {
+        "name": "Mace",
+        "slot": "primary",
+        "trait": "strength",
+        "range": "Melee",
+        "die": "d8",
+        "mod": 1,
+        "damageType": "physical",
+        "burden": "one-handed"
+      },
+      {
+        "name": "Round Shield",
+        "slot": "secondary",
+        "trait": "strength",
+        "range": "Melee",
+        "die": "d4",
+        "mod": 0,
+        "damageType": "physical",
+        "burden": "one-handed",
+        "feature": "Protective: +1 to Armor Score."
+      }
+    ],
+    "features": [
+      {
+        "name": "Frontline Tank",
+        "source": "class",
+        "hope": true,
+        "text": "Spend 3 Hope to clear 2 Armor Slots."
+      },
+      {
+        "name": "Unstoppable",
+        "source": "class",
+        "text": "Once a long rest, become Unstoppable: set a d4 on your sheet showing 1 and turn it up each time you deal damage; when it would pass 4, or the scene ends, it's over. Until then, physical damage hits you one step lighter, and nothing can Restrain you or make you Vulnerable.",
+        "uses": { "max": 1, "per": "long rest" }
+      },
+      {
+        "name": "Unwavering",
+        "source": "subclass",
+        "text": "Your damage thresholds are 1 higher (already on your sheet)."
+      },
+      {
+        "name": "Iron Will",
+        "source": "subclass",
+        "text": "When physical damage hits you, you may mark one extra Armor Slot to bring it down a step."
+      },
+      {
+        "name": "High Stamina",
+        "source": "ancestry",
+        "text": "You started with one extra Stress slot (already on your sheet)."
+      },
+      {
+        "name": "Adaptability",
+        "source": "ancestry",
+        "text": "When a roll that used one of your Experiences fails, you can mark a Stress to roll it again."
+      },
+      {
+        "name": "Dedicated",
+        "source": "community",
+        "text": "You live by three sayings: 'Nobody left on the wrong bank.' 'Check the knots yourself.' 'Be early.' Once a rest, when you act on one of them, roll a d20 in place of your Hope die.",
+        "uses": { "max": 1, "per": "rest" }
+      }
+    ],
+    "equipment": [
+      { "name": "Torch", "qty": 1 },
+      { "name": "Rope", "qty": 1, "note": "The flood-rope from the crossing, fifty feet, knots checked" },
+      { "name": "Warden's whistle", "qty": 1, "note": "Her mentor's, passed down; three blasts means everyone to the bank" },
+      { "name": "Grandmother's lace veil", "qty": 1, "note": "Keepsake. Torn at one corner by a thornling" },
+      { "name": "Minor Health Potion", "qty": 1 }
+    ],
+    "gold": { "handfuls": 1, "bags": 0, "chests": 0 }
+  },
+  "ifUnclaimed": {
+    "npc": "Wren goes into the Hush alone the moment Tobin crosses the treeline, ordering everyone else to stay at the Oak. The party finds her in Act 2 holding a felled trunk off a trapped woodcutter, too stubborn to let go; she joins them as an NPC who guards the rear and counts heads. At the end she says her vow beside Tobin whether he is fully awake or not.",
+    "reassign": [
+      {
+        "beat": "The thorn-pinned veil and the burned roses (end of Act 1)",
+        "to": ["ama-kettleby", "juni-hale"],
+        "text": "Three nights ago you saw Wren at the Vow-Oak at midnight with a hatchet and a lantern, cutting down a tangle of roses that had grown up it overnight, and burning them in the ford. You said nothing. The veil that comes back to you tonight is pinned with one thorn, and you think you know why."
+      },
+      {
+        "beat": "Tobin's vow at dawn needs someone he promised himself to",
+        "to": ["juni-hale", "pell-nimblewick"],
+        "text": "When the Vow countdown is being filled in Act 5, your words count double if you say them with Tobin's hand in yours: you speak for Wren, who is holding the rear."
+      }
+    ],
+    "cuts": [
+      "Wren's confession at the Briar Gate about the roses.",
+      "The bride and groom vowing together to keep the wood; the Lady is answered by the party, not the couple."
+    ]
+  }
+}

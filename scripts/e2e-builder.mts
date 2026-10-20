@@ -8,7 +8,9 @@
  *   KEEP=1 pnpm e2e:builder         — leave the test one-shots in content/ afterwards
  *
  * From nothing, in the UI: a 2024 5e one-shot with three characters and a
- * Ten Candles module with a pre-made. Along the way it trips the checks on
+ * Ten Candles module with a pre-made, and a Daggerheart one-shot with two
+ * characters, an adversary and the rules help (trait spread, the rules'
+ * numbers, domain cards from the class's domains, a tier-1 weapon). Along the way it trips the checks on
  * purpose (a hook that's too long, a hand-typed HP, a public tie that echoes
  * the secret, missing fields), jumps to them from the problem list, fixes
  * them, publishes both and reads them back on the board and their sheets.
@@ -27,7 +29,8 @@ const KEEP = process.env.KEEP === "1";
 const HEIST = "builder-test-heist";
 const NIGHT = "builder-test-night";
 const COPY = "builder-test-night-copy";
-const TEST_SLUGS = [HEIST, NIGHT, COPY];
+const VOW = "builder-test-vow";
+const TEST_SLUGS = [HEIST, NIGHT, COPY, VOW];
 
 function env(name: string): string {
   if (process.env[name]) return process.env[name]!;
@@ -431,6 +434,79 @@ try {
   const gm = await textOf(`/${NIGHT}/gm`);
   check(gm.includes("They come up the steps with the tide."), "the GM page has the module");
   check(!night.includes("They come up the steps"), "the job page doesn't leak the module");
+
+  // ======================= A Daggerheart one-shot from scratch =======================
+  await newOneShot("daggerheart", "Builder Test Vow", VOW);
+  await type("oneshot.posting.header", "HIRING: TWO BLADES FOR THE TOLL BRIDGE");
+  await type("oneshot.pitch", "The bridge-troll wants a song, a riddle and a fair fight, in that order.");
+  await type("oneshot.premise", "Two friends owe the toll and have one night to pay it.");
+  await type("oneshot.posting.reward", "Free crossing for a year");
+  await type("oneshot.setting", "A toll bridge over a loud river");
+  await type("oneshot.players.min", "2");
+  await tag("oneshot.tone", "hopeful");
+  await add("oneshot.adversaries", "adversary");
+  await type("oneshot.adversaries.0.name", "The Toll-Troll");
+  for (const name of ["Kit Fenn", "Lark Abernathy"]) await addCharacter(name);
+  const dhStory = async (i: number, other: string) => {
+    await type(`cast.${i}.poster.epithet`, "the Debtor");
+    await type(`cast.${i}.poster.hook`, "Owes the bridge a toll and means to pay it in steel.");
+    await type(`cast.${i}.story.pronouns`, "she/her");
+    await type(`cast.${i}.story.concept`, "A river-guard who lost a bet.");
+    await type(`cast.${i}.story.stake`, "No crossing, no wedding on the far bank.");
+    await type(`cast.${i}.story.goal`, "Pay the toll.");
+    await type(`cast.${i}.story.secret`, "She could swim it, and hasn't told anyone.");
+    await type(`cast.${i}.story.appearance`, "Wet boots, dry wit.");
+    await type(`cast.${i}.story.voice`, "Low and amused.");
+    await add(`cast.${i}.story.mannerisms`, "mannerism");
+    await type(`cast.${i}.story.mannerisms.0`, "Flips a copper while thinking");
+    await add(`cast.${i}.story.ties`, "tie");
+    await choose(`cast.${i}.story.ties.0.to`, other);
+    await type(`cast.${i}.story.ties.0.text`, "Shared the bet, and the loss.");
+    await type(`cast.${i}.mech.ancestry`, "Human");
+    await type(`cast.${i}.mech.community`, "Seaborne");
+    for (const [n, x] of ["River Guard", "Bad Bets"].entries()) {
+      await add(`cast.${i}.mech.experiences`, "Experience");
+      await type(`cast.${i}.mech.experiences.${n}.name`, x);
+    }
+  };
+  await openCharacter("kit-fenn");
+  await dhStory(0, "Lark Abernathy");
+  check(await issueAt("cast.0.mech.domainCards"), "Daggerheart: a level-1 character without two domain cards is flagged on the field");
+  await page.getByRole("button", { name: "Not Good Enough (Blade)" }).click();
+  await page.getByRole("button", { name: "Untouchable (Bone)" }).click();
+  check(!(await issueAt("cast.0.mech.domainCards")), "…and picking two from the Warrior's domains (Blade, Bone) clears it");
+  await type("cast.0.mech.evasion", "14");
+  check(await issueAt("cast.0.mech.evasion"), "a hand-typed Evasion that breaks the rules is flagged");
+  await page.getByRole("button", { name: "Use the rules' numbers" }).click();
+  check((await field("cast.0.mech.evasion").inputValue()) === "11" && !(await issueAt("cast.0.mech.evasion")), "…'Use the rules' numbers' puts back Warrior 11 in leather");
+  await type("cast.0.mech.traits.knowledge", "2");
+  check(await issueAt("cast.0.mech.traits"), "a trait spread that isn't +2 +1 +1 +0 +0 −1 is flagged");
+  await page.getByRole("button", { name: "Spread for a Warrior" }).click();
+  check(!(await issueAt("cast.0.mech.traits")), "…and 'Spread for a Warrior' lays it out");
+  await shell("cast.0.mech.weapons").scrollIntoViewIfNeeded();
+  await page.getByLabel("Add a tier-1 weapon").click();
+  await page.getByRole("option", { name: /^Longsword/ }).click();
+  check((await field("cast.0.mech.weapons.0.name").inputValue()) === "Longsword", "a tier-1 weapon from the SRD table fills in its numbers");
+  await shot(page, "08-dh-mechanics");
+  await openCharacter("lark-abernathy");
+  await dhStory(1, "Kit Fenn");
+  await choose("cast.1.mech.class", "Wizard");
+  await choose("cast.1.mech.subclass", "School of War (Spellcast: Knowledge)");
+  await page.getByRole("button", { name: "Spread for a Wizard" }).click();
+  await page.getByRole("button", { name: "Use the rules' numbers" }).click();
+  await page.getByRole("button", { name: "Book of Ava (Codex)" }).click();
+  await page.getByRole("button", { name: "Bolt Beacon (Splendor)" }).click();
+  check((await field("cast.1.mech.hp").inputValue()) === "5", "a Wizard's Hit Points follow the class (5)");
+  const dhLeft = await issues();
+  if (dhLeft) console.log(await page.locator("[data-issue-count]").innerText());
+  check(dhLeft === 0, "the Daggerheart one-shot passes every check");
+  await saved();
+  await publish(VOW);
+  const vow = await textOf(`/${VOW}`);
+  check(vow.includes("Builder Test Vow") && vow.includes("Kit Fenn") && !vow.includes("Toll-Troll"), "its job page shows the cast and not the GM-only adversary");
+  const kit = await textOf(`/${VOW}/kit-fenn`);
+  check(kit.includes("Not Good Enough") && kit.includes("Evasion"), "Kit's sheet shows her domain cards and Evasion");
+  check((await textOf(`/${VOW}/gm`)).includes("The Toll-Troll"), "the GM page has the adversary");
 
   // ======================= Duplicate, edit, unpublish =======================
   await page.goto(`${BASE}/admin`, { waitUntil: "networkidle" });

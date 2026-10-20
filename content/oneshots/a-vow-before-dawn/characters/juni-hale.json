@@ -1,0 +1,180 @@
+{
+  "id": "juni-hale",
+  "name": "Juniper Hale",
+  "order": 5,
+  "poster": {
+    "header": "LOST",
+    "epithet": "the Seed",
+    "hook": "Lost in the Hush at seven, found three days later. Still hears the trees talk.",
+    "reward": "Answers to Juni, and to moths",
+    "icon": "leaf"
+  },
+  "flashback": "What did the Lady sing to you while you slept in the Hush?",
+  "story": {
+    "pronouns": "they/them",
+    "appearance": "A slight fungril of twenty-seven with a soft cap of pale, frilled gills the colour of cream, freckled with tiny glowing spores when they're nervous. Maid-of-honour dress in moss green, already muddy at the hem, a satchel of herbs and a short ash staff with a sprouting twig they refuse to prune.",
+    "concept": "Juni is Larkspur Ford's herbalist: they set bones, birth calves, sell sleep-tonic and tell you, without being asked, which of your houseplants is unhappy. As a child they were lost in the Hush with Tobin and Pell, slept through nearly all of it, and woke at the treeline three days later with a rose-seed in their fist and the wood's voice in their ear. They have never told anyone that the voice never left.",
+    "stake": "The voice they've heard every night for twenty years went silent at midnight, at the exact moment Tobin walked into the trees. Something is wrong with the Lady, and Juni is the only one who knows she's not the monster.",
+    "goal": "Reach the Lady before dawn, find out what is hurting her, and bring both of their friends home: Tobin, and the wood.",
+    "secret": "The Lady has been talking to Juni in dreams since they were seven, gently, like a grandmother. For the past year she has been asking a question: whether Juni would like, one day, to keep the Hush after her. Juni has never said no. Some nights they think they'd like to say yes. They have told no one, not even Wren, because they don't know if they're afraid of the answer or of wanting it.",
+    "voice": "Soft and curious, with long tangents about plants; asks questions of things that can't talk and waits politely for an answer. Gets suddenly fierce about anything being hurt.",
+    "mannerisms": [
+      "Says 'excuse me' to bushes before pushing through them",
+      "Their cap glows faintly when they lie, which is why they don't",
+      "Hums the same four-note tune under their breath; nobody else knows where it's from"
+    ],
+    "background": [
+      {
+        "question": "What did the wild leave in you when you were small, and what have you grown from it?",
+        "answer": "A rose-seed and a voice. The seed they planted behind the herbalist's cottage, and it has bloomed every month of the year, even in snow. The voice taught them every herb they know."
+      },
+      {
+        "question": "Who in the village have you healed that you couldn't save, and what did you learn?",
+        "answer": "Old Father Linden, Ama's teacher, who died of a winter cough when Juni was fifteen. They learned to sit with people at the end, and that Ama cries only in the shrine garden."
+      },
+      {
+        "question": "What part of nature frightens you?",
+        "answer": "Rot that doesn't feed anything. The kind that just spreads. Lately they've been smelling it on the wind from the felled edge."
+      }
+    ],
+    "ties": [
+      {
+        "to": "wren-ashby",
+        "text": "Best friends since they were six. Wren sat outside the door for three days when Juni wouldn't wake, and Juni would follow her anywhere. They are the only one who knows Wren is terrified of being left behind.",
+        "public": "Best friends since they were six; maid of honour"
+      },
+      {
+        "to": "pell-nimblewick",
+        "text": "Lost in the Hush together. Juni slept through it and remembers only the Lady's singing. They sometimes catch Pell watching them as if waiting to be accused of something, and have no idea why.",
+        "public": "Lost in the Hush together, twenty years ago"
+      },
+      {
+        "to": "ama-kettleby",
+        "text": "Ama wrapped them in her stole at the treeline and taught them every herb in the shrine garden. Juni loves her like a grandmother and suspects she knows more about that night than she says.",
+        "public": "Learned every herb in the shrine garden from her"
+      }
+    ],
+    "intro": "\"Juni Hale, herbalist. Hello. Sorry. The trees are very upset tonight and it's making it hard to concentrate.\""
+  },
+  "mech": {
+    "class": "Druid",
+    "subclass": "Warden of Renewal",
+    "level": 1,
+    "ancestry": "Fungril",
+    "community": "Underborne",
+    "traits": {
+      "agility": 0,
+      "strength": -1,
+      "finesse": 0,
+      "instinct": 2,
+      "presence": 1,
+      "knowledge": 1
+    },
+    "evasion": 11,
+    "armor": {
+      "name": "Gambeson Armor",
+      "score": 3,
+      "major": 5,
+      "severe": 11,
+      "evasionMod": 1,
+      "feature": "Flexible: +1 to Evasion."
+    },
+    "armorScore": 3,
+    "hp": 6,
+    "stress": 6,
+    "thresholds": { "major": 6, "severe": 12 },
+    "proficiency": 1,
+    "bonuses": {},
+    "experiences": [
+      { "name": "Village Herbalist", "bonus": 2 },
+      { "name": "Hears the Green Talking", "bonus": 2 }
+    ],
+    "domainCards": [
+      { "name": "Vicious Entangle", "where": "loadout" },
+      { "name": "Rune Ward", "where": "loadout", "note": "Their ward is the rose-seed husk they woke up holding." }
+    ],
+    "weapons": [
+      {
+        "name": "Shortstaff",
+        "slot": "primary",
+        "trait": "instinct",
+        "range": "Close",
+        "die": "d8",
+        "mod": 1,
+        "damageType": "magic",
+        "burden": "one-handed"
+      }
+    ],
+    "features": [
+      {
+        "name": "Evolution",
+        "source": "class",
+        "hope": true,
+        "text": "Spend 3 Hope to take a beast form without marking Stress, and raise one trait by 1 while you hold it."
+      },
+      {
+        "name": "Beastform",
+        "source": "class",
+        "text": "Mark a Stress to become an animal of your tier or lower (Juni favours a badger, a hare or a great grey moth). You use its traits and attacks, can't cast or use weapons while changed, and can drop the shape whenever you like; marking your last Hit Point drops it for you."
+      },
+      {
+        "name": "Wildtouch",
+        "source": "class",
+        "text": "At will, make small harmless nature tricks happen: coax a bud open, call a breeze, set a patch of moss glowing, make a pinecone roll toward you."
+      },
+      {
+        "name": "Clarity of Nature",
+        "source": "subclass",
+        "text": "Once a long rest, make a pocket of calm wild space within Close range. Anyone who rests there a few minutes shares out cleared Stress equal to your Instinct, as you choose.",
+        "uses": { "max": 1, "per": "long rest" }
+      },
+      {
+        "name": "Regeneration",
+        "source": "subclass",
+        "text": "Touch someone and spend 3 Hope to clear 1d4 of their Hit Points."
+      },
+      {
+        "name": "Fungril Network",
+        "source": "ancestry",
+        "text": "Make an Instinct roll (12) to speak with any fungril you know, however far away, through the threads under the ground. (Tonight, the threads under the Hush are full of something that isn't fungril.)"
+      },
+      {
+        "name": "Death Connection",
+        "source": "ancestry",
+        "text": "Touch the body of something that died within the hour and mark a Stress to catch a memory, a sound or a feeling from its last moments."
+      },
+      {
+        "name": "Low-Light Living",
+        "source": "community",
+        "text": "In dim light or deep shadow you roll with advantage to hide, search or notice things."
+      }
+    ],
+    "equipment": [
+      { "name": "Torch", "qty": 1, "note": "Rarely lit; they see well enough" },
+      { "name": "Rope", "qty": 1, "note": "Plaited willow, still alive and growing slowly" },
+      { "name": "A pendant found in the dirt", "qty": 1, "note": "Class item: a smooth acorn of green stone, warm at night" },
+      { "name": "Rose-seed husk", "qty": 1, "note": "Keepsake: what they were holding when they woke at the treeline" },
+      { "name": "Minor Health Potion", "qty": 1, "note": "Their own recipe; tastes of mint and moss" }
+    ],
+    "gold": { "handfuls": 1, "bags": 0, "chests": 0 }
+  },
+  "ifUnclaimed": {
+    "npc": "Juni sleepwalks into the Hush ten paces behind Tobin, and the party finds them in Act 4 curled asleep among the roots of the Lady's hall, smiling. Woken, they speak gently for the Lady and translate the wood for the party. In Act 5 they offer, quietly, to stay; the party should talk them out of it or find a better way.",
+    "reassign": [
+      {
+        "beat": "The Lady's seed and the offer to keep the Hush (Act 5)",
+        "to": ["bram-mossgrave", "ama-kettleby"],
+        "text": "When the Hollow Groom rises, the Lady presses a seed into your hand: if you plant it in your own heart and swear to keep the Hush, the Hollow has nothing left to eat. It is not the only way. If enough of you swear to keep the wood together, nobody has to stay."
+      },
+      {
+        "beat": "Knowing the Lady isn't the monster",
+        "to": ["bram-mossgrave", "ama-kettleby"],
+        "text": "Whatever the village says, you know the thing at the heart of the Hush has kept the wood safe for centuries. What's hurting it smells of rot, not roses."
+      }
+    ],
+    "cuts": [
+      "The voice in the dreams, and the option of a PC becoming the Hush's next keeper.",
+      "Feeling the Hollow move under the stumps in Act 2; the party first learns of it in the Lady's hall."
+    ]
+  }
+}

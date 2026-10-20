@@ -12,6 +12,8 @@ import { JobPage } from "@/components/board/JobPage";
 import { CharacterPage } from "@/systems/dnd5e/pages/CharacterPage";
 import { PrintCastPage } from "@/systems/dnd5e/pages/PrintPage";
 import { PremadePage } from "@/systems/tencandles/pages/PremadePage";
+import { CharacterPage as DhCharacterPage } from "@/systems/daggerheart/pages/CharacterPage";
+import { DhPrintCastPage } from "@/systems/daggerheart/pages/Printables";
 
 type Props =
   | { slug: string; page: string | null; os: PublicAnyOneShot; problems: null }
@@ -21,7 +23,7 @@ type Props =
  * The real player pages, rendered from the newest saved version (the draft
  * if there is one): /admin/preview/<slug> is the job page,
  * /admin/preview/<slug>/<id> a sheet or pre-made, /admin/preview/<slug>/print
- * every 5e sheet ready to print. GM only, never static. Links on them lead to
+ * every 5e or Daggerheart sheet ready to print. GM only, never static. Links on them lead to
  * the published site.
  */
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, params, resolvedUrl }) => {
@@ -36,7 +38,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
   const { issues, parsed } = checkDoc((got.draft ?? got.published)!, loadSpellBook());
   if (!parsed) return { props: { slug, page, os: null, problems: issues.map((i) => `${i.path.join(".")}: ${i.message}`) } };
   if (page && page !== "print" && !parsed.cast.some((c) => c.id === page)) return { notFound: true };
-  if (page === "print" && parsed.system !== "dnd5e") return { notFound: true };
+  if (page === "print" && parsed.system === "tencandles") return { notFound: true };
   return { props: { slug, page, os: toPublic(parsed), problems: null } };
 };
 
@@ -67,6 +69,10 @@ export default function PreviewPage({ slug, page, os, problems }: Props) {
         <JobPage os={os} cameos={[]} />
       ) : page === "print" && os.system === "dnd5e" ? (
         <PrintCastPage os={os} />
+      ) : page === "print" && os.system === "daggerheart" ? (
+        <DhPrintCastPage os={os} />
+      ) : os.system === "daggerheart" ? (
+        <DhCharacterPage os={os} id={page} />
       ) : os.system === "dnd5e" ? (
         <CharacterPage os={os} id={page} />
       ) : (

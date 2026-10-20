@@ -67,7 +67,7 @@ export default function TapestryPage({ os }: { os: PublicAnyOneShot }) {
             </Typography>
             <Typography color="text.secondary" sx={{ mb: 2, maxWidth: 760 }}>
               Woven from the table: posters torn, seals broken, the natural 20s and 1s
-              {os.system === "tencandles" ? " (here, candles going dark and the dead)" : ""}, each act, the notes passed and the fates.
+              {os.system === "tencandles" ? " (here, candles going dark and the dead)" : os.system === "daggerheart" ? " (here, the critical successes)" : ""}, each act, the notes passed and the fates.
               {data?.gm ? " Rename a panel by typing over its title; drop the ones you'd rather forget." : ""}
             </Typography>
             <Box sx={{ display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap" }}>
