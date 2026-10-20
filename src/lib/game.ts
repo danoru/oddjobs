@@ -22,8 +22,12 @@ export interface GameRules<S, A, V> {
   init(): S;
   /** Actions are parsed with this before they reach `apply`. */
   action: z.ZodType<A>;
-  /** Pure: the next state, or why not. `rng` returns [0, 1) and is only used for dice. */
-  apply(state: S, action: A, actor: Actor, rng: () => number): Applied<S>;
+  /**
+   * Pure: the next state, or why not. `rng` returns [0, 1) and is only used for
+   * chance (dice, candle burn times); `now` is the server's clock in ms, for
+   * anything timed (a candle's burn).
+   */
+  apply(state: S, action: A, actor: Actor, rng: () => number, now: number): Applied<S>;
   /** What one viewer may see. Never includes other players' ids. */
   view(state: S, viewer: Viewer): V;
 }

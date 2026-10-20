@@ -8,24 +8,37 @@ const FLICKER = [1.7, 2.3, 1.9, 2.6, 2.1, 1.8, 2.4, 2.0, 2.7, 1.6];
 
 /**
  * Ten candles in a row. With `onToggle`, each is a button the GM uses to match
- * the real candles on the table (or to stand in for them).
+ * the real candles on the table (or to stand in for them). `left` is how much
+ * of each lit candle is left to burn (1 = fresh, 0 = spent; null when candles
+ * don't burn down), and `sputter` the one a draft is bending.
  */
 export function Candles({
   lit,
   onToggle,
   className,
   label = "Candles",
+  left,
+  sputter = null,
 }: {
   lit: boolean[];
   onToggle?: (index: number, lit: boolean) => void;
   className?: string;
   label?: string;
+  left?: (number | null)[];
+  sputter?: number | null;
 }) {
   const count = lit.filter(Boolean).length;
   return (
     <div className={`${s.candles} ${className ?? ""}`} role="group" aria-label={`${label}: ${count} of ${lit.length} lit`}>
       {lit.map((on, i) => {
-        const style = { ["--flicker" as string]: `${FLICKER[i % FLICKER.length]}s`, ["--delay" as string]: `${-i * 0.37}s` };
+        const frac = on ? (left?.[i] ?? null) : null;
+        const style = {
+          ["--flicker" as string]: `${FLICKER[i % FLICKER.length]}s`,
+          ["--delay" as string]: `${-i * 0.37}s`,
+          // A burning candle shrinks from 78% of its box to a stub.
+          ...(frac !== null ? { ["--h" as string]: `${(20 + 58 * Math.max(0, Math.min(1, frac))).toFixed(1)}%` } : {}),
+        };
+        const state = [on ? "" : s.dark, frac !== null && frac < 0.04 ? s.gutter : "", sputter === i && on ? s.sputter : ""].join(" ");
         const body = (
           <>
             {on && <span className={s.glow} aria-hidden="true" />}
@@ -38,7 +51,7 @@ export function Candles({
           <button
             key={i}
             type="button"
-            className={`${s.candle} ${on ? "" : s.dark}`}
+            className={`${s.candle} ${state}`}
             style={style}
             aria-pressed={on}
             aria-label={`Candle ${i + 1}, ${on ? "lit" : "dark"}`}
@@ -47,7 +60,7 @@ export function Candles({
             {body}
           </button>
         ) : (
-          <span key={i} className={`${s.candle} ${on ? "" : s.dark}`} style={style} aria-hidden="true">
+          <span key={i} className={`${s.candle} ${state}`} style={style} aria-hidden="true">
             {body}
           </span>
         );

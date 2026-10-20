@@ -10,6 +10,7 @@ import { SYSTEMS } from "@/systems/registry";
 import { litCount, STEPS, type TcView } from "../game";
 import { CLOSING_LINE, OPENING_LINE } from "../rules";
 import { Candles, outcome, RollDice, seatName } from "./Bits";
+import { candlesLeft, useNow } from "./CandleKeeper";
 import { FinalWords } from "./Recorder";
 import { TvLive } from "@/components/tv/TvLive";
 import s from "./Tc.module.css";
@@ -32,6 +33,7 @@ const STEP_LINE: Record<(typeof STEPS)[number], string> = {
 export function CandlesTv({ os }: { os: PublicTcOneShot }) {
   const { table } = useClaims(os.slug);
   const { game, extras, error } = useGame<TcView, { intro: string | null }>(table, "table", null);
+  const now = useNow();
   const [qr, setQr] = useState("");
   const [sound, setSound] = useState(false);
   const engine = useRef<SoundEngine | null>(null);
@@ -79,7 +81,17 @@ export function CandlesTv({ os }: { os: PublicTcOneShot }) {
           </span>
           {table ? <span>Table {table}</span> : null}
         </div>
-        <Candles lit={game?.candles ?? Array.from({ length: 10 }, () => false)} className={s.tvCandles} />
+        <Candles
+          lit={game?.candles ?? Array.from({ length: 10 }, () => false)}
+          left={game ? candlesLeft(game, now) : undefined}
+          sputter={game?.draft?.index ?? null}
+          className={s.tvCandles}
+        />
+        {game?.draft && (
+          <p className={s.tvLine} style={{ textAlign: "center", fontStyle: "italic" }} role="status">
+            A draft stirs the candles…
+          </p>
+        )}
 
         {game?.phase !== "lobby" && <h1 className={s.srOnly}>{os.title}: the candles</h1>}
         <div className={s.tvStage} aria-live="polite">

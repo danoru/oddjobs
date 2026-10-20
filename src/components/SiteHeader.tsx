@@ -6,9 +6,7 @@ import { ReadingMenu } from "@/components/reading/ReadingMenu";
 export function SiteHeader({ back, reading = false }: { back?: { href: string; label: string }; reading?: boolean }) {
   return (
     <>
-      <a href="#main" className="skip-link">
-        Skip to the page
-      </a>
+      {/* The skip link is the app's first element (src/pages/_app.tsx), ahead of the GM bar. */}
       <Box
         component="header"
         className="no-print"

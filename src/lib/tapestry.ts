@@ -72,11 +72,11 @@ export function buildTapestry(input: TapestryInput): Panel[] {
       const who = (e.data as { who: string }).who;
       timed.push({ id: `death:${e.id}`, kind: "death", title: `${who} chooses the dark`, caption: "and does not come back", at: e.at, characterId: null });
     } else if (e.kind === "candle") {
-      const d = e.data as { lit: number; seized?: boolean };
+      const d = e.data as { lit: number; seized?: boolean; cause?: "hand" | "burnout" | "draft" };
       timed.push({
         id: `candle:${e.id}`,
         kind: "darkened",
-        title: "A candle goes dark",
+        title: d.cause === "burnout" ? "A candle burns down" : d.cause === "draft" ? "A draft takes a candle" : "A candle goes dark",
         caption: d.seized ? "spent to take back the telling" : `${d.lit} still burn`,
         at: e.at,
         characterId: null,

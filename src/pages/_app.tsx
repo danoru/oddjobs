@@ -16,7 +16,7 @@ function oneShotOf(props: unknown): OneShotLike | undefined {
 
 // Emotion zero-config SSR — see pyrosi-retrospective: the material-nextjs
 // adapter duplicates Emotion instances under pnpm and breaks hydration.
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps, router }: AppProps) {
   return (
     <>
       <Head>
@@ -25,6 +25,12 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        {/* First on every page, ahead of the GM bar: every page's main content is #main. */}
+        {router.pathname !== "/login" && (
+          <a href="#main" className="skip-link">
+            Skip to the page
+          </a>
+        )}
         <GmBar os={oneShotOf(pageProps)} />
         <Component {...pageProps} />
       </ThemeProvider>

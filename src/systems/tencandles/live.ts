@@ -71,11 +71,10 @@ export function mirrorTc(prev: TcState | null, next: TcState, opts?: MirrorOptio
         rows.push({ kind: "death", data: { who: nameOf(i) }, byPlayer: p.playerId, toPlayer: null, hidden: false });
     });
 
-  // A candle the GM darkened by hand during play (not one a roll put out).
-  const byRoll = rows.filter((r) => r.kind === "roll" && (r.data as PoolRollData).darkened).length;
+  // A candle put out by the GM's hand, by burning down or by a draft (not one a roll put out).
   const seized = next.log.filter((r) => r.resolved?.seized && prev?.log.find((x) => x.id === r.id && !x.resolved?.seized)).length;
-  if (prev && (prev.phase === "scene" || prev.phase === "truths") && litCount(next) < litCount(prev) - byRoll - seized)
-    rows.push({ kind: "candle", data: { lit: litCount(next) }, byPlayer: null, toPlayer: null, hidden: false });
+  if (prev && next.lastOut && next.lastOut.n !== prev.lastOut?.n && (prev.phase === "scene" || prev.phase === "truths"))
+    rows.push({ kind: "candle", data: { lit: litCount(next), cause: next.lastOut.cause }, byPlayer: null, toPlayer: null, hidden: false });
   if (seized)
     rows.push({ kind: "candle", data: { lit: litCount(next), seized: true }, byPlayer: null, toPlayer: null, hidden: false });
 

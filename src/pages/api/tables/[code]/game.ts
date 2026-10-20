@@ -66,7 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   for (let attempt = 0; attempt < 6; attempt++) {
     const row = attempt === 0 ? table.game : await read();
     const state = row?.state ?? game.rules.init();
-    const result = game.rules.apply(state, parsed.data, actor, cryptoRng);
+    const result = game.rules.apply(state, parsed.data, actor, cryptoRng, Date.now());
     if (!result.ok) return reply(state, 409, result.error);
     const json = result.state as Prisma.InputJsonValue;
     try {

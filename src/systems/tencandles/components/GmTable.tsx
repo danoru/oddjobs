@@ -5,6 +5,7 @@ import type { OneShotWithCast } from "../schema";
 import { litCount, recipients, STEPS, type TcView } from "../game";
 import { CLOSING_LINE, OPENING_LINE, RULES, SETTING_RULE, type TcSettings } from "../rules";
 import { CardFace, Candles, outcome, RollDice, RuleMark, seatName } from "./Bits";
+import { CandleSettings, candlesLeft, DraftPrompt, useCandleKeeper, useNow } from "./CandleKeeper";
 import { FinalWords } from "./Recorder";
 import { SeatList } from "./PlayerTable";
 import s from "./Tc.module.css";
@@ -24,6 +25,9 @@ type Act = (a: unknown) => Promise<string | null>;
 /** The GM's side of a Ten Candles table: seats, rules, candles, every card, the dice and the truths. */
 export function GmTable({ os, code }: { os: OneShotWithCast; code: string | null }) {
   const { game, error, busy, act } = useGame<TcView>(code, "gm", null);
+  // This page keeps the candles on the screen: burning down, and drafts.
+  useCandleKeeper(game, act);
+  const now = useNow();
   if (!code)
     return (
       <section className={s.room} style={{ marginTop: 24 }}>
@@ -59,7 +63,15 @@ export function GmTable({ os, code }: { os: OneShotWithCast; code: string | null
         Every rule here is our own summary from fan references and reviews: we couldn&apos;t check any of it against the book.
         Chips mark where sources disagree or we&apos;re guessing. Where your book differs, the book wins.
       </p>
-      <Candles lit={game.candles} onToggle={(index, on) => void act({ type: "candle", index, lit: on })} label="Candles (tap to match the real ones)" />
+      <Candles
+        lit={game.candles}
+        left={candlesLeft(game, now)}
+        sputter={game.draft?.index ?? null}
+        onToggle={(index, on) => void act({ type: "candle", index, lit: on })}
+        label="Candles (tap to match the real ones, or to put one out)"
+      />
+      <CandleSettings game={game} act={act} />
+      <DraftPrompt game={game} act={act} busy={busy} />
       <p className={s.tally} style={{ textAlign: "center" }}>
         {lit} lit · players&apos; pool {game.pools.players} ({game.pools.lost} lost to 1s) · your pool {game.pools.gm}
         <RuleMark id="accidental" />

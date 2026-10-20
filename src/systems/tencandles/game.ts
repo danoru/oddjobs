@@ -99,7 +99,16 @@ export interface TcState {
   log: Roll[];
   /** Seat whose failure darkened the last candle (starts the next truths). */
   active: number | null;
+  /** When each candle was lit (server ms), and how long it burns (ms); null while dark or when candles don't burn. */
+  litAt: (number | null)[];
+  life: (number | null)[];
+  /** A draft making a candle sputter, waiting for the GM to say whether it goes out. */
+  draft: { index: number; at: number } | null;
+  /** The last candle put out by something other than a roll: the GM's hand, burning down, or a draft. `n` counts them. */
+  lastOut: { index: number; cause: OutCause; n: number } | null;
 }
+
+export type OutCause = "hand" | "burnout" | "draft";
 
 export function initialState(): TcState {
   return {
@@ -120,8 +129,43 @@ export function initialState(): TcState {
     roll: null,
     log: [],
     active: null,
+    litAt: Array.from({ length: CANDLES }, () => null),
+    life: Array.from({ length: CANDLES }, () => null),
+    draft: null,
+    lastOut: null,
   };
 }
+
+/** A game saved before candles burned (or settings were added) gets the missing fields. */
+export function normalize(s: TcState): TcState {
+  const blank = () => Array.from({ length: CANDLES }, () => null);
+  return {
+    ...s,
+    settings: { ...DEFAULT_SETTINGS, ...s.settings },
+    litAt: s.litAt ?? blank(),
+    life: s.life ?? blank(),
+    draft: s.draft ?? null,
+    lastOut: s.lastOut ?? null,
+  };
+}
+
+/** How long a candle lit now will burn, in ms, or null when candles don't burn at this table. */
+export function burnTime(settings: Pick<TcSettings, "burnMin" | "burnMax">, rng: () => number): number | null {
+  if (!settings.burnMin || settings.burnMin <= 0) return null;
+  const hi = Math.max(settings.burnMin, settings.burnMax);
+  return Math.round((settings.burnMin + rng() * (hi - settings.burnMin)) * 60_000);
+}
+
+/** When a lit candle will go out on its own (server ms), or null. */
+export const burnsOutAt = (s: Pick<TcState, "litAt" | "life">, i: number) => {
+  const at = s.litAt[i];
+  const life = s.life[i];
+  return at === null || at === undefined || life === null || life === undefined ? null : at + life;
+};
+
+/** Candles that have burned all the way down by `now`. */
+export const spent = (s: Pick<TcState, "candles" | "litAt" | "life">, now: number) =>
+  s.candles.map((on, i) => (on && (burnsOutAt(s, i) ?? Infinity) <= now ? i : -1)).filter((i) => i >= 0);
 
 // ---- Derived -------------------------------------------------------------------
 
@@ -196,6 +240,9 @@ export const tcAction = z.discriminatedUnion("type", [
         playback: z.enum(["end", "onDeath"]),
         firstSceneTruths: z.boolean(),
         keepRecordings: z.boolean(),
+        burnMin: z.number().int().min(0).max(600),
+        burnMax: z.number().int().min(0).max(600),
+        draftsPerHour: z.number().min(0).max(6),
       })
       .partial(),
   }),
@@ -211,6 +258,12 @@ export const tcAction = z.discriminatedUnion("type", [
   z.object({ type: z.literal("recorded"), kind: z.enum(["audio", "text"]).nullable() }),
   // Play
   z.object({ type: z.literal("candle"), index: z.number().int().min(0).max(CANDLES - 1), lit: z.boolean() }),
+  /** GM's page: a candle has burned all the way down. */
+  z.object({ type: z.literal("burnout"), index: z.number().int().min(0).max(CANDLES - 1) }),
+  /** GM's page: a draft stirs the candles (the server picks which one sputters). */
+  z.object({ type: z.literal("draft") }),
+  /** The GM decides: does the sputtering candle go out? */
+  z.object({ type: z.literal("draftSettle"), out: z.boolean() }),
   z.object({ type: z.literal("roll"), moment: z.boolean().optional(), seat: seat.optional() }),
   z.object({ type: z.literal("burn") }),
   z.object({ type: z.literal("embrace") }),
@@ -341,7 +394,42 @@ function resolve(s: TcState, r: Roll): TcState {
   return next;
 }
 
-export function applyTc(s: TcState, a: TcAction, actor: Actor, rng: () => number): Applied<TcState> {
+/**
+ * A candle going out during play, whatever put it out (a roll aside): during
+ * truths the round just gets shorter (one truth per lit candle); in a scene,
+ * the scene ends.
+ */
+function putOut(s: TcState, index: number, cause: OutCause): TcState {
+  if (!s.candles[index]) return s;
+  const candles = s.candles.map((c, i) => (i === index ? false : c));
+  const lastOut = { index, cause, n: (s.lastOut?.n ?? 0) + 1 };
+  const next = { ...s, candles, lastOut };
+  if (next.phase === "truths" && next.truths) {
+    if (!candles.some(Boolean)) return { ...next, phase: "ended", truths: null };
+    return { ...next, truths: { ...next.truths, needed: Math.min(next.truths.needed, litCount({ candles }) - 1) } };
+  }
+  if (next.phase !== "scene") return next;
+  return endScene(next, s.active);
+}
+
+/**
+ * Apply an action, then keep the candles' burn times in step with which are
+ * lit: a candle that lights gets its burn time, one that goes dark loses it,
+ * and a draft over a candle that's gone (or outside play) blows over.
+ */
+export function applyTc(s0: TcState, a: TcAction, actor: Actor, rng: () => number, now = 0): Applied<TcState> {
+  const s = normalize(s0);
+  const r = applyRules(s, a, actor, rng, now);
+  if (!r.ok) return r;
+  const next = r.state;
+  const litAt = next.candles.map((on, i) => (on ? (s.candles[i] ? s.litAt[i] : now) : null));
+  const life = next.candles.map((on, i) => (on ? (s.candles[i] ? s.life[i] : burnTime(next.settings, rng)) : null));
+  const playing = next.phase === "scene" || next.phase === "truths";
+  const draft = next.draft && playing && next.candles[next.draft.index] ? next.draft : null;
+  return { ok: true, state: { ...next, litAt, life, draft } };
+}
+
+function applyRules(s: TcState, a: TcAction, actor: Actor, rng: () => number, now: number): Applied<TcState> {
   const gm = actor.role === "gm";
   const me = actor.role === "player" ? seatOf(s.players, actor.playerId) : -1;
   const seated = me >= 0;
@@ -475,16 +563,31 @@ export function applyTc(s: TcState, a: TcAction, actor: Actor, rng: () => number
         return ok({ ...s, candles });
       }
       if (a.lit) return ok({ ...s, candles: s.candles.map((c, i) => (i === a.index ? true : c)) }); // a correction
-      if (!s.candles[a.index]) return ok(s);
       // A candle going out, on its own or by the GM's hand, ends the scene.
-      const candles = s.candles.map((c, i) => (i === a.index ? false : c));
-      // During truths the round just gets shorter: one truth per lit candle.
-      if (s.phase === "truths" && s.truths) {
-        if (!candles.some(Boolean)) return ok({ ...s, candles, phase: "ended", truths: null });
-        return ok({ ...s, candles, truths: { ...s.truths, needed: Math.min(s.truths.needed, litCount({ candles }) - 1) } });
-      }
-      if (s.phase !== "scene") return ok({ ...s, candles });
-      return ok(endScene({ ...s, candles }, s.active));
+      return ok(putOut(s, a.index, "hand"));
+    }
+    case "burnout": {
+      if (!gm) return fail("Only the GM's page tends the candles");
+      if (!s.candles[a.index]) return ok(s);
+      const at = burnsOutAt(s, a.index);
+      // A minute's grace for clocks that disagree.
+      if (at === null || now < at - 60_000) return fail("That candle hasn't burned down yet");
+      return ok(putOut(s, a.index, "burnout"));
+    }
+    case "draft": {
+      if (!gm) return fail("Only the GM's page feels the drafts");
+      if (s.phase !== "scene" && s.phase !== "truths") return fail("No draft between scenes");
+      if (s.draft) return fail("A candle is already sputtering");
+      const lit = s.candles.map((on, i) => (on ? i : -1)).filter((i) => i >= 0);
+      if (!lit.length) return fail("No candle left to sputter");
+      return ok({ ...s, draft: { index: lit[Math.floor(rng() * lit.length)], at: now } });
+    }
+    case "draftSettle": {
+      if (!gm) return fail("Only the GM decides");
+      if (!s.draft) return fail("No candle is sputtering");
+      const index = s.draft.index;
+      const cleared = { ...s, draft: null };
+      return ok(a.out ? putOut(cleared, index, "draft") : cleared);
     }
     case "roll": {
       if (s.phase !== "scene") return fail("No scene is running");
@@ -647,6 +750,11 @@ export interface TcView {
   waiting: number[];
   /** Which seats' final words may be heard by this viewer now. */
   heard: number[];
+  /** When each lit candle goes out on its own (server ms), or null; and how long it was given to burn (ms). */
+  burnsOut: (number | null)[];
+  burnLife: (number | null)[];
+  /** A candle sputtering in a draft, waiting on the GM. */
+  draft: TcState["draft"];
 }
 
 /** May this viewer read this card? The GM always; anyone once it burns; else only its owner and its writer. */
@@ -668,7 +776,8 @@ export function audible(s: TcState, viewer: Viewer, you: number | null): number[
     });
 }
 
-export function viewTc(s: TcState, viewer: Viewer): TcView {
+export function viewTc(s0: TcState, viewer: Viewer): TcView {
+  const s = normalize(s0);
   const you = viewer.role === "player" ? seatOf(s.players, viewer.playerId) : -1;
   const y = you >= 0 ? you : null;
   const seats: SeatView[] = s.players.map((p, i) => {
@@ -708,6 +817,9 @@ export function viewTc(s: TcState, viewer: Viewer): TcView {
     log: s.log,
     waiting: waitingOn(s),
     heard: audible(s, viewer, y),
+    burnsOut: s.candles.map((_, i) => burnsOutAt(s, i)),
+    burnLife: s.candles.map((on, i) => (on ? s.life[i] : null)),
+    draft: s.draft,
   };
 }
 

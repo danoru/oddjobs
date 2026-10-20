@@ -209,6 +209,15 @@ export interface TcSettings {
   firstSceneTruths: boolean;
   /** Keep recordings on the server (small, capped) so the GM can play them. Off: they stay on each phone. */
   keepRecordings: boolean;
+  /**
+   * Candles on the screen burn down like real ones: each gets a burn time
+   * between these many minutes when it's lit, and goes out when it's spent.
+   * 0 turns burning off (a table with real candles, where the GM taps to match).
+   */
+  burnMin: number;
+  burnMax: number;
+  /** Drafts: how often, on average, a draft makes a candle sputter (the GM decides whether it goes out). 0 = never. */
+  draftsPerHour: number;
 }
 
 export const DEFAULT_SETTINGS: TcSettings = {
@@ -219,6 +228,9 @@ export const DEFAULT_SETTINGS: TcSettings = {
   playback: "end",
   firstSceneTruths: false,
   keepRecordings: false,
+  burnMin: 120,
+  burnMax: 180,
+  draftsPerHour: 1,
 };
 
 /** Which rule each setting picks a reading of, for the "unconfirmed" markers. */
@@ -230,6 +242,9 @@ export const SETTING_RULE: Record<keyof TcSettings, RuleId | null> = {
   playback: "playback",
   firstSceneTruths: "firstScene",
   keepRecordings: null,
+  burnMin: null,
+  burnMax: null,
+  draftsPerHour: null,
 };
 
 /** Fixed lines the table says. Short phrases, as the game has them. */

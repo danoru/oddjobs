@@ -74,6 +74,8 @@ try {
   await keep.click();
   for (let i = 0; i < 20 && !(await keep.isChecked()); i++) await gm.waitForTimeout(150);
   check(await keep.isChecked(), "GM keeps recordings at this table");
+  // No random drafts while the script plays (they'd put a prompt over the GM page); e2e:toys tests them.
+  await gm.request.post(`${BASE}/api/tables/${code}/game`, { data: { action: { type: "settings", patch: { draftsPerHour: 0 } } } });
 
   // ---- Three phones join and sit ----
   const phones: Page[] = [];

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGame } from "@/lib/useGame";
 import { useShake } from "@/lib/shake";
+import { candlesLeft, useNow } from "./CandleKeeper";
 import type { PublicTcOneShot } from "@/lib/public";
 import { playRip } from "@/lib/rip";
 import { recipients, score, type CardView, type TcView, type TraitKind } from "../game";
@@ -40,6 +41,7 @@ export function PlayerTable({
   claimedId: string | null;
 }) {
   const { game, extras, error, busy, act } = useGame<TcView, Extras>(code, "player", player.id);
+  const now = useNow();
   const premade = os.cast.find((c) => c.id === claimedId) ?? null;
 
   // Keep the seat's name and pre-made up to date while we're still in the lobby.
@@ -55,7 +57,7 @@ export function PlayerTable({
 
   return (
     <div className={s.phone}>
-      <Candles lit={game.candles} />
+      <Candles lit={game.candles} left={candlesLeft(game, now)} sputter={game.draft?.index ?? null} />
       <p className={s.tally} style={{ textAlign: "center" }}>
         {game.phase === "scene" || game.phase === "truths"
           ? `${game.lastStand ? "The Last Stand" : `Scene ${game.scene}`} · ${game.pools.players} ${game.pools.players === 1 ? "die" : "dice"} in the pool · the GM has ${game.pools.gm}`

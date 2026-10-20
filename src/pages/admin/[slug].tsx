@@ -43,9 +43,6 @@ export default function BuilderPage(props: BuilderProps) {
         <meta name="robots" content="noindex" />
       </Head>
       <Container maxWidth={false} sx={{ pb: 8, pt: 2, maxWidth: 1800 }}>
-        <a href="#main" className="skip-link">
-          Skip to the form
-        </a>
         <Builder {...props} />
       </Container>
     </>

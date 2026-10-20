@@ -491,6 +491,8 @@ try {
     return (await r.json()) as { game: { phase: string; candles: boolean[]; truths: { speaker: unknown } | null } };
   };
   // Character creation, quickly, through the game API (pnpm e2e:candles plays it through the phones).
+  // Drafts are tested on purpose below, not at random.
+  await game({ type: "settings", patch: { draftsPerHour: 0 } }, null);
   await game({ type: "begin" }, null);
   for (const id of tcIds) await game({ type: "traits", virtue: "brave", vice: "rash" }, id);
   await game({ type: "next" }, null);
@@ -538,6 +540,24 @@ try {
   check(true, `at seven candles the TV raises "${tcOs.acts[1].title}"`);
   await tcTv.waitForTimeout(3600);
   await shot(tcTv, "tc-tv-act-card");
+
+  // A draft: the candle sputters on the TV and the GM must decide.
+  await gm.goto(`${BASE}/${TC}/gm`, { waitUntil: "networkidle" });
+  await game({ type: "draft" }, null);
+  await gm.getByRole("alertdialog").waitFor();
+  check((await gm.getByRole("alertdialog").innerText()).includes("is sputtering"), "a draft puts a prompt in front of the GM");
+  await until("the TV shows the draft", async () => (await tcTv.getByText("A draft stirs the candles").count()) > 0);
+  check(true, "the TV shows the candle sputtering");
+  await shot(gm, "tc-gm-draft");
+  await shot(tcTv, "tc-tv-draft");
+  const litBefore = (await game({ type: "settings", patch: {} }, null)).game.candles.filter(Boolean).length;
+  await gm.getByRole("button", { name: "It holds" }).click();
+  await until("prompt gone", async () => (await gm.getByRole("alertdialog").count()) === 0);
+  check((await game({ type: "settings", patch: {} }, null)).game.candles.filter(Boolean).length === litBefore, "the GM says it holds: no candle lost");
+  check(
+    (await (await gmCtx.request.get(`${BASE}/api/tables/${tcCode}/game?as=table`)).json()).game.burnsOut.filter((x: number | null) => x !== null).length === litBefore,
+    "every lit candle on the screen has a burn time",
+  );
 
   // Notes, bell and rumors at a Ten Candles table.
   await tcPhones[0].getByLabel("Pass the note to").selectOption({ index: 1 });
