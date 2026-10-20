@@ -235,6 +235,12 @@ export const oneShotSchema = z.object({
   ruleset: z.enum(["2014", "2024"]).describe("Ruleset"),
   level: z.number().int().min(1).max(20).describe("Level"),
   /**
+   * Homebrew: the cast may break the rules on purpose (a bride with 40 HP, a
+   * custom class, three saves). The rules checks (levels, HP, slots, saves,
+   * ruleset-only fields) are skipped; the ones that keep pages working stay.
+   */
+  homebrew: z.boolean().default(false).describe("Homebrew (skip the rules checks)"),
+  /**
    * The same story at other levels. Each level has one file per character in
    * variants/<level>/<id>.json holding that level's mechanics.
    */

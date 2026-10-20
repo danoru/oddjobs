@@ -17,7 +17,7 @@ function CastSheet({ os, stock, names }: { os: PublicOneShot; stock: Character; 
   const c = useMemo(() => applyTweaks(stock, tweaks), [stock, tweaks]);
   return (
     <>
-      <SheetFront c={c} ruleset={os.ruleset} oneshotTitle={os.title} />
+      <SheetFront c={c} ruleset={os.ruleset} homebrew={os.homebrew} oneshotTitle={os.title} />
       <SheetBack c={c} oneshotTitle={os.title} names={names} />
     </>
   );

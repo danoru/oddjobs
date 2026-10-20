@@ -142,7 +142,7 @@ export function CharacterPage({ os: base, id }: { os: PublicOneShot; id: string 
                 <TableToys live={live} coin={coin} rumors={os.hasRumors} />
               </div>
             )}
-            <SheetFront c={c} ruleset={os.ruleset} oneshotTitle={os.title} titleAs="h1" onRoll={seated ? (r) => setArmed({ ...r }) : undefined} />
+            <SheetFront c={c} ruleset={os.ruleset} homebrew={os.homebrew} oneshotTitle={os.title} titleAs="h1" onRoll={seated ? (r) => setArmed({ ...r }) : undefined} />
             <SheetBack c={c} oneshotTitle={os.title} names={names} sealedSecret sectionAs="h2" />
           </main>
         </Box>

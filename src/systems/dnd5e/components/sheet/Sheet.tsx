@@ -35,6 +35,7 @@ export function SheetFront({
   oneshotTitle,
   titleAs: Title = "h2",
   onRoll,
+  homebrew = false,
 }: {
   c: Character;
   ruleset: Ruleset;
@@ -43,6 +44,8 @@ export function SheetFront({
   titleAs?: "h1" | "h2";
   /** At a table: tapping a number rolls it (src/components/table/DiceTray.tsx). */
   onRoll?: (r: RollSpec) => void;
+  /** A homebrew one-shot: the sheet says so, since its numbers may not follow the book. */
+  homebrew?: boolean;
 }) {
   const d = derive(c);
   const m = c.mech;
@@ -67,7 +70,7 @@ export function SheetFront({
             {m.lineage ? ` (${m.lineage})` : ""} · Background: {m.background}
           </div>
           <div>
-            Level {d.level} · {ruleset} rules
+            Level {d.level} · {ruleset} rules{homebrew ? " · homebrew" : ""}
           </div>
         </div>
       </header>

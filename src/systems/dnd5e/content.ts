@@ -6,20 +6,14 @@ import { rulesCheck } from "./rules";
  * 5e checks Zod can't see, per character: levels add up, the rules math
  * (src/systems/dnd5e/rules.ts), ruleset-only fields, and customization
  * options that tag exactly one entry. The shared checks (ties, ids, letters)
- * are in src/lib/content.ts.
+ * are in src/lib/content.ts. A homebrew one-shot skips the rules checks and
+ * keeps only what the pages need (options that tag exactly one entry).
  */
-export function crossCheck(os: Pick<OneShot, "level" | "ruleset">, cast: Character[]): string[] {
+export function crossCheck(os: Pick<OneShot, "level" | "ruleset"> & { homebrew?: boolean }, cast: Character[]): string[] {
   const errs: string[] = [];
   for (const c of cast) {
     const at = `${c.id}:`;
-    if (totalLevel(c) !== os.level) errs.push(`${at} level ${totalLevel(c)} but one-shot is level ${os.level}`);
-    else errs.push(...rulesCheck(c, os.ruleset));
-    if (c.mech.saves.length !== 2) errs.push(`${at} expected 2 saving throw proficiencies`);
-    if (os.ruleset === "2024" && !c.mech.originFeat) errs.push(`${at} 2024 characters need an originFeat`);
-    if (os.ruleset === "2014" && c.mech.originFeat) errs.push(`${at} originFeat is a 2024 rule`);
-    if (os.ruleset === "2014" && c.mech.weaponMasteries.length) errs.push(`${at} weapon masteries are a 2024 rule`);
-    for (const e of c.mech.expertise)
-      if (!c.mech.skills.includes(e)) errs.push(`${at} expertise in ${e} without proficiency`);
+    if (!os.homebrew) errs.push(...rulesFor(os, c, at));
 
     for (const opt of c.options) {
       const tagged =
@@ -49,5 +43,18 @@ export function crossCheck(os: Pick<OneShot, "level" | "ruleset">, cast: Charact
       if (!names.includes(tagged[0])) errs.push(`${at} option "${opt.id}" has no choice matching stock "${tagged[0]}"`);
     }
   }
+  return errs;
+}
+
+/** The rules a by-the-book character keeps: levels add up, the rules math, two saves, ruleset-only fields. */
+function rulesFor(os: Pick<OneShot, "level" | "ruleset">, c: Character, at: string): string[] {
+  const errs: string[] = [];
+  if (totalLevel(c) !== os.level) errs.push(`${at} level ${totalLevel(c)} but one-shot is level ${os.level}`);
+  else errs.push(...rulesCheck(c, os.ruleset));
+  if (c.mech.saves.length !== 2) errs.push(`${at} expected 2 saving throw proficiencies`);
+  if (os.ruleset === "2024" && !c.mech.originFeat) errs.push(`${at} 2024 characters need an originFeat`);
+  if (os.ruleset === "2014" && c.mech.originFeat) errs.push(`${at} originFeat is a 2024 rule`);
+  if (os.ruleset === "2014" && c.mech.weaponMasteries.length) errs.push(`${at} weapon masteries are a 2024 rule`);
+  for (const e of c.mech.expertise) if (!c.mech.skills.includes(e)) errs.push(`${at} expertise in ${e} without proficiency`);
   return errs;
 }

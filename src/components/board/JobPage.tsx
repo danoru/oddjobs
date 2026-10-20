@@ -70,6 +70,11 @@ export function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Su
                 {words.rules(os.ruleset)}
               </span>
             )}
+            {os.system === "dnd5e" && os.homebrew && (
+              <span className={s.stampHomebrew} data-part="homebrewStamp" title="This cast breaks the rules on purpose">
+                HOMEBREW
+              </span>
+            )}
             <div className={s.postingHeader} data-part="postingHeader">
               {os.posting.header}
             </div>

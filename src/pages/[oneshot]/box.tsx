@@ -89,7 +89,7 @@ export default function BoxPage({ os, pub, book }: Props) {
               <div className={`${b.section} ${sheet.sheet}`} data-box="sheets">
                 {fiveE.cast.map((c) => (
                   <Fragment key={c.id}>
-                    <SheetFront c={c} ruleset={fiveE.ruleset} oneshotTitle={os.title} />
+                    <SheetFront c={c} ruleset={fiveE.ruleset} homebrew={fiveE.homebrew} oneshotTitle={os.title} />
                     <SheetBack c={c} oneshotTitle={os.title} names={names} />
                   </Fragment>
                 ))}

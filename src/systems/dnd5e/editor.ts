@@ -11,7 +11,7 @@ import { CLASSES, deriveLoose } from "./editorMath";
  */
 export const editor: SystemEditor = {
   oneshotSections: [
-    { ...corePosting, fields: [...corePosting.fields!, "ruleset", "level"] },
+    { ...corePosting, fields: [...corePosting.fields!, "ruleset", "level", "homebrew"] },
     {
       ...coreSkin,
       title: "Skin & level variants",
@@ -62,6 +62,9 @@ export const editor: SystemEditor = {
   ],
   hints: {
     ...coreHints,
+    "oneshot:homebrew": {
+      help: "For a cast that breaks the rules on purpose: HP, spell slots, saves, levels and ruleset-only fields aren't checked, and the posting and sheets say HOMEBREW. The live rules help still shows what the book would give.",
+    },
     "oneshot:coins": {
       help: "Brass coins players toss each other across the TV: Heroic Inspiration under 2024, Inspiration under 2014. Leave empty for the defaults.",
       fields: ["enabled", "name", "tossesPerAct"],

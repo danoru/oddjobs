@@ -67,3 +67,25 @@ describe("the builder: acts, rumors, notices and coins", () => {
 function realDocFor(system: string) {
   return realDoc(system === "dnd5e" ? "the-drowned-bell" : "lights-out-at-marrowby");
 }
+
+describe("the builder: homebrew one-shots", () => {
+  it("skips the 5e rules checks when a one-shot is homebrew, and keeps them otherwise", () => {
+    const strict = realDoc("the-drowned-bell");
+    const c = strict.cast[0] as { mech: { hp: number; saves: string[] } };
+    c.mech.hp = 999;
+    c.mech.saves = ["str", "dex", "con"];
+    const issues = checkDoc(strict, spells).issues.map((i) => i.message);
+    expect(issues.some((m) => /HP 999/.test(m))).toBe(true);
+    expect(issues.some((m) => /2 saving throw/.test(m))).toBe(true);
+
+    (strict.oneshot as Record<string, unknown>).homebrew = true;
+    expect(checkDoc(strict, spells).issues).toEqual([]);
+  });
+
+  it("still checks what the pages need in a homebrew one-shot", () => {
+    const doc = realDoc("the-drowned-bell");
+    (doc.oneshot as Record<string, unknown>).homebrew = true;
+    (doc.cast[0] as { story: { ties: { to: string }[] } }).story.ties[0].to = "nobody-here";
+    expect(checkDoc(doc, spells).issues.some((i) => /unknown character "nobody-here"/.test(i.message))).toBe(true);
+  });
+});

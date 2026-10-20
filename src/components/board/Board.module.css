@@ -158,6 +158,15 @@
   color: var(--wax);
 }
 
+/* A homebrew cast: a second stamp under the ruleset's. */
+.stampHomebrew {
+  composes: stamp;
+  top: 58px;
+  right: 24px;
+  transform: rotate(-5deg);
+  color: #3e6b35;
+}
+
 /* Which game a posting is for: a little inked tab, top left. */
 .systemBadge {
   position: absolute;

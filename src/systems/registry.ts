@@ -112,7 +112,7 @@ export const SYSTEMS: Record<SystemId, SystemMeta> = {
 };
 
 type AnyOneShotLike =
-  | (Pick<dnd5e.OneShot, "system" | "ruleset" | "level"> & { variants?: { level: number }[] })
+  | (Pick<dnd5e.OneShot, "system" | "ruleset" | "level"> & { variants?: { level: number }[]; homebrew?: boolean })
   | Pick<tencandles.OneShot, "system">;
 
 /** The line under a poster: class and level in 5e; in Ten Candles, what's in their pockets (traits come at the table). */
@@ -125,7 +125,7 @@ export function posterTag(
 
 /** The ruleset stamp on a posting: "2024 rules", or the system's badge. */
 export function rulesStamp(os: AnyOneShotLike): string {
-  return os.system === "dnd5e" ? `${os.ruleset} rules` : SYSTEMS[os.system].badge;
+  return os.system === "dnd5e" ? `${os.ruleset} rules${os.homebrew ? " · homebrew" : ""}` : SYSTEMS[os.system].badge;
 }
 
 /** Whether a one-shot has a page; static paths for system-specific pages use this. */

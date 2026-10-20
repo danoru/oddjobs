@@ -3,7 +3,16 @@ import Head from "next/head";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { theme } from "@/lib/theme";
+import { GmBar } from "@/components/GmBar";
 import "@/styles/globals.css";
+
+type OneShotLike = { slug?: string; title?: string; system?: string };
+
+/** The one-shot a page is about, for the GM bar: player and GM pages pass `os`; the builder passes its draft. */
+function oneShotOf(props: unknown): OneShotLike | undefined {
+  const p = props as { os?: OneShotLike; initial?: { oneshot?: OneShotLike } };
+  return p.os ?? p.initial?.oneshot;
+}
 
 // Emotion zero-config SSR — see pyrosi-retrospective: the material-nextjs
 // adapter duplicates Emotion instances under pnpm and breaks hydration.
@@ -16,6 +25,7 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <GmBar os={oneShotOf(pageProps)} />
         <Component {...pageProps} />
       </ThemeProvider>
     </>
