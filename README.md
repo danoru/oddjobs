@@ -11,7 +11,6 @@ One-shots come in more than one game system:
 - **Daggerheart** is built on its SRD, with level-1 casts, domain cards and duality dice rolled from the phone.
 - **Paranoia** is a play aid for tables that own the 2023 Core Book. It gives Troubleshooters whose naughty sides never reach a player page, NODE dice with the Computer die, six-packs of clones, treason Flags, treason reports and Friend Computer on every screen.
 
-See [docs/SYSTEMS.md](docs/SYSTEMS.md) for how systems plug in, and for each game's rules, licence and sources.
 
 Next 16 (Pages Router) · React 19 · MUI 9 · CSS Modules · Zod · Vitest · Prisma 6 + Postgres · pnpm · Vercel. Content is JSON in git, validated at build time, and written through the **builder** at `/admin` (see [The builder](#the-builder)); the database only holds table sessions (who tore which poster).
 
@@ -96,7 +95,7 @@ Paranoia one-shots have the same pages, but secrets work differently:
 
 ## Ten Candles at the table
 
-A play aid, not the game: you need [Ten Candles](https://cavalrygames.com/ten-candles-info) (Cavalry Games). Every rule and prompt is in our own words. We couldn't check the rules against the book, so each rule carries a confidence grade, and the UI marks any rule our sources disagree on or that we couldn't confirm. The GM picks the house reading for the disputed ones before play. The details and sources are in [docs/SYSTEMS.md](docs/SYSTEMS.md).
+A play aid, not the game: you need [Ten Candles](https://cavalrygames.com/ten-candles-info) (Cavalry Games). Every rule and prompt is in our own words. We couldn't check the rules against the book, so each rule carries a confidence grade, and the UI marks any rule our sources disagree on or that we couldn't confirm. The GM picks the house reading for the disputed ones before play.
 
 - **Live play** is one JSON game state per table (`Game` in Prisma). It changes only through a pure reducer (`src/systems/tencandles/game.ts`) and is read only through a per-viewer projection: the GM sees everything, a player sees their own stack plus the cards they wrote and anything burned, and the TV sees only what's public. Dice are rolled on the server. Phones poll `/api/tables/<code>/game` every 2 s.
 - **Candles on the screen** behave like real ones, for tables without real candles (or smoke detectors that object). Each candle gets a burn time when it's lit (2 to 3 hours by default, random within the range so they don't all go out together), shrinks on the TV as it burns, gutters in its last minutes and goes out when it's spent, which ends the scene like any candle going out. **Drafts** come at random (about once an hour by default): a candle sputters on the TV and the GM gets a prompt they can't miss (a dialog, a gust of sound, a buzz, a flashing tab title and, if allowed, a system notification) to decide whether it goes out. The GM page keeps the candles, so keep it open; both are set on the GM page under the candles, at any time, and "real candles" turns burning off.
@@ -105,7 +104,7 @@ A play aid, not the game: you need [Ten Candles](https://cavalrygames.com/ten-ca
 
 ## Daggerheart at the table
 
-Built on the Daggerheart SRD 1.0 under the Darrington Press Community Gaming License. Every Daggerheart page carries the licence's notice, and all rules text is in our own words. A private table falls outside the licence's sharing rules, but a public site wouldn't (websites aren't a permitted format); see [docs/SYSTEMS.md](docs/SYSTEMS.md#daggerheart-daggerheart).
+Built on the Daggerheart SRD 1.0 under the Darrington Press Community Gaming License. Every Daggerheart page carries the licence's notice, and all rules text is in our own words. A private table falls outside the licence's sharing rules, but a public site wouldn't (websites aren't a permitted format).
 
 - **Duality dice from the sheet.** Tap a trait or a weapon's attack on the phone.
   - The server rolls the Hope and Fear d12s.
@@ -122,7 +121,7 @@ Built on the Daggerheart SRD 1.0 under the Darrington Press Community Gaming Lic
 
 ## Paranoia at the table
 
-A play aid for Mongoose's 2023 PARANOIA Core Book; you need the book. There's no licence for Paranoia, so every rule is our own paraphrase, graded like the Ten Candles rules, and the GM picks house readings where sources disagree. See [docs/SYSTEMS.md](docs/SYSTEMS.md#paranoia-paranoia).
+A play aid for Mongoose's 2023 PARANOIA Core Book; you need the book. There's no licence for Paranoia, so every rule is our own paraphrase, graded like the Ten Candles rules, and the GM picks house readings where sources disagree.
 
 - **The naughty side stays secret.** No player page carries anyone's society, mutation or secret objectives. Each phone gets only its own Troubleshooter's.
 - **NODE dice.** Tap a stat or a skill on the phone.
@@ -204,7 +203,7 @@ Customizations are stored per browser (localStorage) and can be shared with a `#
 
 A dev server keeps each page's list of paths for a moment, so right after publishing the builder knocks on the new job page once before it says so; another page of a brand-new one-shot can still 404 on the very first visit (reload). A production build has the new one-shot only after you commit, push and deploy.
 
-The store behind it is an interface (`src/lib/store/`), so a database store can replace the files later without touching the builder; [docs/PLAN.md](docs/PLAN.md#migrating-to-a-database-store) has the plan.
+The store behind it is an interface (`src/lib/store/`), so a database store can replace the files later without touching the builder.
 
 ## Writing a one-shot
 
@@ -283,4 +282,3 @@ GitHub (private repo — gated content may include non-SRD material) → Vercel.
 
 `vercel-build` runs `prisma migrate deploy`, then `prisma generate`, then validation, then `next build`.
 
-See `docs/PLAN.md` for the roadmap and the wow-feature list.
