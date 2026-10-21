@@ -38,6 +38,18 @@ describe("resolveDbUrls", () => {
     expect(new URL(r.url!).searchParams.get("schema")).toBe("other");
   });
 
+  it("ignores a localhost DATABASE_URL on Vercel and uses Supabase", () => {
+    const local = { DATABASE_URL: "postgres://u:p@localhost:51214/template1?schema=tearoff", DIRECT_URL: "postgres://u:p@localhost:51214/template1" };
+    const r = resolveDbUrls({ VERCEL: "1", ...local, ...supabase });
+    expect(r.source).toBe("supabase");
+    expect(r.ignoredLocal).toBe(true);
+    expect(new URL(r.directUrl!).port).toBe("5432");
+    // …but off Vercel the local database still wins.
+    expect(resolveDbUrls({ ...local, ...supabase }).source).toBe("env");
+    // A real hosted DATABASE_URL on Vercel is still respected.
+    expect(resolveDbUrls({ VERCEL: "1", DATABASE_URL: "postgres://u:p@db.example.com:5432/x", ...supabase }).source).toBe("env");
+  });
+
   it("reports when there is no database at all", () => {
     expect(resolveDbUrls({})).toEqual({ source: "none" });
   });

@@ -31,7 +31,10 @@ if (fs.existsSync(envFile)) {
   }
 }
 
-const { url, directUrl, source } = resolveDbUrls(env, { remote });
+const { url, directUrl, source, ignoredLocal } = resolveDbUrls(env, { remote });
+if (ignoredLocal) {
+  console.warn("db-env: ignoring DATABASE_URL — it points at localhost, which can't work on Vercel. Delete DATABASE_URL and DIRECT_URL from the Vercel project's environment variables.");
+}
 if (!url || !directUrl) {
   console.error(
     remote
@@ -40,7 +43,7 @@ if (!url || !directUrl) {
   );
   process.exit(1);
 }
-console.log(`db-env: using the ${source === "env" ? "DATABASE_URL in .env" : `Supabase database (${new URL(url).hostname})`}`);
+console.log(`db-env: using ${source === "env" ? `DATABASE_URL (${new URL(url).hostname})` : `the Supabase integration's database (${new URL(url).hostname})`}`);
 
 // Shell out through the package manager's bin path, as pnpm scripts do.
 const run = spawnSync(command[0], command.slice(1), {
