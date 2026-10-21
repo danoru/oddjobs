@@ -2,7 +2,7 @@ import Head from "next/head";
 import type { GetServerSideProps } from "next";
 import { Alert, Button, Container } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
-import { requestRole } from "@/lib/auth";
+import { pageViewer } from "@/lib/auth";
 import { requireOneShot, survivors } from "@/lib/source";
 import { db } from "@/lib/prisma";
 import { toPublic, type PublicAnyOneShot } from "@/lib/public";
@@ -27,7 +27,8 @@ type Props = { nights: Night[]; error: string | null };
  * the tables' saved epilogues.
  */
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, resolvedUrl }) => {
-  if (!(await requestRole(req))) return { redirect: { destination: `/login?next=${encodeURIComponent(resolvedUrl)}`, permanent: false } };
+  const gate = await pageViewer({ req, resolvedUrl }, "member");
+  if (gate.redirect) return { redirect: gate.redirect };
   res.setHeader("Cache-Control", "private, no-store");
   let tables;
   try {
@@ -70,7 +71,7 @@ export default function ChroniclePage({ nights, error }: Props) {
         <title>The chronicle · Oddjobs</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
-        <SiteHeader back={{ href: "/", label: "the board" }} />
+        <SiteHeader back={{ href: "/board", label: "the board" }} />
         <main id="main" tabIndex={-1}>
           <div className={`${c.toolbar} no-print`}>
             <span style={{ flex: 1 }}>

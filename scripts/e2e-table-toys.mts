@@ -23,19 +23,12 @@ import { loadOneShot, loadSpellBook } from "../src/lib/content";
 import { cardsFor, paginate } from "../src/systems/dnd5e/cards";
 import { extraPages } from "../src/lib/box";
 import type { OneShotWithCast } from "../src/lib/schema";
+import { ensureE2eUsers, signInAs, type E2eWho } from "./e2e-auth.mts";
 
-const ROOT = path.join(import.meta.dirname, "..");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
 const SHOTS = process.env.SHOTS ? path.resolve(process.env.SHOTS) : null;
 const PLAYER = "x-tearoff-player";
 
-function env(name: string): string {
-  if (process.env[name]) return process.env[name]!;
-  const file = path.join(ROOT, ".env");
-  const line = fs.existsSync(file) ? fs.readFileSync(file, "utf8").match(new RegExp(`^${name}=(.*)$`, "m")) : null;
-  if (!line) throw new Error(`Set ${name} (or put it in .env)`);
-  return line[1].trim().replace(/^"|"$/g, "");
-}
 
 let passed = 0;
 function check(ok: unknown, what: string) {
@@ -76,12 +69,12 @@ async function pdfPages(page: Page, route: string, format: "Letter" | "A4") {
   return countPages(pdf);
 }
 
+await ensureE2eUsers();
 const browser = await chromium.launch({ args: ["--autoplay-policy=no-user-gesture-required"] });
 
-async function signedIn(password: string, phone = false): Promise<BrowserContext> {
+async function signedIn(who: E2eWho, phone = false): Promise<BrowserContext> {
   const ctx = await browser.newContext({ viewport: phone ? { width: 390, height: 844 } : { width: 1280, height: 900 } });
-  const r = await ctx.request.post(`${BASE}/api/login`, { data: { password } });
-  if (!r.ok()) throw new Error(`Login failed (${r.status()}) — is the server running at ${BASE}?`);
+  await signInAs(ctx, BASE, who);
   return ctx;
 }
 
@@ -123,7 +116,7 @@ async function openTable(gm: Page, slug: string) {
 const pages: Page[] = [];
 
 try {
-  const gmCtx = await signedIn(env("GM_PASSWORD"));
+  const gmCtx = await signedIn("admin");
   const gm = await gmCtx.newPage();
   pages.push(gm);
   gm.on("dialog", (d) => void d.accept());
@@ -145,7 +138,7 @@ try {
     { name: "Bo", id: "marrow", char: "Marrow" },
   ];
   for (const w of who) {
-    const ctx = await signedIn(env("APP_PASSWORD"), true);
+    const ctx = await signedIn("player", true);
     const p = await ctx.newPage();
     p.on("dialog", (d) => void d.accept());
     pages.push(p);
@@ -470,7 +463,7 @@ try {
   check(true, `GM opened Ten Candles table ${tcCode}`);
   const tcPhones: Page[] = [];
   for (const [i, name] of ["Cy", "Di"].entries()) {
-    const ctx = await signedIn(env("APP_PASSWORD"), true);
+    const ctx = await signedIn("player", true);
     const p = await ctx.newPage();
     pages.push(p);
     await p.goto(`${BASE}/${TC}/play?table=${tcCode}`, { waitUntil: "networkidle" });

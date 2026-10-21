@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { beforeAll, describe, expect, it } from "vitest";
-import { AUTH_COOKIE, createToken } from "./auth";
+import { installTestUsers, sessionCookies, type TestWho } from "./testAuth";
 import { loadSpellBook } from "./content";
 import { SpellBookStore } from "./store";
 import { formatJson } from "./store/json";
@@ -12,6 +12,7 @@ import { handler } from "@/pages/api/admin/spells";
 
 beforeAll(() => {
   process.env.AUTH_SECRET = "test-secret";
+  installTestUsers();
 });
 
 /** A content folder in a temp dir: the real spell book and one 5e one-shot that uses it. */
@@ -26,8 +27,8 @@ function tempStore(writable: boolean): SpellBookStore {
 
 type Res = { statusCode: number; body: unknown; headers: Record<string, string> };
 
-async function call(store: SpellBookStore, opts: { role?: "gm" | "table" | null; method: string; body?: unknown }): Promise<Res> {
-  const cookies: Record<string, string> = opts.role ? { [AUTH_COOKIE]: await createToken(opts.role) } : {};
+async function call(store: SpellBookStore, opts: { role?: TestWho | null; method: string; body?: unknown }): Promise<Res> {
+  const cookies = await sessionCookies(opts.role);
   const out: Res = { statusCode: 200, body: undefined, headers: {} };
   const res = {
     status(code: number) {
@@ -73,7 +74,7 @@ describe("spell book API", () => {
       const store = tempStore(true);
       const before = book(store);
       const res = await call(store, { ...req, role });
-      expect(res.statusCode).toBe(403);
+      expect(res.statusCode).toBe(role ? 403 : 401);
       expect(JSON.stringify(res.body)).not.toContain("Armor of Agathys");
       expect(book(store)).toBe(before);
     }

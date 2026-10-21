@@ -28,6 +28,8 @@ export interface OneShotSummary {
   updatedAt: string;
   /** Problems in the version the builder would open (the draft if there is one). */
   issueCount: number;
+  /** Who owns it (a user id), or null: admins only (everything from before accounts). */
+  ownerId: string | null;
 }
 
 export interface StoredOneShot {
@@ -65,25 +67,35 @@ export interface RevisionSummary {
   castCount: number;
 }
 
+/**
+ * Ownership (phase 10): every one-shot has an owner, or none (admins only).
+ * The stores only keep it; who may do what is decided by OwnedStore
+ * (./owned.ts), which the builder always goes through. Writes that create a
+ * one-shot take its owner, so the one-shot and its owner land together.
+ */
 export interface OneShotStore {
   /** Whether this store may write right now, and if not why. */
   gate(): WriteGate;
   list(): Promise<OneShotSummary[]>;
   get(slug: string): Promise<StoredOneShot | null>;
-  /** Creates or replaces the draft. The doc's slug is forced to `slug`. */
-  saveDraft(slug: string, doc: OneShotDoc): Promise<WriteResult>;
+  /** The one-shot's owner, or null for none (or no such one-shot). */
+  owner(slug: string): Promise<string | null>;
+  /** Hands a one-shot to someone, or back to the admins (null). */
+  setOwner(slug: string, ownerId: string | null): Promise<void>;
+  /** Creates or replaces the draft. The doc's slug is forced to `slug`. `owner` owns it if this creates the one-shot. */
+  saveDraft(slug: string, doc: OneShotDoc, owner?: string | null): Promise<WriteResult>;
   /** Fails with PublishError, writing nothing, unless the draft passes every check. */
   publish(slug: string): Promise<WriteResult>;
   /** Takes it off the board and keeps it as a draft. */
   unpublish(slug: string): Promise<WriteResult>;
   /** Drops the draft, keeping the published version. */
   discardDraft(slug: string): Promise<WriteResult>;
-  /** Copies the newest version of `from` to a new draft `to`. */
-  duplicate(from: string, to: string): Promise<WriteResult>;
+  /** Copies the newest version of `from` to a new draft `to`, owned by `owner`. */
+  duplicate(from: string, to: string, owner?: string | null): Promise<WriteResult>;
   /** Removes draft and published version. */
   delete(slug: string): Promise<WriteResult>;
-  /** Saves an exported doc as a new draft. */
-  import(slug: string, doc: OneShotDoc): Promise<WriteResult>;
+  /** Saves an exported doc as a new draft, owned by `owner`. */
+  import(slug: string, doc: OneShotDoc, owner?: string | null): Promise<WriteResult>;
   /** The newest version (draft, else published) as one JSON document. */
   export(slug: string): Promise<OneShotDoc | null>;
   /** Saves and publishes, newest first. Only stores that keep a history have it (the FileStore's is git). */

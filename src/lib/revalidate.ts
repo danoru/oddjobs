@@ -14,6 +14,9 @@ import { isSafeId } from "./store/doc";
 /** Just what's needed to list a one-shot's pages: a published doc, or a parsed one-shot. */
 type Shape = { slug?: unknown; system?: unknown; cast: { id?: unknown }[] };
 
+/** What lists the one-shots: the public landing page's strip of posters and the members' board. */
+export const BOARD_PAGES = ["/", "/board"];
+
 /** The one-shot's static player pages (GM pages render per request and aren't listed). */
 export function pagesOf(os: Shape): string[] {
   const slug = os.slug;

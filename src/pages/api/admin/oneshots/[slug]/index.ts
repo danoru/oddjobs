@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { adminGuard, methodNotAllowed, sendStoreError } from "@/lib/admin.server";
 import { coerceDoc, looksLikeDoc } from "@/lib/store/doc";
-import { pagesOfDoc, revalidatePages } from "@/lib/revalidate";
+import { BOARD_PAGES, pagesOfDoc, revalidatePages } from "@/lib/revalidate";
 import type { OneShotStore } from "@/lib/store";
 
 const deleteBody = z.object({ confirm: z.string() });
@@ -32,7 +32,7 @@ export async function handler(req: NextApiRequest, res: NextApiResponse, injecte
     if (!b.success || b.data.confirm !== slug) return res.status(400).json({ error: `Type "${slug}" to confirm` });
     const before = await store.get(slug);
     const result = await store.delete(slug);
-    await revalidatePages(res, ["/", ...pagesOfDoc(before?.published)]);
+    await revalidatePages(res, [...BOARD_PAGES, ...pagesOfDoc(before?.published)]);
     return res.status(200).json(result);
   } catch (e) {
     return sendStoreError(res, e);

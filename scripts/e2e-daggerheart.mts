@@ -30,20 +30,13 @@ import { cardsFor } from "../src/systems/daggerheart/cards";
 import { sheetLimits } from "../src/systems/daggerheart/derive";
 import { foldTallies, type DualityData } from "../src/systems/daggerheart/live";
 import { extraPages } from "../src/lib/box";
+import { ensureE2eUsers, signInAs, type E2eWho } from "./e2e-auth.mts";
 
-const ROOT = path.join(import.meta.dirname, "..");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
 const SHOTS = process.env.SHOTS ? path.resolve(process.env.SHOTS) : null;
 const PLAYER = "x-tearoff-player";
 const SLUG = "a-vow-before-dawn";
 
-function env(name: string): string {
-  if (process.env[name]) return process.env[name]!;
-  const file = path.join(ROOT, ".env");
-  const line = fs.existsSync(file) ? fs.readFileSync(file, "utf8").match(new RegExp(`^${name}=(.*)$`, "m")) : null;
-  if (!line) throw new Error(`Set ${name} (or put it in .env)`);
-  return line[1].trim().replace(/^"|"$/g, "");
-}
 
 let passed = 0;
 function check(ok: unknown, what: string) {
@@ -80,12 +73,12 @@ async function pdfPages(page: Page, route: string, format: "Letter" | "A4") {
   return countPages(pdf);
 }
 
+await ensureE2eUsers();
 const browser = await chromium.launch({ args: ["--autoplay-policy=no-user-gesture-required"] });
 
-async function signedIn(password: string, phone = false): Promise<BrowserContext> {
+async function signedIn(who: E2eWho, phone = false): Promise<BrowserContext> {
   const ctx = await browser.newContext({ viewport: phone ? { width: 390, height: 844 } : { width: 1280, height: 900 } });
-  const r = await ctx.request.post(`${BASE}/api/login`, { data: { password } });
-  if (!r.ok()) throw new Error(`Login failed (${r.status()}) — is the server running at ${BASE}?`);
+  await signInAs(ctx, BASE, who);
   return ctx;
 }
 
@@ -125,7 +118,7 @@ const limits = sheetLimits(os.cast);
 const testid = (p: Page, id: string) => p.locator(`[data-testid="${id}"]`);
 
 try {
-  const gmCtx = await signedIn(env("GM_PASSWORD"));
+  const gmCtx = await signedIn("admin");
   const gm = await gmCtx.newPage();
   pages.push(gm);
   gm.on("dialog", (d) => void d.accept());
@@ -145,7 +138,7 @@ try {
   ];
   const phones: Page[] = [];
   for (const w of who) {
-    const ctx = await signedIn(env("APP_PASSWORD"), true);
+    const ctx = await signedIn("player", true);
     const p = await ctx.newPage();
     p.on("dialog", (d) => void d.accept());
     pages.push(p);
@@ -354,7 +347,9 @@ try {
     const r = await p1.context().request.get(`${BASE}/${SLUG}/box`, { maxRedirects: 0 });
     check(r.status() >= 300 && r.status() < 400, "players are sent away from the printed box");
   }
-  await p1.goto(`${BASE}/${SLUG}/tapestry`, { waitUntil: "networkidle" });
+  // "load", not "networkidle": with the database store the pages are ISR, and Next quietly re-fetches
+  // stale page data in the background, which never counts as idle. The panels are waited for below.
+  await p1.goto(`${BASE}/${SLUG}/tapestry`, { waitUntil: "load" });
   await until("tapestry panels", async () => (await testid(p1, "tapestry-panel").count()) > 2);
   const tapestry = await testid(p1, "tapestry").innerText();
   check(tapestry.includes("torn from the board") && tapestry.includes(os.acts[0].title), "the tapestry weaves the claims and the act");

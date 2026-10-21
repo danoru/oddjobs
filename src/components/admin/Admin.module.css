@@ -1089,3 +1089,18 @@
 .historyAction[data-action="import"] {
   color: var(--ink-soft);
 }
+
+/* An admin hands a one-shot to an author from the list. */
+.ownerSelect {
+  font: inherit;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px dashed var(--ink-soft);
+  padding: 0 2px;
+}
+
+.ownerSelect:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: 2px;
+}

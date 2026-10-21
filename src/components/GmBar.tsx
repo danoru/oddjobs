@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
+import { useWhoami } from "@/lib/useWhoami";
 import g from "./GmBar.module.css";
 
 /**
- * The GM's bar across the top of every page, for whoever came in with the GM
- * password: the builder, the spell book, the chronicle and, on a one-shot's
+ * The GM's bar across the top of every page, for the admins (the GM pages
+ * are theirs until games arrive): the builder, the spell book, the people,
+ * the chronicle and, on a one-shot's
  * pages, its GM page, TV, printed box (or kit), tapestry and builder entry.
  * "Hide" folds it into a small tab, to see a page as players do. It's only
  * navigation: every GM page and API checks the role itself.
@@ -13,10 +15,9 @@ import g from "./GmBar.module.css";
 
 const HIDDEN_KEY = "tearoff:gmbar";
 const EVENT = "tearoff:gmbar";
-let cachedRole: string | null | undefined;
 
 /** Routes where the bar stays out of the way: the TV is cast to the table, and the door is the door. */
-const QUIET = ["/login", "/[oneshot]/tv"];
+const QUIET = ["/", "/login", "/join/[code]", "/reset/[token]", "/[oneshot]/tv"];
 
 type OneShotLike = { slug?: string; title?: string; system?: string };
 
@@ -50,24 +51,9 @@ function useHidden(): [boolean, (v: boolean) => void] {
 
 export function GmBar({ os }: { os?: OneShotLike }) {
   const router = useRouter();
-  const [role, setRole] = useState<string | null | undefined>(cachedRole);
+  // Until someone is signed in (say, on the door), ask again on each navigation.
+  const role = useWhoami(router.pathname)?.role;
   const [hidden, setHidden] = useHidden();
-
-  // Ask once per page load; until a role comes back (say, on the door), ask again on each navigation.
-  useEffect(() => {
-    if (cachedRole) return;
-    let alive = true;
-    fetch("/api/whoami", { cache: "no-store" })
-      .then((r) => (r.ok ? (r.json() as Promise<{ role: string | null }>) : { role: null }))
-      .catch(() => ({ role: null }))
-      .then((j) => {
-        if (j.role) cachedRole = j.role;
-        if (alive) setRole(j.role);
-      });
-    return () => {
-      alive = false;
-    };
-  }, [router.pathname]);
 
   if (role !== "gm" || QUIET.includes(router.pathname)) return null;
 
@@ -75,8 +61,10 @@ export function GmBar({ os }: { os?: OneShotLike }) {
   const title = os?.title ?? slug;
   const tc = os?.system === "tencandles";
   const here = router.asPath.split(/[?#]/)[0];
+  // No prefetching: most of these render on the server per request (the box, the builder, the people page),
+  // and prefetching would run every one of them on each page load.
   const link = (href: string, label: string) => (
-    <Link key={href} href={href} className={g.link} aria-current={here === href ? "page" : undefined}>
+    <Link key={href} href={href} prefetch={false} className={g.link} aria-current={here === href ? "page" : undefined}>
       {label}
     </Link>
   );
@@ -110,6 +98,7 @@ export function GmBar({ os }: { os?: OneShotLike }) {
         <span className={g.group}>
           {link("/admin", "Builder")}
           {link("/admin/spells", "Spell book")}
+          {link("/admin/people", "People")}
           {link("/chronicle", "Chronicle")}
         </span>
         <button type="button" className={g.hide} onClick={() => setHidden(true)} title="See the page as players do">

@@ -2,7 +2,7 @@ import Head from "next/head";
 import type { GetServerSideProps } from "next";
 import { Button, Container } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
-import { requestRole } from "@/lib/auth";
+import { pageViewer } from "@/lib/auth";
 import { requireOneShot } from "@/lib/source";
 import type { OneShotWithCast } from "@/systems/tencandles/schema";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -17,9 +17,9 @@ type Props = { os: OneShotWithCast };
  * per request after the role check, like the GM page.
  */
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, params, resolvedUrl }) => {
-  if ((await requestRole(req)) !== "gm") {
-    return { redirect: { destination: `/login?next=${encodeURIComponent(resolvedUrl)}`, permanent: false } };
-  }
+  // The GM pages are the admins' until games arrive (phase 11).
+  const gate = await pageViewer({ req, resolvedUrl }, "admin");
+  if (gate.redirect) return { redirect: gate.redirect };
   const slug = String(params?.oneshot ?? "");
   if (!/^[a-z0-9-]+$/.test(slug)) return { notFound: true };
   let os;

@@ -22,8 +22,10 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import UnpublishedIcon from "@mui/icons-material/Unpublished";
-import { requestRole } from "@/lib/auth";
-import { getStore, type OneShotSummary, type WriteGate } from "@/lib/store";
+import { pageViewer } from "@/lib/auth";
+import { isAdmin } from "@/lib/accounts";
+import { db } from "@/lib/prisma";
+import { storeFor, type OneShotSummary, type WriteGate } from "@/lib/store";
 import { slugify } from "@/lib/store/doc";
 import { SYSTEM_IDS, type SystemId } from "@/lib/schema";
 import { SYSTEMS } from "@/systems/registry";
@@ -33,15 +35,24 @@ import { useChangedFiles } from "@/components/admin/changedFiles";
 import { parchmentTheme } from "@/components/admin/parchmentTheme";
 import s from "@/components/admin/Admin.module.css";
 
-type Props = { oneshots: OneShotSummary[]; gate: WriteGate };
+/** `owners`: who may own a one-shot (admins and authors), for an admin to hand one-shots around; empty for an author. */
+type Owner = { id: string; username: string };
+type Props = { oneshots: OneShotSummary[]; gate: WriteGate; admin: boolean; owners: Owner[]; me: string };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, resolvedUrl }) => {
-  if ((await requestRole(req)) !== "gm") {
-    return { redirect: { destination: `/login?next=${encodeURIComponent(resolvedUrl)}`, permanent: false } };
-  }
-  const store = getStore();
+  const gate = await pageViewer({ req, resolvedUrl }, "author");
+  if (gate.redirect) return { redirect: gate.redirect };
+  const store = storeFor(gate.viewer);
+  const admin = isAdmin(gate.viewer);
+  const owners = admin
+    ? await db().user.findMany({
+        where: { disabledAt: null, OR: [{ role: "admin" }, { author: true }] },
+        select: { id: true, username: true },
+        orderBy: { usernameLower: "asc" },
+      })
+    : [];
   res.setHeader("Cache-Control", "private, no-store");
-  return { props: JSON.parse(JSON.stringify({ oneshots: await store.list(), gate: store.gate() })) as Props };
+  return { props: JSON.parse(JSON.stringify({ oneshots: await store.list(), gate: store.gate(), admin, owners, me: gate.viewer.id })) as Props };
 };
 
 const SYSTEM_BLURB: Record<SystemId, string> = {
@@ -59,7 +70,7 @@ type Dialogs =
   | null;
 
 /** The builder's front page: every one-shot, published and draft, and what you can do with each. */
-export default function AdminPage({ oneshots, gate }: Props) {
+export default function AdminPage({ oneshots, gate, admin, owners, me }: Props) {
   const router = useRouter();
   const [dialog, setDialog] = useState<Dialogs>(null);
   const [error, setError] = useState<string | null>(null);
@@ -83,6 +94,12 @@ export default function AdminPage({ oneshots, gate }: Props) {
   }
   const refresh = () => router.replace(router.asPath, undefined, { scroll: false });
 
+  /** Admins only: hand a one-shot to an author (or back to the admins). */
+  async function setOwner(o: OneShotSummary, ownerId: string | null) {
+    const { ok } = await call(`/api/admin/oneshots/${o.slug}/owner`, { method: "POST", body: JSON.stringify({ ownerId }) });
+    if (ok) router.replace(router.asPath);
+  }
+
   async function unpublish(o: OneShotSummary) {
     if (!window.confirm(`Take "${o.title}" off the board? It stays here as a draft.`)) return;
     if ((await call(`/api/admin/oneshots/${o.slug}/unpublish`, { method: "POST" })).ok) await refresh();
@@ -105,7 +122,7 @@ export default function AdminPage({ oneshots, gate }: Props) {
         <meta name="robots" content="noindex" />
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
-        <SiteHeader back={{ href: "/", label: "the board" }} />
+        <SiteHeader back={{ href: "/board", label: "the board" }} />
         <main id="main">
           <header className={s.toolbar}>
             <h1 className={s.toolbarTitle}>The one-shot builder</h1>
@@ -156,6 +173,29 @@ export default function AdminPage({ oneshots, gate }: Props) {
                         /{o.slug} · {o.castCount} character{o.castCount === 1 ? "" : "s"} · updated{" "}
                         {new Date(o.updatedAt).toLocaleString()}
                         {o.issueCount > 0 && ` · ${o.issueCount} problem${o.issueCount === 1 ? "" : "s"} to fix before publishing`}
+                        {admin ? (
+                          <>
+                            {" · "}
+                            <label>
+                              owner{" "}
+                              <select
+                                className={s.ownerSelect}
+                                value={o.ownerId ?? ""}
+                                disabled={busy}
+                                onChange={(e) => void setOwner(o, e.target.value || null)}
+                                aria-label={`Who owns ${o.title}`}
+                              >
+                                <option value="">admins only</option>
+                                {owners.map((u) => (
+                                  <option key={u.id} value={u.id}>
+                                    {u.username}
+                                    {u.id === me ? " (you)" : ""}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          </>
+                        ) : null}
                       </div>
                     </div>
                     <div className={s.ledgerActions}>

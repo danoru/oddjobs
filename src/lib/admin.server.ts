@@ -1,43 +1,44 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { requestRole } from "./auth";
-import { getStore, PublishError, StoreError, type OneShotStore, type WriteGate } from "./store";
+import type { Viewer } from "./accounts";
+import { apiViewer, type Need } from "./auth";
+import { PublishError, StoreError, storeFor, type OneShotStore, type OwnedStore, type WriteGate } from "./store";
 
 /**
- * Every /api/admin route starts here: GM only (the proxy lets any signed-in
- * player through to /api, so the role is checked again on the server), and
- * mutating calls only when the store may write. Answers the request itself
- * and returns null when it shouldn't go on.
+ * Every /api/admin/oneshots route starts here: authors and admins only, read
+ * from the database on every request (the proxy only checks that someone is
+ * signed in), and mutating calls only when the store may write. The store
+ * comes back wrapped for this person (OwnedStore): an author only ever
+ * reaches their own one-shots. Answers the request itself and returns null
+ * when it shouldn't go on.
  */
 export async function adminGuard(
   req: NextApiRequest,
   res: NextApiResponse,
   opts: { write: boolean; store?: OneShotStore },
-): Promise<OneShotStore | null>;
-/** The same, for another store behind the content write gate (the spell book). */
-export async function adminGuard<S extends { gate(): WriteGate }>(
+): Promise<OwnedStore | null> {
+  const viewer = await apiViewer(req, res, "author", "Only authors and admins can use the builder");
+  if (!viewer) return null;
+  const store = storeFor(viewer, opts.store);
+  return writeGate(res, store, opts.write) ? store : null;
+}
+
+/** The same for another store behind the content write gate: the spell book (authors) or the shared world (admins). */
+export async function contentGuard<S extends { gate(): WriteGate }>(
   req: NextApiRequest,
   res: NextApiResponse,
-  opts: { write: boolean; store: S },
-): Promise<S | null>;
-export async function adminGuard(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  opts: { write: boolean; store?: { gate(): WriteGate } },
-): Promise<{ gate(): WriteGate } | null> {
-  res.setHeader("Cache-Control", "private, no-store");
-  if ((await requestRole(req)) !== "gm") {
-    res.status(403).json({ error: "Only the GM can use the builder" });
-    return null;
-  }
-  const store = opts.store ?? getStore();
-  if (opts.write) {
-    const gate = store.gate();
-    if (!gate.writable) {
-      res.status(403).json({ error: gate.reason ?? "The builder is read-only here", readOnly: true });
-      return null;
-    }
-  }
-  return store;
+  opts: { write: boolean; store: S; need: Need },
+): Promise<{ store: S; viewer: Viewer } | null> {
+  const viewer = await apiViewer(req, res, opts.need);
+  if (!viewer) return null;
+  return writeGate(res, opts.store, opts.write) ? { store: opts.store, viewer } : null;
+}
+
+function writeGate(res: NextApiResponse, store: { gate(): WriteGate }, write: boolean): boolean {
+  if (!write) return true;
+  const gate = store.gate();
+  if (gate.writable) return true;
+  res.status(403).json({ error: gate.reason ?? "The builder is read-only here", readOnly: true });
+  return false;
 }
 
 /** Store errors become their HTTP answer; anything else is a 500. */

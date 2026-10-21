@@ -2,9 +2,9 @@ import Head from "next/head";
 import Link from "next/link";
 import type { GetServerSideProps } from "next";
 import { Alert, Container } from "@mui/material";
-import { requestRole } from "@/lib/auth";
+import { pageViewer } from "@/lib/auth";
 import { spellBook } from "@/lib/source";
-import { getStore } from "@/lib/store";
+import { storeFor } from "@/lib/store";
 import { isSafeId } from "@/lib/store/doc";
 import { checkDoc } from "@/lib/oneShotCheck";
 import { toPublic, type PublicAnyOneShot } from "@/lib/public";
@@ -25,16 +25,15 @@ type Props =
  * The real player pages, rendered from the newest saved version (the draft
  * if there is one): /admin/preview/<slug> is the job page,
  * /admin/preview/<slug>/<id> a sheet or pre-made, /admin/preview/<slug>/print
- * every 5e or Daggerheart sheet ready to print. GM only, never static. Links on them lead to
+ * every 5e or Daggerheart sheet ready to print. Its author or an admin only, never static. Links on them lead to
  * the published site.
  */
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, params, resolvedUrl }) => {
-  if ((await requestRole(req)) !== "gm") {
-    return { redirect: { destination: `/login?next=${encodeURIComponent(resolvedUrl)}`, permanent: false } };
-  }
+  const gate = await pageViewer({ req, resolvedUrl }, "author");
+  if (gate.redirect) return { redirect: gate.redirect };
   const [slug, page = null, ...rest] = (params?.path as string[] | undefined) ?? [];
   if (!isSafeId(slug) || rest.length || (page !== null && !isSafeId(page))) return { notFound: true };
-  const got = await getStore().get(slug);
+  const got = await storeFor(gate.viewer).get(slug);
   if (!got) return { notFound: true };
   res.setHeader("Cache-Control", "private, no-store");
   const { issues, parsed } = checkDoc((got.draft ?? got.published)!, await spellBook());

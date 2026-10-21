@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { GetServerSideProps } from "next";
 import { Alert, Box, Button, Container, Typography } from "@mui/material";
-import { requestRole } from "@/lib/auth";
+import { pageViewer } from "@/lib/auth";
 import { requireOneShot } from "@/lib/source";
 import type { OneShotWithCast } from "@/lib/schema";
 import { useClaims, useLevel } from "@/lib/storage";
@@ -24,9 +24,9 @@ type Props = { os: OneShotWithCast };
  * no static page or data file for it.
  */
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, params, resolvedUrl }) => {
-  if ((await requestRole(req)) !== "gm") {
-    return { redirect: { destination: `/login?next=${encodeURIComponent(resolvedUrl)}`, permanent: false } };
-  }
+  // The GM pages are the admins' until games arrive (phase 11).
+  const gate = await pageViewer({ req, resolvedUrl }, "admin");
+  if (gate.redirect) return { redirect: gate.redirect };
   const slug = String(params?.oneshot ?? "");
   if (!/^[a-z0-9-]+$/.test(slug)) return { notFound: true };
   let os: OneShotWithCast;

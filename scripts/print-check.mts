@@ -17,24 +17,15 @@
  * Exits 1 on any failure.
  */
 import { chromium, type Page } from "playwright";
-import fs from "node:fs";
-import path from "node:path";
 import { loadOneShot, loadSpellBook, publishedSlugs } from "../src/lib/content";
 import { cardsFor, paginate } from "../src/systems/dnd5e/cards";
 import { levelsOf, withVariant } from "../src/systems/dnd5e/variants";
 import { cardsFor as dhCardsFor } from "../src/systems/daggerheart/cards";
 import { cardsFor as paCardsFor } from "../src/systems/paranoia/cards";
+import { ensureE2eUsers, signInAs } from "./e2e-auth.mts";
 
-const ROOT = path.join(import.meta.dirname, "..");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
 
-function password(): string {
-  if (process.env.APP_PASSWORD) return process.env.APP_PASSWORD;
-  const env = [".env.local", ".env"].map((f) => path.join(ROOT, f)).find((f) => fs.existsSync(f)) ?? path.join(ROOT, ".env");
-  const line = fs.existsSync(env) ? fs.readFileSync(env, "utf8").match(/^APP_PASSWORD=(.*)$/m) : null;
-  if (!line) throw new Error("Set APP_PASSWORD (or put it in .env)");
-  return line[1].trim();
-}
 
 /** Chromium writes one "/Type /Page" object per page (and "/Type /Pages" for the tree). */
 export const countPages = (pdf: Buffer) => (pdf.toString("latin1").match(/\/Type\s*\/Page(?!s)/g) ?? []).length;
@@ -51,6 +42,7 @@ const slugs = process.argv.slice(2).filter((a) => !a.startsWith("--"));
 const targets = slugs.length ? slugs : publishedSlugs();
 const book = loadSpellBook();
 
+await ensureE2eUsers(["player"]);
 const browser = await chromium.launch();
 let failures = 0;
 const rows: string[] = [];
@@ -77,8 +69,7 @@ function report(ok: boolean, what: string, detail: string) {
 
 for (const mode of MODES) {
   const context = await browser.newContext();
-  const login = await context.request.post(`${BASE}/api/login`, { data: { password: password() } });
-  if (!login.ok()) throw new Error(`Login failed (${login.status()}) — is the server running at ${BASE}?`);
+  await signInAs(context, BASE, "player");
   const page = await context.newPage();
 
   for (const slug of targets) {

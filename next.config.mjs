@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Auth.js imports "next/server" without an extension, which Node's ESM loader
+  // refuses when the package runs unbundled from a Pages Router API route.
+  transpilePackages: ["next-auth"],
+  // A native module: load it from node_modules, never bundle it.
+  serverExternalPackages: ["@node-rs/argon2"],
   // With content as files (the default), player pages are built from it at build
   // time, but the GM page reads it per request (src/lib/content.ts keeps content
   // out of tracing), so ship it explicitly. (With TEAROFF_STORE=db everything
@@ -28,6 +33,8 @@ const nextConfig = {
     "/admin": ["./content/**/*.json"],
     "/admin/**/*": ["./content/**/*.json"],
     "/api/admin/**/*": ["./content/**/*.json"],
+    // The link-preview images read their two fonts from disk.
+    "/api/og": ["./src/app/api/og/fonts/*.woff"],
   },
 };
 

@@ -58,7 +58,7 @@ export function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Su
         <title>{`${os.title} · Oddjobs`}</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
-        <SiteHeader back={{ href: "/", label: "the board" }} />
+        <SiteHeader back={{ href: "/board", label: "the board" }} />
 
         <main id="main" tabIndex={-1} className={`${s.frame} ${k.skinned}`} data-skin={skin} data-part="frame">
           <div className={s.note} data-part="posting" style={{ ["--tilt" as string]: "-0.6deg", marginBottom: 32 }}>

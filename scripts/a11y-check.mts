@@ -7,27 +7,21 @@
  *   pnpm a11y-check              — board, job pages, a sheet, cards, tents and the GM page
  *   pnpm a11y-check lot-thirteen/odalys-quill the-drowned-bell/print
  *
- * Signs in with GM_PASSWORD (so the GM page is included) from .env or the
- * environment. Exits 1 on any axe violation or focus stop without a ring.
+ * Signs in as the e2e admin (scripts/e2e-auth.mts, made in the local
+ * database if needed), so the GM pages, the builder and the people page are
+ * included; the public pages (the landing page, the door, an invite) are
+ * checked without a session. Exits 1 on any axe violation or focus stop
+ * without a ring.
  */
 import { chromium } from "playwright";
-import fs from "node:fs";
-import path from "node:path";
 import { createRequire } from "node:module";
 import { loadOneShot, publishedSlugs } from "../src/lib/content";
+import { ensureE2eUsers, signInAs } from "./e2e-auth.mts";
 
-const ROOT = path.join(import.meta.dirname, "..");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
 const AXE = createRequire(import.meta.url).resolve("axe-core/axe.min.js");
 const TABS = 12;
 
-function gmPassword(): string {
-  if (process.env.GM_PASSWORD) return process.env.GM_PASSWORD;
-  const env = [".env.local", ".env"].map((f) => path.join(ROOT, f)).find((f) => fs.existsSync(f)) ?? path.join(ROOT, ".env");
-  const line = fs.existsSync(env) ? fs.readFileSync(env, "utf8").match(/^GM_PASSWORD=(.*)$/m) : null;
-  if (!line) throw new Error("Set GM_PASSWORD (or put it in .env)");
-  return line[1].trim();
-}
 
 function defaultRoutes(): string[] {
   const slugs = publishedSlugs();
@@ -37,7 +31,9 @@ function defaultRoutes(): string[] {
   const dh = all.filter((os) => os.system === "daggerheart");
   const pa = all.filter((os) => os.system === "paranoia");
   return [
-    "",
+    "board",
+    "settings",
+    "admin/people",
     ...slugs,
     `${first.slug}/${first.cast[0].id}`,
     `${first.slug}/cards`,
@@ -48,18 +44,28 @@ function defaultRoutes(): string[] {
   ];
 }
 
+/** Pages anyone may open: checked without a session. */
+const PUBLIC_ROUTES = ["", "login", "join/not-a-real-invite", "reset/not-a-real-token"];
+
 const args = process.argv.slice(2).filter((a) => !a.startsWith("--"));
 const routes = args.length ? args : defaultRoutes();
 
+await ensureE2eUsers(["admin"]);
 const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
-const login = await context.request.post(`${BASE}/api/login`, { data: { password: gmPassword() } });
-if (!login.ok()) throw new Error(`Login failed (${login.status()}) — is the server running at ${BASE}?`);
-const page = await context.newPage();
+await signInAs(context, BASE, "admin");
+const signedInPage = await context.newPage();
+const anonPage = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
 let problems = 0;
 
-for (const route of routes) {
-  await page.goto(`${BASE}/${route}`, { waitUntil: "networkidle" });
+for (const [route, page] of [
+  ...(args.length ? [] : PUBLIC_ROUTES.map((r) => [r, anonPage] as const)),
+  ...routes.map((r) => [r, signedInPage] as const),
+]) {
+  // Settled enough to check: with the database store, pages are ISR and Next quietly re-fetches stale
+  // page data in the background, which never counts as idle, so give "networkidle" a few seconds at most.
+  await page.goto(`${BASE}/${route}`, { waitUntil: "load" });
+  await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
   await page.addScriptTag({ path: AXE });
   const violations: string[] = await page.evaluate(async () => {
     // @ts-expect-error axe is the global the script tag adds
@@ -91,7 +97,7 @@ for (const route of routes) {
 
   problems += violations.length + unringed.length;
   const ok = violations.length === 0 && unringed.length === 0;
-  console.log(`${ok ? "ok  " : "FAIL"} /${route}`);
+  console.log(`${ok ? "ok  " : "FAIL"} /${route}${page === anonPage ? " (signed out)" : ""}`);
   for (const v of violations) console.log(`       axe: ${v}`);
   for (const u of unringed) console.log(`       no focus ring on "${u}"`);
 }

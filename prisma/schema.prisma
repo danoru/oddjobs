@@ -151,9 +151,16 @@ model OneShot {
   draft     Json?             @db.Json
   /// The OneShotDoc players see; null until first published.
   published Json?             @db.Json
+  /// Who may edit it in the builder besides the admins (phase 10). Null =
+  /// admins only: everything written before accounts, until `admin:create`
+  /// hands it to the first admin.
+  ownerId   String?
+  owner     User?             @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
   history   OneShotRevision[]
+
+  @@index([ownerId])
 }
 
 /// A one-shot's history: what was saved, published, unpublished, imported,
@@ -192,4 +199,99 @@ model Survivor {
   updatedAt DateTime @updatedAt
 
   @@index([oneshot])
+}
+
+/// Who owns a one-shot kept as files (the FileStore). content/ is in a public
+/// git repo and accounts live in the database, so ownership does too. No row
+/// = admins only (everything that was in git before accounts).
+model OneShotOwner {
+  slug      String   @id
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+/// A person (phase 10). Sign-in is a username and a password (Auth.js
+/// Credentials, JWT sessions, src/auth.ts); there's no email, so a lost
+/// password is a one-time reset link an admin hands over. Accounts only come
+/// from invites (or the first admin, from `pnpm admin:create`).
+model User {
+  id            String          @id @default(cuid())
+  /// As typed at sign-up.
+  username      String
+  /// `username` in lower case: the unique key, so "Rook" and "rook" are one person.
+  usernameLower String          @unique
+  displayName   String
+  pronouns      String?
+  /// argon2id.
+  passwordHash  String
+  /// "admin" | "member". Per-game roles (GM, player) come with games, in phase 11.
+  role          String          @default("member")
+  /// The author badge: may write one-shots in the builder (only their own).
+  author        Boolean         @default(false)
+  /// May make invite links (admins always can).
+  canInvite     Boolean         @default(false)
+  disabledAt    DateTime?
+  /// Bumped to end every session at once (disabled, password changed or
+  /// reset, role changed): a session carries the version it started with.
+  tokenVersion  Int             @default(0)
+  lastLoginAt   DateTime?
+  invitedById   String?
+  invitedBy     User?           @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+  invited       User[]          @relation("InvitedBy")
+  inviteId      String?
+  invite        Invite?         @relation("JoinedWith", fields: [inviteId], references: [id], onDelete: SetNull)
+  invitesMade   Invite[]        @relation("InviteMaker")
+  resets        PasswordReset[] @relation("ResetFor")
+  resetsMade    PasswordReset[] @relation("ResetMaker")
+  oneShots      OneShot[]
+  fileOneShots  OneShotOwner[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+/// An invite link, `/join/<code>`: single- or multi-use, with an expiry, and
+/// optionally the author badge for whoever joins with it.
+model Invite {
+  id           String    @id @default(cuid())
+  code         String    @unique
+  /// Who it's for, to tell links apart in the list ("for Sam").
+  note         String?
+  maxUses      Int       @default(1)
+  uses         Int       @default(0)
+  expiresAt    DateTime
+  grantsAuthor Boolean   @default(false)
+  revokedAt    DateTime?
+  createdById  String?
+  createdBy    User?     @relation("InviteMaker", fields: [createdById], references: [id], onDelete: SetNull)
+  joined       User[]    @relation("JoinedWith")
+  createdAt    DateTime  @default(now())
+}
+
+/// A one-time password reset link, `/reset/<token>`, made by an admin and
+/// handed over by hand. Only the token's SHA-256 is kept.
+model PasswordReset {
+  id          String    @id @default(cuid())
+  tokenHash   String    @unique
+  userId      String
+  user        User      @relation("ResetFor", fields: [userId], references: [id], onDelete: Cascade)
+  createdById String?
+  createdBy   User?     @relation("ResetMaker", fields: [createdById], references: [id], onDelete: SetNull)
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+}
+
+/// A failed sign-in, reset or join, for rate limiting that holds across
+/// serverless instances (src/lib/rateLimit.ts). Rows older than a day are
+/// pruned as new ones arrive.
+model AuthAttempt {
+  id        Int      @id @default(autoincrement())
+  /// "login:user:<username>", "login:ip:<hash>", "reset:ip:<hash>" or "join:ip:<hash>"
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
 }

@@ -7,24 +7,17 @@
  *   pnpm parity diff <before> <after>
  *                                 — compare two snapshots; exits 1 on any difference
  *
- * Signs in with GM_PASSWORD from .env (or the environment), so the GM page is included.
+ * Signs in as the e2e admin (scripts/e2e-auth.mts), so the GM page is included.
  */
 import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
 import { loadOneShot, publishedSlugs } from "../src/lib/content";
 import { levelsOf } from "../src/systems/dnd5e/variants";
+import { ensureE2eUsers, signInAs } from "./e2e-auth.mts";
 
-const ROOT = path.join(import.meta.dirname, "..");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
 
-function gmPassword(): string {
-  if (process.env.GM_PASSWORD) return process.env.GM_PASSWORD;
-  const env = path.join(ROOT, ".env");
-  const line = fs.existsSync(env) ? fs.readFileSync(env, "utf8").match(/^GM_PASSWORD=(.*)$/m) : null;
-  if (!line) throw new Error("Set GM_PASSWORD (or put it in .env)");
-  return line[1].trim();
-}
 
 const countPages = (pdf: Buffer) => (pdf.toString("latin1").match(/\/Type\s*\/Page(?!s)/g) ?? []).length;
 const fileFor = (route: string) => route.replace(/[/?=&]+/g, "_").replace(/^_|_$/g, "") || "home";
@@ -34,11 +27,11 @@ async function snap(dir: string) {
   fs.mkdirSync(path.join(dir, "shots"), { recursive: true });
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
-  const login = await context.request.post(`${BASE}/api/login`, { data: { password: gmPassword() } });
-  if (!login.ok()) throw new Error(`Login failed (${login.status()}) — is the server running at ${BASE}?`);
+  await ensureE2eUsers(["admin"]);
+  await signInAs(context, BASE, "admin");
   const page = await context.newPage();
 
-  const routes: string[] = [""];
+  const routes: string[] = ["board"];
   const printables: string[] = [];
   for (const slug of publishedSlugs()) {
     const os = loadOneShot(slug);

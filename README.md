@@ -1,6 +1,6 @@
 # Oddjobs
 
-*Formerly Tear-Off.* The repo folder, browser storage keys, login cookie and Foundry module id still say `tearoff` on purpose, so saved claims, logins and imported Foundry actors keep working.
+*Formerly Tear-Off.* The repo folder, browser storage keys and Foundry module id still say `tearoff` on purpose, so saved claims and imported Foundry actors keep working.
 
 A tavern notice board of ready-made one-shot **casts**. Each one-shot is a job posting; its characters are posters with a hook, ties to each other, a stake in *this* adventure and a private secret. Players tear a poster off to claim a character, then print it, send it to Foundry, rebuild it in D&D Beyond, or tweak it.
 
@@ -12,34 +12,38 @@ One-shots come in more than one game system:
 - **Paranoia** is a play aid for tables that own the 2023 Core Book. It gives Troubleshooters whose naughty sides never reach a player page, NODE dice with the Computer die, six-packs of clones, treason Flags, treason reports and Friend Computer on every screen.
 
 
-Next 16 (Pages Router) · React 19 · MUI 9 · CSS Modules · Zod · Vitest · Prisma 6 + Postgres · pnpm · Vercel. Content is written through the **builder** at `/admin` (see [The builder](#the-builder)) and kept either as JSON in git, validated at build time (the default), or in Postgres with `TEAROFF_STORE=db`, so the GM can write and publish everything on the deployed site (see [Content in the database](#content-in-the-database)). The database always holds the table sessions (who tore which poster).
+Everyone signs in with their own account (username and password, by invite only; see [Accounts](#accounts)). Strangers see a public landing page at `/` with a few posters from our own casts, and nothing more.
+
+Next 16 (Pages Router, plus one App Router route for Auth.js) · React 19 · MUI 9 · CSS Modules · Zod · Auth.js v5 · Vitest · Prisma 6 + Postgres · pnpm · Vercel. Content is written through the **builder** at `/admin` (see [The builder](#the-builder)) and kept either as JSON in git, validated at build time (the default), or in Postgres with `TEAROFF_STORE=db`, so the GM can write and publish everything on the deployed site (see [Content in the database](#content-in-the-database)). The database always holds the table sessions (who tore which poster).
 
 ## Run it
 
 ```bash
 pnpm install
-cp .env.example .env         # set APP_PASSWORD, GM_PASSWORD and AUTH_SECRET
+cp .env.example .env         # set AUTH_SECRET
 pnpm db:dev                  # local Postgres (Prisma's `prisma dev`); prints a TCP URL
 # also put DATABASE_URL and DIRECT_URL in .env (keep everything in .env: the Prisma CLI only reads .env,
 # and a .env.local would override it for Next):
 #   the printed TCP URL plus &schema=tearoff&connection_limit=1, for both
 pnpm db:deploy               # apply prisma/migrations
-pnpm dev                     # http://localhost:3004
+pnpm admin:create <you>      # the first admin: asks for a password
+pnpm dev                     # http://localhost:3004, then sign in at /login
 ```
 
-The site sits behind a password gate (`src/proxy.ts`, `src/lib/auth.ts`, ported from world-gazetteer) with two tiers. Whoever comes in with the GM password gets a **GM bar** across the top of every page (`src/components/GmBar.tsx`): the builder, the spell book and the chronicle, plus, on a one-shot's pages, its GM page, TV, printed box (and kit), tapestry and builder entry. **Hide** folds it into a small tab to see a page as players do; the TV never shows it. It asks `/api/whoami` for the role and is only navigation: the pages and APIs still check the role themselves. `APP_PASSWORD` lets players in. `GM_PASSWORD` lets the GM in too and also opens `/<oneshot>/gm`. The signed cookie carries the role (`table` or `gm`). The proxy sends anyone else from a GM page to the login page, and the GM page and GM-only API routes check the role again themselves.
+The database is required: accounts live there, as do the tables. Admins get a **GM bar** across the top of every page (`src/components/GmBar.tsx`): the builder, the spell book, the people page and the chronicle, plus, on a one-shot's pages, its GM page, TV, printed box (and kit), tapestry and builder entry. **Hide** folds it into a small tab to see a page as players do; the TV never shows it. It asks `/api/whoami` who's signed in and is only navigation: the pages and APIs check the user themselves. Authors get a **Builder** link in the header instead.
+
+`pnpm typecheck` includes Next's generated route types (`.next/types`); if it complains about a page that no longer exists after a dev session, delete `.next/types` and `.next/dev/types` (or run `pnpm build`).
 
 If `prisma migrate` fails with `prepared statement "s0" already exists`, the local server is holding a stale connection: `pnpm exec prisma dev stop tearoff`, then `pnpm db:dev` again. Adding `&pgbouncer=true` to the local `DATABASE_URL` (not `DIRECT_URL`) stops the app from using named prepared statements, which keeps the local server from tripping over them under the phones' polling. The local server takes one connection at a time. In phase 4's four-phone Ten Candles runs, the detached server (`pnpm db:dev`) stopped on its own a few minutes in; running it in the foreground in its own terminal (`pnpm exec prisma dev --name tearoff`) stayed up, and so does having only one app server connected to it.
 
 In phase 6's runs the local `prisma dev` server also exited silently a few minutes into a busy table (a GM, phones and the TV all polling) and came back empty: it only holds test tables, so start it again and run `pnpm db:deploy`. For long e2e runs, a plain PGlite socket server (`@electric-sql/pglite` with `@electric-sql/pglite-socket`, the engine `prisma dev` uses) on the same port stayed up for every run.
 
-Without a database the site still works: claims just stay in each browser, as in v1.
-
 | Script | What it does |
 |---|---|
 | `pnpm validate [slug]` | Parse and cross-check content; prints each character's key numbers (Daggerheart: Evasion, HP, Stress, Armor, thresholds, traits and domain cards) |
-| `pnpm test` | The database store (DbStore, the spell book and survivors in Postgres, history and restore, revalidation from the admin API, import idempotence, GM-only access) against the local database in a schema of its own, `tearoff_test`; skipped, with a warning, when no local database is running. Rules math (HP, slots, pact magic), level variants, cards, tokens, reading modes, customization, exporters, auth roles, table codes, `gmNotes` stays off player pages; the event log's rules and privacy (notes, hidden rolls, rumor truths, ticks, targeted bells, no browser ids), the tapestry, the Ten Candles mirror and its act cards, shake detection, and the builder's new fields. Daggerheart: the derived numbers, every check, the SRD tables and errata, duality dice, Hope/Fear/slot tallies and who may move them, its privacy rules, and its checks pointing at their builder fields |
+| `pnpm test` | The database store (DbStore, the spell book and survivors in Postgres, history and restore, revalidation from the admin API, import idempotence, GM-only access) and accounts (invites single- and multi-use, expired and taken down; the sign-in rate limit; reset links; the people page's rules; who owns which one-shot) against the local database in a schema of its own, `tearoff_test`; skipped, with a warning, when no local database is running. Rules math (HP, slots, pact magic), level variants, cards, tokens, reading modes, customization, exporters, account rules, ownership in the builder (an author can't reach someone else's one-shot through the store or any API route), the landing page's allowlist (no secrets, no Daggerheart or Paranoia), table codes, `gmNotes` stays off player pages; the event log's rules and privacy (notes, hidden rolls, rumor truths, ticks, targeted bells, no browser ids), the tapestry, the Ten Candles mirror and its act cards, shake detection, and the builder's new fields. Daggerheart: the derived numbers, every check, the SRD tables and errata, duality dice, Hope/Fear/slot tallies and who may move them, its privacy rules, and its checks pointing at their builder fields |
 | `pnpm build` | `prisma generate`, validate, then `next build` (fails on any broken one-shot) |
+| `pnpm admin:create <username>` | Make the first admin (or, with `--reset`, get back into an admin account: new password, admin again). Asks for the password hidden, takes it from stdin, or makes one up with `--generate`. `--name "Display Name"`. The first admin (when there's no enabled admin yet) also gets every one-shot in the database with no owner. `--remote` does it on the hosted Supabase database, after you type its host to confirm. See [Accounts](#accounts) |
 | `pnpm db:dev` | Start a local Postgres server in the background (`prisma dev --name tearoff --detach`); stop it with `pnpm exec prisma dev stop tearoff` |
 | `pnpm db:migrate` | `prisma migrate dev`: make a new migration after editing `prisma/schema.prisma` |
 | `pnpm db:deploy` | Apply migrations to the database in `.env` (the hosted one on Vercel) |
@@ -47,33 +51,55 @@ Without a database the site still works: claims just stay in each browser, as in
 | `pnpm db:import [--overwrite]` | Copy the git content (spell book, `content/legacy` survivors, one-shots) into the database in `.env`. Skips what's already there unless `--overwrite`; running it twice changes nothing. `scripts/import-oneshots.ts`, `import-spells.ts` and `import-survivors.ts` do one each |
 | `pnpm db:import:remote` | The same into the hosted Supabase database. **Writes to the live site's database** |
 | `pnpm pdf [slug] [--a4]` | **Local only.** Render `public/pdf/<slug>-sheets`, `-cards`, `-tents` and `-flyer` PDFs (and `<slug>-l<N>-…` for each level variant; `<slug>-kit` and `-flyer` for Ten Candles) from a running server with Playwright. Never runs on Vercel. |
-| `pnpm a11y-check [route…]` | **Local only.** Run axe-core over the main pages (signed in as GM) and Tab through each, checking every focus stop shows a ring. Exits 1 on any problem. |
+| `pnpm a11y-check [route…]` | **Local only.** Run axe-core over the main pages (signed in as the e2e admin; the landing page, login, join and reset pages signed out) and Tab through each, checking every focus stop shows a ring. Exits 1 on any problem. |
 | `pnpm parity snap <dir>` / `pnpm parity diff <a> <b>` | **Local only.** Snapshot every 5e page's visible text, every printable's PDF page count and a few screenshots, then compare two snapshots. Run it before and after a refactor: phase 4 used it to prove moving 5e into `src/systems/dnd5e/` changed nothing. |
 | `pnpm e2e:builder` | **Local only.** Builds a 5e one-shot (three characters), a Ten Candles module, a Daggerheart one-shot (two characters, with the rules help) and a Paranoia mission (two Troubleshooters, the skill draft, naughty sides kept off player pages) from nothing in the builder, in headless Chromium against a running dev server: trips and fixes the checks, publishes both, reads them back on the board and their sheets, duplicates, edits and unpublishes one, checks players can't reach `/admin` or its API, then deletes every test one-shot. `SHOTS=dir` saves screenshots, `KEEP=1` leaves the test one-shots. |
 | `pnpm e2e:candles` | **Local only.** Plays a whole Ten Candles night in headless Chromium against a running server with a database: a GM and three phones with fake microphones, creation, recordings, truths, rolls, the Last Stand and the end. Checks along the way that nobody sees another player's cards or recordings. `SHOTS=dir` saves screenshots. |
 | `pnpm e2e:toys` | **Local only.** Phase 6's table toys end to end in headless Chromium against a running server with a database: a GM, two phones and the TV on a 5e table (The Drowned Bell) and a Ten Candles one (Lights Out at Marrowby). Dice and the tray, notes, the bell, act cards, the spotlight (with a fast-forwarded clock), rumors, the town board, coins, the epilogue per table, the tapestry and the chronicle; it page-checks the printed box on Letter and A4, the tapestry and the chronicle, and checks over HTTP and on screen that players never see GM-only data, other players' notes, hidden rolls or rumor truths. `SHOTS=dir` saves screenshots. |
 | `pnpm e2e:daggerheart` | **Local only.** A Daggerheart night (A Vow Before Dawn) in headless Chromium, against a running server with a database: a GM, two phones and the TV. It covers the opening Fear, duality rolls from the sheet until both Hope and Fear have come up (checked against the server's fold and on the TV), an Experience and advantage, damage dice, slots and the damage helper, the GM correcting a mark and spending Fear, adversary attacks behind the screen, and phase 6's toys at a Daggerheart table. It also checks the box's page count on Letter and A4, the tapestry and the chronicle, axe on the new screens, and over HTTP that players never see the adversaries, GM notes, letters, hidden rolls or browser ids. `SHOTS=dir` saves screenshots. |
 | `pnpm e2e:paranoia` | **Local only.** A Paranoia mission in headless Chromium against a running server with a database: a GM, two phones and the TV. It checks first that no player page, print view, cards or tents page carries a naughty side, and that the secrets API hands each phone only its own. Then it plays NODE dice from the sheet (checked against the sheet, wounds and Flags on the server), gear dice, wounds and Moxie on the phone, a clone's death and the next one decanted, a treason report the accused and the TV can't read, Flags and XP from the GM, Friend Computer on every screen, and phase 6's toys. It also checks the box (both sides) on Letter and A4, the tapestry and the chronicle, and runs axe. `SHOTS=dir` saves screenshots. |
+| `pnpm e2e:accounts` | **Local only.** Accounts and the front door in headless Chromium, against a running server and the local database (either store). It makes the first admin with `pnpm admin:create`, signs in on the login page, makes an invite on `/admin/people` and signs a second person up through `/join/<code>`, then checks a used, an expired and a taken-down invite are refused, trips the sign-in rate limit, makes and uses a reset link (the old session ends; the link won't work twice), keeps a plain member out of `/admin`, the GM pages and every admin API, grants the author badge and checks the author can't reach someone else's one-shot through the builder UI or its API, closes an account, and checks the landing page's HTML and `_next/data` JSON carry no secrets and no Daggerheart or Paranoia. It deletes the people it made. `SHOTS=dir` saves screenshots. |
 | `pnpm e2e:db` | **Local only.** The database store in headless Chromium, against a server started with `TEAROFF_STORE=db` after `pnpm db:import` (best a production one, `pnpm build && pnpm start -p 3004`, to prove no rebuild is needed): the imported one-shots on the board, a Ten Candles module published from the builder and on the board at once, a revision published and the first version restored from the history panel, unpublished (its pages 404) and deleted; a spell edited and seen on the cards; a survivor saved from the epilogue and seen on the home board; players kept out of the builder, its history and the shared world's API. It puts everything back. `pnpm e2e:builder` works against the same server too (it checks the database instead of the files). `SHOTS=dir` saves screenshots. |
 | `pnpm print-check [slug]` | **Local only.** Render every printable at every level, on Letter and A4, in each reading mode, count the PDF pages and look for card text that overflows. Exits 1 if anything doesn't fit. |
 
+The end-to-end scripts and the local tools (`pdf`, `a11y-check`, `parity`, `print-check`) sign in as three test accounts they make, or put back, in the **local** database (`scripts/e2e-auth.mts`; it refuses any other database): `e2e-admin`, `e2e-author` and `e2e-player`. Run them against a production build (`pnpm build && TEAROFF_CONTENT_WRITE=1 pnpm start -p 3004`): `next dev` throws a Turbopack error on some pages.
+
+## Accounts
+
+Phase 10 replaced the shared passwords with personal accounts: a username and a password, nothing else. There's no email, so nothing is ever sent.
+
+- **Sign-in.** [Auth.js](https://authjs.dev) v5 with the Credentials provider (`src/lib/nextAuth.ts`, served from `src/app/api/auth/[...nextauth]/route.ts`). Passwords are hashed with argon2id (`@node-rs/argon2`). Usernames are unique whatever their case (`Rook` and `rook` are one person). The session is an encrypted JWT in a cookie (Credentials sign-in can't keep sessions in the database), signed with `AUTH_SECRET`, good for 30 days.
+- **Rate limit.** Five wrong passwords for one username, or 25 from one address, in 15 minutes shut the door for that name (or address) until the window passes, even for the right password. Bad invite codes and reset links count too. It's kept in the database (`AuthAttempt`), so it holds across Vercel's instances. A good sign-in clears that name's count.
+- **Invites.** Admins make invite links on `/admin/people`: single- or multi-use (up to 50), lasting from an hour to 30 days, optionally handing out the author badge, with a note to tell them apart. Admins can also let a member invite people: theirs are single-use, a week at most, without the badge, made from `/settings`. `/join/<code>` is the sign-up, a poster: username, what the table calls you, pronouns, password. Using an invite and making the account happen together, so two people racing for a single-use invite can't both get in. A used, expired or taken-down invite says so. There's no public sign-up.
+- **Lost passwords.** An admin makes a one-time reset link on `/admin/people` (shown once; only its hash is kept), good for 48 hours, and hands it over however they like. Using it sets a new password and signs that person out everywhere. Making a new one cancels the old. Anyone can change their own password (and their display name and pronouns) at `/settings`; that signs out their other sessions too.
+- **Roles.** Site-wide, an account is an `admin` or a `member`, plus the **author** badge for the builder and a "may invite" switch. Until games arrive (phase 11), the GM pages and the GM's side of the table APIs are the admins'. On `/admin/people` an admin grants and takes away admin, author and inviting, makes reset links and closes accounts. Closing an account, or taking admin away, ends that person's sessions at once; an admin can't demote or close themselves, and there's always one enabled admin.
+- **Who checks what.** `src/proxy.ts` only checks there's a session; it lets strangers through to `/`, `/login`, `/join/<code>`, `/reset/<token>`, Auth.js's routes, the sign-up and reset APIs, `/api/whoami`, the link-preview images (`/api/og`) and static files, plus `/api/foundry/*` (which checks its own token). Everything else sends strangers to `/login` (API routes answer 401). Every privileged page and API reads the user from the database on each request (`currentUser`, `pageViewer` and `apiViewer` in `src/lib/auth.ts`), so a closed account or a changed password counts at once there. The phones' polled table APIs trust a player's session without a database read and check only sessions that claim admin. The GM bar's `/api/whoami` also refreshes the session (claims catch up with the database within a minute) and sends an ended session back to the door.
+- **First admin.** `pnpm admin:create <username>` makes it from the command line (see the scripts table); locally against `.env`, on the hosted database with `--remote`.
+
+### Moving from the shared passwords
+
+`APP_PASSWORD` and `GM_PASSWORD` are gone, with `/api/login` and `/api/logout`. Old login cookies just stop counting, so everyone signs in again. `AUTH_SECRET` stays (Auth.js signs and encrypts the session with it). To move over: deploy (the migration adds the account tables), make the first admin with `pnpm admin:create --remote <you>`, sign in, and send everyone an invite from `/admin/people`. Then delete `APP_PASSWORD` and `GM_PASSWORD` from the Vercel project.
+
 ## Pages
 
-- `/` — the board: one posting per one-shot, each with a system badge; filter by game, ruleset and table size.
+- `/` — **public**: the landing page for strangers (signed-in members go straight to `/board`). The hanging sign, the pitch, how it works, a strip of real posters and the way in. It shows only our own D&D 5e and Ten Candles casts, and only their posting and poster lines, through an allowlist (`src/lib/landing.ts`): no secret, GM note, letter, if-unclaimed note or Daggerheart or Paranoia content can reach the page or its `_next/data` JSON. Its link unfurls in Discord as a poster card (Open Graph image drawn by `next/og` at `/api/og`, `src/app/api/og/route.tsx`; fonts Rye and IM Fell English under the SIL Open Font License).
+- `/login`, `/join/<code>` (an invite; unfurls as a poster card too), `/reset/<token>` — **public**: the door. `/settings` — your display name, pronouns and password (and invite links, if an admin lets you).
+- `/admin/people` — **admins only**: invite links, members, admin, author and invite switches, reset links, closing accounts.
+- `/board` — the board: one posting per one-shot, each with a system badge; filter by game, ruleset and table size.
 - `/<oneshot>` — premise, the cast as posters (tear to claim), who-knows-whom, party role coverage. A note on top joins a table by code; `/<oneshot>?table=CODE` fills the code in. If the one-shot has level variants, wax stamps on the posting pick the level. The page wears the one-shot's skin.
 - `/<oneshot>/<character>` — the two-page sheet, plus Print, Customize, D&D Beyond recipe and Foundry export.
 - `/<oneshot>/print` — every sheet, ready to print.
 - `/<oneshot>/cards` and `/<oneshot>/<character>/cards` — spell, item and feature cards, nine to a page with crop marks.
 - `/<oneshot>/tents` and `/<oneshot>/<character>/tent` — folded name tents, two to a page, plus round token PNGs to download.
 - `/<oneshot>/flyer` — a physical tear-off flyer: one strip per character with a QR code to their sheet.
-- `/<oneshot>/gm` — **GM password only.** Open a table and read out its code, watch claims live (and pin any poster back up), plus the `gmNotes`, every character's secret and the full private tie texts. Also: *What changes tonight*, sealed letters to deliver, and the session-zero recap.
+- `/<oneshot>/gm` — **admins only** (the GM, until games arrive in phase 11). Open a table and read out its code, watch claims live (and pin any poster back up), plus the `gmNotes`, every character's secret and the full private tie texts. Also: *What changes tonight*, sealed letters to deliver, and the session-zero recap.
 - `/<oneshot>/tv` — the board for the TV: big posters, the table code and a join QR. Posters rip off live as players claim them on their phones.
 - `/<oneshot>/sounds` — the GM's soundboard: ambience beds that crossfade and one-shot stingers, all synthesised in the browser (no audio files).
 - `/<oneshot>/epilogue` — the morning after: give each character a fate and one line, print a broadsheet front page, and save survivors to the shared world. At a table it's kept with the table: the GM sets the front page and each player writes their own character's line.
 - `/<oneshot>/tapestry` — the night's tapestry: a frieze woven from the table's events, printed as a long strip or a poster. The GM can rename or drop panels.
-- `/<oneshot>/box` — **GM password only.** Print the whole box: every printable for a table without phones, in table order (sealed letters included, so it's GM-only).
+- `/<oneshot>/box` — **admins only.** Print the whole box: every printable for a table without phones, in table order (sealed letters included, so it's GM-only).
 - `/chronicle` — every night with a morning-after front page, bound into one printable book: a title page, then a chapter per night with its broadsheet, tapestry and survivors.
-- `/admin` — **GM password only.** The one-shot builder: every one-shot, published and draft, to create, edit, duplicate, unpublish, delete, import and export. `/admin/<slug>` edits one; `/admin/preview/<slug>[/<character>|/print]` shows the real player pages from the saved draft.
+- `/admin` — **authors and admins.** The one-shot builder: an author's own one-shots (an admin's: every one), published and draft, to create, edit, duplicate, unpublish, delete, import and export. `/admin/<slug>` edits one; `/admin/preview/<slug>[/<character>|/print]` shows the real player pages from the saved draft.
 
 Ten Candles one-shots have no sheets, cards or tents. Instead:
 
@@ -81,7 +107,7 @@ Ten Candles one-shots have no sheets, cards or tents. Instead:
 - `/<oneshot>/<character>` — a pre-made concept (name, look, who they were), to take instead of starting blank.
 - `/<oneshot>/gm` — adds seats, house readings for disputed rules, ten candles to match the real ones, every player's stack, truths, rolling for a player, and the module with the current stage lit.
 - `/<oneshot>/tv` — ten flickering candles (steady for viewers who prefer less motion), the join QR, truths as they're said, every roll, and the last words in the dark.
-- `/<oneshot>/kit` — **GM password only.** The printable table kit: the module, a candle and scene tracker, 3 × 5 in index cards, MISSING posters and the flyer.
+- `/<oneshot>/kit` — **admins only.** The printable table kit: the module, a candle and scene tracker, 3 × 5 in index cards, MISSING posters and the flyer.
 
 Daggerheart one-shots have the 5e pages, with Daggerheart's own content:
 
@@ -175,11 +201,11 @@ Everything here is system-aware through `src/systems/registry.ts` (each system's
 
 ## Tables (shared claims)
 
-The GM opens a **table** on the GM page and gets a five-character code (no 0/O/1/I). Players type it on the job page with their name. After that, tearing a poster locks it for everyone at that table, and every board, sheet and the GM page poll the table every 3 seconds. Only whoever tore a poster, or the GM, can pin it back up.
+The GM (an admin, until games arrive) opens a **table** on the GM page and gets a five-character code (no 0/O/1/I). Players type it on the job page with their name. After that, tearing a poster locks it for everyone at that table, and every board, sheet and the GM page poll the table every 3 seconds. Only whoever tore a poster, or the GM, can pin it back up.
 
 - Storage: `prisma/schema.prisma`. A `Table` (code and one-shot) has many `Claim`s. The unique `(tableId, characterId)` key is the lock, so two players tearing at once can't both win.
 - API: `POST /api/tables` (GM only) opens a table. `GET /api/tables/<code>` returns the table. `POST` or `DELETE /api/tables/<code>/claims` tears a poster or pins it back up.
-- Players get no accounts. Each browser makes up a random player id (sent as `x-tearoff-player`) and remembers it with the player's name in localStorage. The API only tells each browser which claims are *its own*; it never sends other players' ids.
+- Claims aren't tied to accounts yet (phase 11 does that). Each browser makes up a random player id (sent as `x-tearoff-player`) and remembers it with the player's name in localStorage. The API only tells each browser which claims are *its own*; it never sends other players' ids.
 - Client: `useClaims` in `src/lib/storage.ts`. It polls when the browser has a table code for this one-shot. Without a code it uses localStorage only.
 - Tables are never deleted yet; they're tiny.
 
@@ -189,7 +215,9 @@ Customizations are stored per browser (localStorage) and can be shared with a `#
 
 ## The builder
 
-`/admin` (GM password) is where one-shots are written now; nobody needs to hand-write JSON. With files (the default) it runs on your own machine and writes the same files the build reads, which you then commit. With `TEAROFF_STORE=db` it writes to the database, on the deployed site too, and publishing puts a one-shot on the board at once.
+`/admin` (authors and admins) is where one-shots are written now; nobody needs to hand-write JSON.
+
+**Ownership.** Every one-shot has an owner: whoever made it (new, imported or duplicated). Authors see, edit, publish, unpublish, restore and delete only their own; someone else's reads as missing in the builder, its preview and every `/api/admin/oneshots` route, and writing to it is refused (403). Admins see everything, and can hand a one-shot to another author (the owner picker in the list). Everything written before accounts has no owner, which means admins only; `pnpm admin:create` hands what's in the database to the first admin. The check lives in one place, `OwnedStore` (`src/lib/store/owned.ts`), which wraps whichever store is in use, so it holds for the FileStore and the DbStore alike. The DbStore keeps the owner on the row (`OneShot.ownerId`); the FileStore keeps it in the database too (`OneShotOwner`), since `content/` is in a public repo and accounts live in the database. The spell book is shared: authors add and edit spells, only admins delete them. With files (the default) it runs on your own machine and writes the same files the build reads, which you then commit. With `TEAROFF_STORE=db` it writes to the database, on the deployed site too, and publishing puts a one-shot on the board at once.
 
 - **The list.** Every one-shot with its system and whether it's on the board, a draft, or published with unpublished changes. **New one-shot** (pick the system, give a title), **Duplicate as template**, **Edit**, **Unpublish** (back to a draft), **Delete** (type the slug to confirm), **Import JSON** and **Export**.
 - **The editor.** The one-shot's sections and the cast on the left (reorder with the arrows, add by name), the form in the middle, problems and a live preview on the right.
@@ -208,7 +236,7 @@ Customizations are stored per browser (localStorage) and can be shared with a `#
 
 A dev server keeps each page's list of paths for a moment, so right after publishing the builder knocks on the new job page once before it says so; another page of a brand-new one-shot can still 404 on the very first visit (reload). A production build has the new one-shot only after you commit, push and deploy.
 
-The store behind it is an interface (`src/lib/store/`): the FileStore, or the DbStore with `TEAROFF_STORE=db`. With the database the builder is writable anywhere it can reach the database; the GM password is the only gate. Nothing needs committing.
+The store behind it is an interface (`src/lib/store/`): the FileStore, or the DbStore with `TEAROFF_STORE=db`. With the database the builder is writable anywhere it can reach the database; an author's or admin's account is the only gate. Nothing needs committing.
 
 ## Content in the database
 
@@ -216,7 +244,7 @@ The store behind it is an interface (`src/lib/store/`): the FileStore, or the Db
 
 - **One-shots.** `OneShot` keeps one row per slug with the builder's whole document as JSON: `draft` (being edited, may be invalid) and `published` (what players see). `OneShotRevision` is the history. The DbStore (`src/lib/store/dbStore.ts`) implements the same `OneShotStore` as the FileStore, and publishing runs the same checks (Zod, `crossCheck`, the rules, level variants and the spell book, here the database's) and writes nothing unless they all pass. Documents are `json`, not `jsonb`, so key order survives and an export reads like the files.
 - **The spell book.** One `Spell` row per entry; `/admin/spells` edits it on the deployed site too (`DbSpellStore`). A spell a one-shot uses (published or draft) still can't be deleted.
-- **The shared world.** One `Survivor` row per record; the epilogue saves them directly, and `DELETE /api/admin/survivors { ids }` takes one out again.
+- **The shared world.** One `Survivor` row per record; the epilogue saves them directly (admins), and `DELETE /api/admin/survivors { ids }` takes one out again.
 - **Player pages read the published rows** (`src/lib/source.ts`, through `checkDoc`, so a bad row is a 404, never a broken page). They're ISR: built from the published one-shots at build time, any other path renders on its first visit (`fallback: "blocking"`), and `revalidate: 60` is the safety net. A draft, an unpublished or a deleted one-shot is a 404.
 - **On-demand revalidation** (`src/lib/revalidate.ts`). Publishing, unpublishing and deleting rebuild `/` and every page the one-shot had before and has after (job page, sheets, print, cards, tents, flyer, TV, sounds, epilogue, tapestry, play) with `res.revalidate()`, so the board changes at once. A spell edit rebuilds the cards of every published one-shot that uses it, and saving survivors rebuilds the board and every job page. (`next dev` renders every request fresh, so it skips this.)
 - **GM pages and table APIs** (`/gm`, `/kit`, `/box`, the chronicle, `/api/tables/*`, Foundry) read the same published rows per request; the polled table APIs keep a parsed copy for ten seconds per server instance.
@@ -313,13 +341,16 @@ D&D Beyond has no import API, so each sheet offers a **build recipe** (`src/syst
 
 GitHub → Vercel. Set these in the Vercel project:
 
-- `APP_PASSWORD`, `GM_PASSWORD` and `AUTH_SECRET`.
+- `AUTH_SECRET`: a long random string (`node -e "console.log(require('crypto').randomBytes(33).toString('base64url'))"`). It signs and encrypts the sessions; changing it signs everyone out.
+- Optional: `SITE_URL` (e.g. `https://oddjobsrpg.vercel.app`) for absolute links in the landing page's link preview; without it the build uses Vercel's production domain.
 - Optional: `FOUNDRY_TOKEN` (Foundry table sync).
 - Optional: `TEAROFF_STORE=db` keeps the content in the database, so the builder, the spell book and the shared world can be written on the site. See [Switch the deployed site to the database](#switch-the-deployed-site-to-the-database) for the order to do it in.
 - Don't set `TEAROFF_CONTENT_WRITE` there: with files, the deployed builder is read-only (Vercel's disk is too, and the FileStore refuses to write whenever `VERCEL` is set).
 - **Database:** connect Supabase from the Vercel project's Storage tab. Don't set `DATABASE_URL`/`DIRECT_URL` in Vercel: the app derives them from the integration's `POSTGRES_PRISMA_URL` (pooled, for the app) and `POSTGRES_URL_NON_POOLING` (direct, for migrations), adding `schema=tearoff` and serverless settings (`src/lib/dbUrl.ts`). Everything stays in the `tearoff` schema because Supabase exposes `public` through its REST API with the public anon key, and these tables have no row-level security.
 
 `vercel-build` runs `prisma migrate deploy` (through `scripts/db-env.mts`), then `prisma generate`, then validation, then `next build`.
+
+**Accounts on the deployed site.** After the deploy that brings accounts (the migration adds `User`, `Invite`, `PasswordReset`, `AuthAttempt`, `OneShotOwner` and `OneShot.ownerId`): `pnpm db:status:remote` to check it landed, then `pnpm admin:create --remote <you>` from your machine (it reads the Supabase variables from `.env`, prints the host and asks you to type it back before writing). It hands every one-shot in the database to you. Sign in at `/login` and make invites at `/admin/people`. Then remove `APP_PASSWORD` and `GM_PASSWORD` from the Vercel project; they do nothing now.
 
 Locally, `.env` keeps `DATABASE_URL`/`DIRECT_URL` pointed at `prisma dev`, and those win, so development never touches the hosted database. To work on the hosted one deliberately: `pnpm db:status:remote` (read-only) and `pnpm db:deploy:remote` (apply migrations).
 

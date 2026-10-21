@@ -5,6 +5,7 @@ import { checkDoc, type OneShotDoc, type SpellBook } from "@/lib/oneShotCheck";
 import { loadOneShot, loadSpellBook } from "@/lib/content";
 import { coerceDoc, docFromFiles, docToFiles, isSafeId, normalizeDoc, slugProblem } from "./doc";
 import { formatJson, jsonEqual } from "./json";
+import { MemoryOwnerBook, type OwnerBook } from "./owners";
 import {
   PublishError,
   StoreError,
@@ -95,14 +96,18 @@ export interface FileStoreOptions {
   gate?: () => WriteGate;
   /** Defaults to <root>/rules/spells.json, else the repo's. */
   spells?: () => SpellBook;
+  /** Who owns which one-shot. The app passes the database's (getStore); the default only lasts as long as this object. */
+  owners?: OwnerBook;
 }
 
 export class FileStore implements OneShotStore {
   readonly root: string;
   private readonly gateFn: () => WriteGate;
   private readonly spellsFn: () => SpellBook;
+  private readonly owners: OwnerBook;
 
   constructor(opts: FileStoreOptions = {}) {
+    this.owners = opts.owners ?? new MemoryOwnerBook();
     this.root = opts.root ?? path.join(/*turbopackIgnore: true*/ process.cwd(), "content");
     this.gateFn = opts.gate ?? (() => contentWriteGate());
     const own = path.join(this.root, "rules", "spells.json");
@@ -192,6 +197,7 @@ export class FileStore implements OneShotStore {
 
   async list(): Promise<OneShotSummary[]> {
     const spells = this.spellsFn();
+    const owners = await this.owners.all();
     const out: OneShotSummary[] = [];
     for (const slug of this.slugs()) {
       const got = await this.get(slug);
@@ -205,9 +211,20 @@ export class FileStore implements OneShotStore {
         castCount: doc.cast.length,
         updatedAt: got.updatedAt,
         issueCount: checkDoc(doc, spells).issues.length,
+        ownerId: owners.get(slug) ?? null,
       });
     }
     return out;
+  }
+
+  async owner(slug: string): Promise<string | null> {
+    this.dir("published", slug);
+    return this.owners.get(slug);
+  }
+
+  async setOwner(slug: string, ownerId: string | null): Promise<void> {
+    if (!(await this.get(slug))) throw new StoreError(`"${slug}" doesn't exist`, 404);
+    await this.owners.set(slug, ownerId);
   }
 
   async export(slug: string): Promise<OneShotDoc | null> {
@@ -243,10 +260,13 @@ export class FileStore implements OneShotStore {
     return gone;
   }
 
-  async saveDraft(slug: string, doc: OneShotDoc): Promise<WriteResult> {
+  async saveDraft(slug: string, doc: OneShotDoc, owner?: string | null): Promise<WriteResult> {
     this.assertWritable();
     this.dir("draft", slug);
-    return { changed: [this.writeDraft(slug, doc)] };
+    const isNew = !this.readDraft(slug) && !this.readPublished(slug);
+    const changed = [this.writeDraft(slug, doc)];
+    if (isNew) await this.owners.set(slug, owner ?? null);
+    return { changed };
   }
 
   async publish(slug: string): Promise<WriteResult> {
@@ -337,24 +357,30 @@ export class FileStore implements OneShotStore {
     if (this.readDraft(slug) || this.readPublished(slug)) throw new StoreError(`"${slug}" already exists`, 409);
   }
 
-  async duplicate(from: string, to: string): Promise<WriteResult> {
+  async duplicate(from: string, to: string, owner?: string | null): Promise<WriteResult> {
     this.assertWritable();
     const doc = await this.export(from);
     if (!doc) throw new StoreError(`"${from}" doesn't exist`, 404);
     this.assertFree(to);
     const title = typeof doc.oneshot.title === "string" ? doc.oneshot.title : from;
-    return { changed: [this.writeDraft(to, { ...doc, oneshot: { ...doc.oneshot, title: `${title} (copy)` } })] };
+    const changed = [this.writeDraft(to, { ...doc, oneshot: { ...doc.oneshot, title: `${title} (copy)` } })];
+    await this.owners.set(to, owner ?? null);
+    return { changed };
   }
 
   async delete(slug: string): Promise<WriteResult> {
     this.assertWritable();
     if (!(await this.get(slug))) throw new StoreError(`"${slug}" doesn't exist`, 404);
-    return { changed: [...this.removeDir(this.dir("draft", slug)), ...this.removeDir(this.dir("published", slug))] };
+    const changed = [...this.removeDir(this.dir("draft", slug)), ...this.removeDir(this.dir("published", slug))];
+    await this.owners.set(slug, null);
+    return { changed };
   }
 
-  async import(slug: string, doc: OneShotDoc): Promise<WriteResult> {
+  async import(slug: string, doc: OneShotDoc, owner?: string | null): Promise<WriteResult> {
     this.assertWritable();
     this.assertFree(slug);
-    return { changed: [this.writeDraft(slug, doc)] };
+    const changed = [this.writeDraft(slug, doc)];
+    await this.owners.set(slug, owner ?? null);
+    return { changed };
   }
 }

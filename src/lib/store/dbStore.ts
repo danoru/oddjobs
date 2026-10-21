@@ -24,7 +24,8 @@ import {
  * be invalid, publishing runs the same checks (Zod, crossCheck, the rules,
  * level variants and the spell book, here the database's) and writes nothing
  * unless they all pass. It's writable wherever the database is, the deployed
- * site included; the GM-only check stays in adminGuard.
+ * site included. Who may write which one-shot is OwnedStore's job (./owned.ts);
+ * the row keeps its owner in `ownerId`.
  *
  * Every write that changes a document leaves a revision. Autosaves within a
  * minute of the last one share it, and each one-shot keeps its newest
@@ -102,8 +103,18 @@ export class DbStore implements OneShotStore {
         castCount: doc.cast.length,
         updatedAt: got.updatedAt,
         issueCount: checkDoc(doc, spells).issues.length,
+        ownerId: row.ownerId,
       };
     });
+  }
+
+  async owner(slug: string): Promise<string | null> {
+    return (await this.row(slug))?.ownerId ?? null;
+  }
+
+  async setOwner(slug: string, ownerId: string | null): Promise<void> {
+    if (!(await this.row(slug))) throw new StoreError(`"${slug}" doesn't exist`, 404);
+    await this.client().oneShot.update({ where: { slug }, data: { ownerId } });
   }
 
   async export(slug: string): Promise<OneShotDoc | null> {
@@ -134,7 +145,7 @@ export class DbStore implements OneShotStore {
   /** The row's new state plus its revision, written together. */
   private async write(
     slug: string,
-    data: { draft: OneShotDoc | null; published: OneShotDoc | null; create?: boolean },
+    data: { draft: OneShotDoc | null; published: OneShotDoc | null; create?: boolean; owner?: string | null },
     revision: { action: RevisionAction; doc: OneShotDoc },
   ): Promise<WriteResult> {
     const client = this.client();
@@ -146,7 +157,7 @@ export class DbStore implements OneShotStore {
       published: data.published === null ? Prisma.DbNull : json(data.published),
     };
     const row = data.create
-      ? client.oneShot.create({ data: { slug, ...fields } })
+      ? client.oneShot.create({ data: { slug, ...fields, ownerId: data.owner ?? null } })
       : client.oneShot.update({ where: { slug }, data: fields });
 
     // An autosave a moment after the last one updates that revision.
@@ -173,12 +184,12 @@ export class DbStore implements OneShotStore {
     if (old.length) await client.oneShotRevision.deleteMany({ where: { id: { in: old.map((r) => r.id) } } });
   }
 
-  async saveDraft(slug: string, doc: OneShotDoc): Promise<WriteResult> {
+  async saveDraft(slug: string, doc: OneShotDoc, owner?: string | null): Promise<WriteResult> {
     const row = await this.row(slug);
     const next = normalizeDoc(coerceDoc(doc), slug);
     if (row?.draft != null && jsonEqual(row.draft, next)) return { changed: [] };
     const published = row?.published == null ? null : coerceDoc(row.published);
-    return this.write(slug, { draft: next, published, create: !row }, { action: "save", doc: next });
+    return this.write(slug, { draft: next, published, create: !row, owner }, { action: "save", doc: next });
   }
 
   async publish(slug: string): Promise<WriteResult> {
@@ -223,13 +234,13 @@ export class DbStore implements OneShotStore {
     if (await this.row(slug)) throw new StoreError(`"${slug}" already exists`, 409);
   }
 
-  async duplicate(from: string, to: string): Promise<WriteResult> {
+  async duplicate(from: string, to: string, owner?: string | null): Promise<WriteResult> {
     const doc = await this.export(from);
     if (!doc) throw new StoreError(`"${from}" doesn't exist`, 404);
     await this.assertFree(to);
     const title = typeof doc.oneshot.title === "string" ? doc.oneshot.title : from;
     const copy = normalizeDoc({ ...doc, oneshot: { ...doc.oneshot, title: `${title} (copy)` } }, to);
-    return this.write(to, { draft: copy, published: null, create: true }, { action: "import", doc: copy });
+    return this.write(to, { draft: copy, published: null, create: true, owner }, { action: "import", doc: copy });
   }
 
   async delete(slug: string): Promise<WriteResult> {
@@ -239,10 +250,10 @@ export class DbStore implements OneShotStore {
     return { changed: [] };
   }
 
-  async import(slug: string, doc: OneShotDoc): Promise<WriteResult> {
+  async import(slug: string, doc: OneShotDoc, owner?: string | null): Promise<WriteResult> {
     await this.assertFree(slug);
     const next = normalizeDoc(coerceDoc(doc), slug);
-    return this.write(slug, { draft: next, published: null, create: true }, { action: "import", doc: next });
+    return this.write(slug, { draft: next, published: null, create: true, owner }, { action: "import", doc: next });
   }
 
   async restore(slug: string, revisionId: string): Promise<WriteResult> {

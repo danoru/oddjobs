@@ -1,74 +1,61 @@
-import { useState } from "react";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import { Alert, Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { useState } from "react";
+import { safeNext } from "@/lib/accounts";
+import { fullLoad } from "@/lib/fullLoad";
+import { signInWithPassword } from "@/lib/signInClient";
+import { Alert, DoorPage, Field, Seal, doorStyles as d } from "@/components/door/Door";
+
+const NEED: Record<string, string> = {
+  admin: "That page is for the tavern's admins. Sign in as one to open it.",
+  author: "That page is for authors. Sign in as one, or ask an admin for the badge.",
+};
 
 export default function LoginPage() {
   const router = useRouter();
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const forGm = typeof router.query.next === "string" && /^\/[^/]+\/gm\/?$/.test(router.query.next.split("?")[0]);
+  const need = typeof router.query.need === "string" ? NEED[router.query.need] : undefined;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError(null);
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
-    setBusy(false);
-    if (res.ok) {
-      const next = typeof router.query.next === "string" ? router.query.next : "/";
-      // Same-site paths only: "//host" and "/\host" would leave the site.
-      router.push(/^\/(?![/\\])/.test(next) ? next : "/");
-    } else {
-      setError("The barkeep shakes their head. Try again.");
+    const r = await signInWithPassword(username, password);
+    if (r.ok) {
+      fullLoad(safeNext(router.query.next));
+      return;
     }
+    setBusy(false);
+    setError(
+      r.code === "rate_limited"
+        ? "Too many wrong words at the door. The barkeep will listen again in a few minutes."
+        : r.code === "credentials"
+          ? "The barkeep doesn't know that name and password. Try again."
+          : "The door is stuck. Try again in a moment.",
+    );
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", p: 2 }}>
-      <Box
-        component="form"
-        onSubmit={submit}
-        sx={{
-          width: "100%",
-          maxWidth: 360,
-          p: 4,
-          bgcolor: "var(--parchment)",
-          color: "var(--ink)",
-          boxShadow: "0 12px 30px rgba(0,0,0,0.5)",
-          transform: "rotate(-1deg)",
-        }}
-      >
-        <Stack spacing={2}>
-          <Typography variant="h2" align="center" sx={{ fontSize: 34, color: "var(--wax)" }}>
-            Oddjobs
-          </Typography>
-          <Typography align="center" sx={{ fontFamily: "var(--font-print)", fontSize: 18 }}>
-            {forGm ? "Only the GM goes behind the screen. Speak the GM's word." : "Speak the word at the door."}
-          </Typography>
-          <TextField
-            type="password"
-            label="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoFocus
-            fullWidth
-            sx={{
-              "& .MuiInputBase-root": { color: "var(--ink)" },
-              "& .MuiInputLabel-root": { color: "var(--ink-soft)" },
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: "var(--ink-soft)" },
-            }}
-          />
-          {error && <Alert severity="error">{error}</Alert>}
-          <Button type="submit" variant="contained" color="secondary" disabled={busy}>
-            Enter the tavern
-          </Button>
-        </Stack>
-      </Box>
-    </Box>
+    <>
+      <Head>
+        <title>Sign in · Oddjobs</title>
+      </Head>
+      <DoorPage header="At the door" title="Who goes there?" lede={need ?? "Sign in with your name on the board."}>
+        <form className={d.form} onSubmit={submit} noValidate>
+          <Field id="username" label="Username" autoComplete="username" autoCapitalize="none" spellCheck={false} value={username} onChange={(e) => setUsername(e.target.value)} required autoFocus />
+          <Field id="password" label="Password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          {error && <Alert>{error}</Alert>}
+          <div className={d.actions}>
+            <Seal busy={busy}>Enter</Seal>
+          </div>
+        </form>
+        <p className={d.small}>
+          New here? You need an invite link from someone at the table. Forgot your password? Ask an admin for a reset link.
+        </p>
+      </DoorPage>
+    </>
   );
 }

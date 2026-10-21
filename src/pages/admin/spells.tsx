@@ -20,7 +20,8 @@ import { ThemeProvider } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
-import { requestRole } from "@/lib/auth";
+import { pageViewer } from "@/lib/auth";
+import { isAdmin } from "@/lib/accounts";
 import { getSpellStore, type WriteGate } from "@/lib/store";
 import { spellNameProblem } from "@/lib/store/spellName";
 import type { SpellBook } from "@/lib/oneShotCheck";
@@ -32,16 +33,16 @@ import { parchmentTheme } from "@/components/admin/parchmentTheme";
 import s from "@/components/admin/Admin.module.css";
 
 /** `wanted` is ?new=<name>, from the builder's "not in the spell book yet" link. */
-type Props = { spells: SpellBook; gate: WriteGate; wanted: string | null };
+/** `canDelete`: only admins take spells out of the shared book; authors add and edit. */
+type Props = { spells: SpellBook; gate: WriteGate; wanted: string | null; canDelete: boolean };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, resolvedUrl, query }) => {
-  if ((await requestRole(req)) !== "gm") {
-    return { redirect: { destination: `/login?next=${encodeURIComponent(resolvedUrl)}`, permanent: false } };
-  }
+  const who = await pageViewer({ req, resolvedUrl }, "author");
+  if (who.redirect) return { redirect: who.redirect };
   const store = getSpellStore();
   res.setHeader("Cache-Control", "private, no-store");
   const wanted = typeof query.new === "string" && query.new.trim() ? query.new.trim().slice(0, 80) : null;
-  return { props: JSON.parse(JSON.stringify({ spells: await store.list(), gate: store.gate(), wanted })) as Props };
+  return { props: JSON.parse(JSON.stringify({ spells: await store.list(), gate: store.gate(), wanted, canDelete: isAdmin(who.viewer) })) as Props };
 };
 
 const SCHOOLS = spellInfoSchema.shape.school.options;
@@ -194,7 +195,7 @@ function problemsOf(f: Form, taken: boolean): Record<string, string> {
 }
 
 /** The spell book editor: content/rules/spells.json, one entry at a time. */
-export default function SpellsPage({ spells, gate, wanted }: Props) {
+export default function SpellsPage({ spells, gate, wanted, canDelete }: Props) {
   const router = useRouter();
   const readOnly = !gate.writable;
   const { add: addChanged } = useChangedFiles();
@@ -321,7 +322,7 @@ export default function SpellsPage({ spells, gate, wanted }: Props) {
                       <Button size="small" variant="outlined" startIcon={<EditIcon />} onClick={() => setEditing({ form: toForm(name, sp), isNew: false })}>
                         {readOnly ? "View" : "Edit"}
                       </Button>
-                      {!readOnly && (
+                      {!readOnly && canDelete && (
                         <Button size="small" color="secondary" startIcon={<DeleteOutlinedIcon />} onClick={() => setDeleting(name)}>
                           Delete
                         </Button>

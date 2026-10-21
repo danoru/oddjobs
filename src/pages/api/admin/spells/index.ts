@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
-import { adminGuard, methodNotAllowed, sendStoreError } from "@/lib/admin.server";
+import { contentGuard, methodNotAllowed, sendStoreError } from "@/lib/admin.server";
+import { isAdmin } from "@/lib/accounts";
 import { getSpellStore, type SpellStore } from "@/lib/store";
 import { cardPagesOf, revalidatePages } from "@/lib/revalidate";
 import { publishedOneShot } from "@/lib/source";
@@ -18,14 +19,19 @@ const deleteBody = z.object({ name: z.string() });
  * DELETE { name } — remove one entry, unless a one-shot still uses it.
  *
  * A change revalidates the cards pages of every published one-shot that uses the spell.
+ *
+ * Authors and admins: the spell book is shared, and an author needs to add
+ * the spells their casts use. Only admins delete.
  */
 export async function handler(req: NextApiRequest, res: NextApiResponse, injected?: SpellStore) {
   if (!["GET", "POST", "PUT", "DELETE"].includes(req.method ?? "")) return methodNotAllowed(res, ["GET", "POST", "PUT", "DELETE"]);
-  const store = await adminGuard(req, res, { write: req.method !== "GET", store: injected ?? getSpellStore() });
-  if (!store) return;
+  const guard = await contentGuard(req, res, { write: req.method !== "GET", store: injected ?? getSpellStore(), need: "author" });
+  if (!guard) return;
+  const { store, viewer } = guard;
   try {
-    if (req.method === "GET") return res.status(200).json({ spells: await store.list(), gate: store.gate() });
+    if (req.method === "GET") return res.status(200).json({ spells: await store.list(), gate: store.gate(), canDelete: isAdmin(viewer) });
     if (req.method === "DELETE") {
+      if (!isAdmin(viewer)) return res.status(403).json({ error: "Only an admin can take a spell out of the book" });
       const b = deleteBody.safeParse(req.body);
       if (!b.success) return res.status(400).json({ error: "Expected { name }" });
       return res.status(200).json(await store.delete(b.data.name));

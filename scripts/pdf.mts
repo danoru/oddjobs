@@ -11,7 +11,7 @@
  *   pnpm pdf --a4                  — A4 instead of US Letter
  *   BASE_URL=http://localhost:3000 pnpm pdf
  *
- * Signs in with GM_PASSWORD (for the Ten Candles kit), else APP_PASSWORD, from .env or the environment.
+ * Signs in as the e2e admin (scripts/e2e-auth.mts; the Ten Candles kit is GM-only).
  * PDF_OUT=dir writes somewhere other than public/pdf.
  * First run on a new machine: pnpm exec playwright install chromium
  */
@@ -20,22 +20,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { loadOneShot, publishedSlugs } from "../src/lib/content";
 import { levelsOf } from "../src/systems/dnd5e/variants";
+import { ensureE2eUsers, signInAs } from "./e2e-auth.mts";
 
 const ROOT = path.join(import.meta.dirname, "..");
 const OUT = process.env.PDF_OUT ? path.resolve(process.env.PDF_OUT) : path.join(ROOT, "public", "pdf");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
 
-/** The GM password if there is one (it opens everything players see, plus the GM-only Ten Candles kit), else the table's. */
-function password(): string {
-  const env = [".env.local", ".env"].map((f) => path.join(ROOT, f)).find((f) => fs.existsSync(f)) ?? path.join(ROOT, ".env");
-  const text = fs.existsSync(env) ? fs.readFileSync(env, "utf8") : "";
-  for (const key of ["GM_PASSWORD", "APP_PASSWORD"]) {
-    if (process.env[key]) return process.env[key]!;
-    const line = text.match(new RegExp(`^${key}=(.*)$`, "m"));
-    if (line?.[1].trim()) return line[1].trim();
-  }
-  throw new Error("Set GM_PASSWORD or APP_PASSWORD (or put them in .env)");
-}
 
 const args = process.argv.slice(2);
 const a4 = args.includes("--a4");
@@ -44,8 +34,8 @@ const targets = slugs.length ? slugs : publishedSlugs();
 
 const browser = await chromium.launch();
 const context = await browser.newContext();
-const login = await context.request.post(`${BASE}/api/login`, { data: { password: password() } });
-if (!login.ok()) throw new Error(`Login failed (${login.status()}) — is the server running at ${BASE}?`);
+await ensureE2eUsers(["admin"]);
+await signInAs(context, BASE, "admin");
 
 fs.mkdirSync(OUT, { recursive: true });
 const page = await context.newPage();

@@ -1,0 +1,362 @@
+/* The landing page: the hanging sign over the tavern door, the pitch, how it
+   works as pinned notes, a strip of real posters, and the way in. */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: var(--parchment);
+  overflow-x: hidden;
+}
+
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 16px 0;
+}
+
+.topLink {
+  font: 16px/1 var(--font-label);
+  letter-spacing: 0.06em;
+  color: var(--brass);
+  padding: 8px 12px;
+  border: 1px solid rgba(210, 168, 90, 0.5);
+  text-decoration: none;
+}
+
+.topLink:hover {
+  background: rgba(210, 168, 90, 0.1);
+}
+
+/* ---- The sign ------------------------------------------------------------ */
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 16px 40px;
+}
+
+.bracket {
+  width: min(78vw, 420px);
+  height: 14px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #4b4b4b, #1f1f1f);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+.sign {
+  position: relative;
+  margin-top: 54px;
+  padding: 14px clamp(22px, 6vw, 48px) 18px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.12) 0 2px, transparent 2px 40px),
+    linear-gradient(180deg, #5a3a1f, #3e2713 70%, #2f1d0e);
+  border: 4px solid #6b4425;
+  border-radius: 6px;
+  box-shadow:
+    inset 0 0 0 2px rgba(0, 0, 0, 0.35),
+    0 16px 30px rgba(0, 0, 0, 0.6);
+  transform-origin: 50% -54px;
+  animation: sway 6s ease-in-out infinite alternate;
+}
+
+.chainLeft,
+.chainRight {
+  position: absolute;
+  top: -58px;
+  width: 6px;
+  height: 58px;
+  background: repeating-linear-gradient(180deg, #6d6d6d 0 6px, #2a2a2a 6px 9px);
+  border-radius: 3px;
+}
+
+.chainLeft {
+  left: 22%;
+}
+
+.chainRight {
+  right: 22%;
+}
+
+.signText {
+  margin: 0;
+  font-family: var(--font-poster);
+  font-weight: 400;
+  font-size: clamp(48px, 13vw, 96px);
+  line-height: 1;
+  color: var(--brass);
+  text-shadow:
+    0 3px 0 #1c140e,
+    0 0 18px rgba(210, 168, 90, 0.25);
+}
+
+@keyframes sway {
+  from {
+    transform: rotate(-1.6deg);
+  }
+  to {
+    transform: rotate(1.6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sign {
+    animation: none;
+  }
+}
+
+.pitch {
+  margin: 34px 0 10px;
+  font-family: var(--font-poster);
+  font-size: clamp(30px, 7vw, 52px);
+  line-height: 1.05;
+  color: var(--parchment);
+}
+
+.lede {
+  max-width: 620px;
+  margin: 0 0 30px;
+  font-family: var(--font-print);
+  font-size: clamp(18px, 2.6vw, 22px);
+  line-height: 1.4;
+  color: #e9dcbc;
+}
+
+/* The way in is a wax seal. */
+.seal {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 148px;
+  height: 148px;
+  border-radius: 50%;
+  text-decoration: none;
+  color: #fbe9dc;
+  background: radial-gradient(circle at 35% 30%, #d4553f, var(--wax) 55%, #6c1d14);
+  box-shadow:
+    0 0 0 6px rgba(108, 29, 20, 0.35),
+    0 10px 20px rgba(0, 0, 0, 0.5),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.35);
+  transform: rotate(-8deg);
+  transition: transform 0.2s ease;
+}
+
+.seal span {
+  font: 14px/1.2 var(--font-label);
+  letter-spacing: 0.04em;
+}
+
+.seal b {
+  font: 400 26px/1.1 var(--font-poster);
+}
+
+.seal:hover {
+  transform: rotate(-2deg) scale(1.04);
+}
+
+.seal:focus-visible,
+.button:focus-visible,
+.topLink:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: 4px;
+}
+
+/* ---- Sections ------------------------------------------------------------ */
+
+.section {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 36px 16px;
+}
+
+.heading {
+  margin: 0 0 8px;
+  font-family: var(--font-poster);
+  font-weight: 400;
+  font-size: clamp(26px, 5vw, 36px);
+  text-align: center;
+  color: var(--brass);
+}
+
+.sub {
+  max-width: 640px;
+  margin: 0 auto 24px;
+  font-family: var(--font-print);
+  font-size: 19px;
+  text-align: center;
+  color: #e9dcbc;
+}
+
+.pin {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f3a08f, #b5402f 45%, #5a160d);
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.45);
+}
+
+.paper {
+  position: relative;
+  color: var(--ink);
+  background-color: var(--parchment);
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 255, 255, 0.45), transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(150, 100, 40, 0.18), transparent 55%);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  transform: rotate(var(--tilt, 0deg));
+}
+
+/* ---- How it works -------------------------------------------------------- */
+
+.steps {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: clamp(16px, 3vw, 32px);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(18px, 3vw, 30px);
+  border: 14px solid #4a2e18;
+  border-radius: 4px;
+  background-color: var(--cork);
+  background-image:
+    radial-gradient(rgba(60, 30, 10, 0.4) 1px, transparent 1.6px),
+    radial-gradient(rgba(255, 220, 170, 0.2) 1px, transparent 1.6px);
+  background-size: 7px 7px, 11px 11px;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.45);
+}
+
+@media (min-width: 980px) {
+  .steps {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+.step {
+  composes: paper;
+  padding: 34px 20px 20px;
+  text-align: center;
+}
+
+.stepNo {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font: 15px/1 var(--font-label);
+  color: var(--ink-soft);
+}
+
+.stepTitle {
+  margin: 8px 0 6px;
+  font-family: var(--font-poster);
+  font-weight: 400;
+  font-size: 24px;
+}
+
+.stepText {
+  margin: 0;
+  font-family: var(--font-print);
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+/* ---- The strip of posters ------------------------------------------------ */
+
+.strip {
+  list-style: none;
+  margin: 0;
+  padding: 18px 16px 26px;
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.poster {
+  composes: paper;
+  flex: 0 0 210px;
+  scroll-snap-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: 32px 16px 16px;
+}
+
+.posterHeader {
+  font: 400 22px/1 var(--font-poster);
+  letter-spacing: 0.08em;
+  color: var(--wax);
+  margin-bottom: 4px;
+}
+
+.posterName {
+  font: 400 21px/1.1 var(--font-poster);
+  margin-top: 6px;
+}
+
+.posterEpithet {
+  font: italic 16px/1.2 var(--font-print);
+  color: var(--ink-soft);
+}
+
+.posterHook {
+  font: 16px/1.3 var(--font-print);
+  margin-top: 6px;
+}
+
+.posterJob {
+  margin-top: auto;
+  padding-top: 10px;
+  font: 13px/1.2 var(--font-label);
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
+/* ---- The door ------------------------------------------------------------ */
+
+.door {
+  text-align: center;
+  padding-bottom: 56px;
+}
+
+.button {
+  display: inline-block;
+  padding: 12px 28px;
+  font: 18px/1 var(--font-label);
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: var(--brass);
+  border: 2px solid #6e4f17;
+  text-decoration: none;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.button:hover {
+  background: #e0b96a;
+}
+
+.footer {
+  margin-top: auto;
+  padding: 18px 16px 24px;
+  text-align: center;
+  font: 14px/1.4 var(--font-print);
+  color: #b9a888;
+  border-top: 1px solid rgba(210, 168, 90, 0.2);
+}

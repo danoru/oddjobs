@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { beforeAll, describe, expect, it } from "vitest";
-import { AUTH_COOKIE, createToken } from "./auth";
+import { installTestUsers, sessionCookies, type TestWho } from "./testAuth";
 import { FileStore } from "./store";
 import { handler as listRoute } from "@/pages/api/admin/oneshots";
 import { handler as oneRoute } from "@/pages/api/admin/oneshots/[slug]";
@@ -12,6 +12,7 @@ import { handler as survivorRoute, type SurvivorWriter } from "@/pages/api/admin
 
 beforeAll(() => {
   process.env.AUTH_SECRET = "test-secret";
+  installTestUsers();
 });
 
 /** A content folder in a temp dir with one real one-shot. */
@@ -31,9 +32,9 @@ type Res = { statusCode: number; body: unknown; headers: Record<string, string> 
 async function call(
   route: (req: NextApiRequest, res: NextApiResponse, store?: FileStore) => Promise<unknown>,
   store: FileStore,
-  opts: { role?: "gm" | "table" | null; method: string; query?: Record<string, string>; body?: unknown },
+  opts: { role?: TestWho | null; method: string; query?: Record<string, string>; body?: unknown },
 ): Promise<Res> {
-  const cookies: Record<string, string> = opts.role ? { [AUTH_COOKIE]: await createToken(opts.role) } : {};
+  const cookies = await sessionCookies(opts.role);
   const out: Res = { statusCode: 200, body: undefined, headers: {} };
   const res = {
     status(code: number) {
@@ -80,7 +81,8 @@ describe("admin API auth", () => {
     for (const role of ["table", null] as const) {
       const store = tempStore(true);
       const res = await call(route, store, { ...req, role });
-      expect(res.statusCode).toBe(403);
+      // Strangers: sign in first (401). Players: not for them (403).
+      expect(res.statusCode).toBe(role ? 403 : 401);
       expect(JSON.stringify(res.body)).not.toContain("Marrowby");
       // Nothing was written.
       expect(fs.existsSync(path.join(store.root, "drafts"))).toBe(false);
@@ -167,8 +169,8 @@ describe("saving to the shared world", () => {
   it("is GM-only", async () => {
     const { w, saved } = writer(true);
     for (const role of ["table", null] as const) {
-      expect((await post(role, w)).statusCode).toBe(403);
-      expect((await call(survivorRoute as never, w as never, { role, method: "DELETE", body: { ids: ["x"] } })).statusCode).toBe(403);
+      expect((await post(role, w)).statusCode).toBe(role ? 403 : 401);
+      expect((await call(survivorRoute as never, w as never, { role, method: "DELETE", body: { ids: ["x"] } })).statusCode).toBe(role ? 403 : 401);
     }
     expect(saved).toEqual([]);
     expect((await post("gm", w)).statusCode).toBe(200);

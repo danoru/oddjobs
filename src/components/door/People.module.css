@@ -1,0 +1,125 @@
+/* The people page and the invite list: a ledger on parchment. */
+
+.inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px 14px;
+  margin-bottom: 12px;
+}
+
+.control {
+  display: grid;
+  gap: 2px;
+  min-width: 80px;
+  flex: 1 1 110px;
+}
+
+.control:first-child {
+  flex: 3 1 200px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-label);
+  font-size: 15px;
+  padding-bottom: 8px;
+}
+
+.check input,
+.table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--wax);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-family: var(--font-print);
+  font-size: 16px;
+}
+
+.table th {
+  font-family: var(--font-label);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-align: left;
+  border-bottom: 2px solid var(--ink-soft);
+  padding: 6px 6px;
+}
+
+.table td {
+  border-bottom: 1px dashed rgba(43, 29, 14, 0.35);
+  padding: 8px 6px;
+  vertical-align: top;
+}
+
+.dead td {
+  color: var(--ink-soft);
+  text-decoration-color: var(--wax);
+}
+
+.dead code {
+  text-decoration: line-through;
+}
+
+.code {
+  font-size: 14px;
+  word-break: break-all;
+}
+
+.copy {
+  font: 14px/1.2 var(--font-sheet);
+  width: min(100%, 420px);
+  padding: 4px 6px;
+  border: 1px solid var(--ink-soft);
+  background: rgba(255, 250, 235, 0.8);
+  color: var(--ink);
+}
+
+.who {
+  font-family: var(--font-poster);
+  font-size: 18px;
+}
+
+.toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
+.rowActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.disabled td {
+  color: var(--ink-soft);
+}
+
+/* On a phone, each person is a card instead of a row. */
+@media (max-width: 640px) {
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .table tr {
+    display: block;
+    border-bottom: 1px dashed rgba(43, 29, 14, 0.4);
+    padding: 8px 0;
+  }
+  .table td {
+    display: block;
+    border: 0;
+    padding: 3px 0;
+  }
+}

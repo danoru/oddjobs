@@ -1,35 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken, AUTH_COOKIE } from "@/lib/auth";
+import { readClaims } from "@/lib/session";
 
 /**
- * `/<oneshot>/gm` (the GM's view of one table), `/<oneshot>/kit` (the GM's
- * printable kit), `/<oneshot>/box` (the whole box, sealed letters and all)
- * and the one-shot builder under `/admin`.
+ * The front door. Everything needs a signed-in account except the public
+ * pages: the landing page (`/`), the door itself (`/login`, `/join/<code>`,
+ * `/reset/<token>`), their APIs, Auth.js's own routes and the link-preview
+ * images. Static assets skip the proxy entirely (see the matcher), and so
+ * does `/api/foundry/`: Foundry calls it cross-origin with a bearer token (no
+ * cookie), and the route checks the token itself.
+ *
+ * This only checks that a session exists (the token, no database). Who may do
+ * what (admins, authors) is checked by each page and API on the server,
+ * against the database (src/lib/auth.ts). Requests for a page's
+ * `_next/data/…json` arrive here under the page's own path, so they follow
+ * the same rule as the page.
  */
-const GM_PAGE = /^\/(?:[^/]+\/(?:gm|kit|box)|admin(?:\/.*)?)\/?$/;
 
-// Everything is behind the table password except the door itself, and the GM
-// pages also need the GM password. This is the convenience redirect; the GM
-// page and GM-only API routes check the role again themselves.
-// /api/foundry/ is excluded in the matcher below: Foundry calls it cross-origin
-// with a bearer token (no cookie), and the route checks the token itself.
+const PUBLIC = /^\/(?:login|join\/[^/]+|reset\/[^/]+|api\/(?:auth\/.*|og(?:\/.*)?|join|reset|whoami))\/?$/;
+
 export async function proxy(req: NextRequest) {
-  const role = await verifyToken(req.cookies.get(AUTH_COOKIE)?.value);
-  if (role && (role === "gm" || !GM_PAGE.test(req.nextUrl.pathname))) {
-    return NextResponse.next();
+  const { pathname } = req.nextUrl;
+  const claims = await readClaims(req.headers.get("cookie"));
+
+  if (pathname === "/") {
+    // The landing page is for strangers; members go straight to the board.
+    if (!claims) return NextResponse.next();
+    const board = req.nextUrl.clone();
+    board.pathname = "/board";
+    return NextResponse.redirect(board);
+  }
+  if (claims || PUBLIC.test(pathname)) return NextResponse.next();
+
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json({ error: "Sign in first" }, { status: 401, headers: { "Cache-Control": "private, no-store" } });
   }
   const login = req.nextUrl.clone();
   login.pathname = "/login";
   login.search = "";
-  // GM pages take no query; on client-side navigations Next adds the route
-  // params to it (`?oneshot=…`), which shouldn't end up in `next`.
-  const search = GM_PAGE.test(req.nextUrl.pathname) ? "" : req.nextUrl.search;
-  login.searchParams.set("next", req.nextUrl.pathname + search);
+  login.searchParams.set("next", pathname + req.nextUrl.search);
   return NextResponse.redirect(login);
 }
 
 export const config = {
-  matcher: [
-    "/((?!login|api/login|api/foundry/|_next/static|_next/image|favicon.ico|fonts/|textures/).*)",
-  ],
+  matcher: ["/((?!api/foundry/|_next/static|_next/image|favicon.ico|robots.txt|fonts/|textures/).*)"],
 };

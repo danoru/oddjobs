@@ -23,8 +23,8 @@
 import { chromium, type Page } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
+import { ensureE2eUsers, signInAs } from "./e2e-auth.mts";
 
-const ROOT = path.join(import.meta.dirname, "..");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
 const SHOTS = process.env.SHOTS ? path.resolve(process.env.SHOTS) : null;
 const SLUG = "db-test-night";
@@ -33,13 +33,6 @@ const SPELL = "Guidance";
 const SPELL_USER = "the-drowned-bell";
 const MARK = "Chalk-marked by the database test.";
 
-function env(name: string): string {
-  if (process.env[name]) return process.env[name]!;
-  const file = path.join(ROOT, ".env");
-  const line = fs.existsSync(file) ? fs.readFileSync(file, "utf8").match(new RegExp(`^${name}=(.*)$`, "m")) : null;
-  if (!line) throw new Error(`Set ${name} (or put it in .env)`);
-  return line[1].trim().replace(/^"|"$/g, "");
-}
 
 function check(ok: unknown, what: string) {
   if (!ok) throw new Error(`FAILED: ${what}`);
@@ -52,11 +45,11 @@ async function shot(page: Page, name: string) {
   await page.screenshot({ path: path.join(SHOTS, `${name}.png`), fullPage: false });
 }
 
+await ensureE2eUsers();
 const browser = await chromium.launch();
 const gm = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
 {
-  const r = await gm.request.post(`${BASE}/api/login`, { data: { password: env("GM_PASSWORD") } });
-  if (!r.ok()) throw new Error(`Login failed (${r.status()}) — is the server running at ${BASE}?`);
+  await signInAs(gm, BASE, "admin");
 }
 const api = gm.request;
 const gate = ((await (await api.get(`${BASE}/api/admin/oneshots`)).json()) as { gate?: { kind?: string } }).gate;
@@ -101,7 +94,7 @@ let spellBefore: unknown = null;
 let survivorId: string | null = null;
 try {
   // ======================= The imported content =======================
-  const board = await textOf("/");
+  const board = await textOf("/board");
   for (const t of ["The Drowned Bell", "Lights Out at Marrowby", "A Vow Before Dawn"]) check(board.includes(t), `the imported "${t}" is on the board`);
   check((await textOf(`/${SPELL_USER}`)).includes("The Drowned Bell"), "a job page renders from the database");
   const gmPage = await textOf(`/${SPELL_USER}/gm`);
@@ -119,14 +112,14 @@ try {
   await rename("DB Test Night");
   await publishInBuilder();
   await shot(page, "01-published");
-  check((await textOf("/")).includes("DB Test Night"), "the published module is on the board at once, with no rebuild");
+  check((await textOf("/board")).includes("DB Test Night"), "the published module is on the board at once, with no rebuild");
   check((await textOf(`/${SLUG}`)).includes("DB Test Night"), "…and its job page");
   check((await textOf(`/${SLUG}/play`)).length > 0, "…and its phone page");
 
   await openBuilder(SLUG);
   await rename("DB Test Night, Revised");
   await publishInBuilder();
-  const revised = await textOf("/");
+  const revised = await textOf("/board");
   check(revised.includes("DB Test Night, Revised"), "a revision is published over it");
 
   const hist = ((await (await api.get(`${BASE}/api/admin/oneshots/${SLUG}/history`)).json()) as { revisions: { id: string; action: string; title: string }[] }).revisions;
@@ -141,7 +134,7 @@ try {
   check((await field("oneshot.title").inputValue()) === "DB Test Night", "restoring opens that version as the draft");
   check((await stored(SLUG)).published?.oneshot.title === "DB Test Night, Revised", "…without touching the board yet");
   await publishInBuilder();
-  const restored = await textOf("/");
+  const restored = await textOf("/board");
   check(restored.includes("DB Test Night") && !restored.includes("DB Test Night, Revised"), "publishing the restored version puts it back on the board");
 
   // ======================= Unpublish and delete =======================
@@ -150,7 +143,7 @@ try {
   await page.locator(`[data-slug="${SLUG}"] [data-status="draft"]`).waitFor({ timeout: 60000 });
   check((await status(`/${SLUG}`)) === 404, "after unpublishing, its job page is a 404");
   check((await status(`/${SLUG}/play`)) === 404, "…and so is its phone page");
-  check(!(await textOf("/")).includes("DB Test Night"), "…and it's off the board");
+  check(!(await textOf("/board")).includes("DB Test Night"), "…and it's off the board");
 
   // ======================= The spell book =======================
   spellBefore = ((await (await api.get(`${BASE}/api/admin/spells`)).json()) as { spells: Record<string, unknown> }).spells[SPELL];
@@ -177,13 +170,13 @@ try {
   await page.getByText(/Saved 1 record to the shared world/).waitFor({ timeout: 30000 });
   check(survivorId?.startsWith(`${SPELL_USER}/`), `the epilogue saves a survivor to the database (${survivorId})`);
   await shot(page, "04-epilogue");
-  const home = await textOf("/");
+  const home = await textOf("/board");
   check(home.includes("Notable survivors") && home.includes(name.replace(/\s+the .*/, "").split(" ")[0]), `the survivor (${name}) is on the home board`);
   await shot(page, "05-board-survivor");
 
   // ======================= Players stay out =======================
   const player = await browser.newContext();
-  await player.request.post(`${BASE}/api/login`, { data: { password: env("APP_PASSWORD") } });
+  await signInAs(player, BASE, "player");
   const pp = await player.newPage();
   for (const url of ["/admin", `/admin/${SLUG}`, "/admin/spells"]) {
     await pp.goto(`${BASE}${url}`);

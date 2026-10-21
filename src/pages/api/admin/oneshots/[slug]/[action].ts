@@ -1,12 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { adminGuard, methodNotAllowed, sendStoreError } from "@/lib/admin.server";
 import { formatJson } from "@/lib/store/json";
-import { pagesOfDoc, revalidatePages } from "@/lib/revalidate";
+import { BOARD_PAGES, pagesOfDoc, revalidatePages } from "@/lib/revalidate";
 import type { OneShotStore } from "@/lib/store";
+import { db } from "@/lib/prisma";
+import { isAdmin } from "@/lib/accounts";
 
 /**
  * POST publish | unpublish | discard | duplicate { to } — move a one-shot between draft and published.
  * POST restore { revision } — make an earlier revision the draft (stores with a history).
+ * POST owner { ownerId } — hand the one-shot to someone (null: back to the admins). Admins only.
  * GET export — the newest version as one JSON file to download.
  * GET history — the saves and publishes, newest first (stores with a history).
  *
@@ -41,7 +44,7 @@ export async function handler(req: NextApiRequest, res: NextApiResponse, injecte
       return sendStoreError(res, e);
     }
   }
-  if (!["publish", "unpublish", "discard", "duplicate", "restore"].includes(action)) return res.status(404).json({ error: "Unknown action" });
+  if (!["publish", "unpublish", "discard", "duplicate", "restore", "owner"].includes(action)) return res.status(404).json({ error: "Unknown action" });
   if (req.method !== "POST") return methodNotAllowed(res, ["POST"]);
   const store = await adminGuard(req, res, { write: true, store: injected });
   if (!store) return;
@@ -50,10 +53,18 @@ export async function handler(req: NextApiRequest, res: NextApiResponse, injecte
       const before = await store.get(slug);
       const result = action === "publish" ? await store.publish(slug) : await store.unpublish(slug);
       const after = await store.get(slug);
-      const revalidated = await revalidatePages(res, ["/", ...pagesOfDoc(before?.published), ...pagesOfDoc(after?.published)]);
+      const revalidated = await revalidatePages(res, [...BOARD_PAGES, ...pagesOfDoc(before?.published), ...pagesOfDoc(after?.published)]);
       return res.status(200).json({ ...result, revalidated: revalidated.done.length, notRevalidated: revalidated.failed.map((f) => f.path) });
     }
     if (action === "discard") return res.status(200).json(await store.discardDraft(slug));
+    if (action === "owner") {
+      if (!isAdmin(store.viewer)) return res.status(403).json({ error: "Only an admin can hand a one-shot to someone" });
+      const ownerId = (req.body as { ownerId?: unknown } | undefined)?.ownerId;
+      if (ownerId !== null && typeof ownerId !== "string") return res.status(400).json({ error: "Expected { ownerId }" });
+      if (ownerId && !(await ownerExists(ownerId))) return res.status(400).json({ error: "No such author" });
+      await store.setOwner(slug, ownerId || null);
+      return res.status(200).json({ ownerId: ownerId || null, changed: [] });
+    }
     if (action === "restore") {
       if (!store.restore) return res.status(404).json({ error: "This store keeps no history (with files, git is the history)" });
       const revision = String((req.body as { revision?: unknown } | undefined)?.revision ?? "");
@@ -65,6 +76,12 @@ export async function handler(req: NextApiRequest, res: NextApiResponse, injecte
   } catch (e) {
     return sendStoreError(res, e);
   }
+}
+
+/** A new owner must be an enabled account that may write: an author or an admin. */
+async function ownerExists(id: string): Promise<boolean> {
+  const u = await db().user.findUnique({ where: { id } });
+  return !!u && !u.disabledAt && (u.role === "admin" || u.author);
 }
 
 export default function route(req: NextApiRequest, res: NextApiResponse) {

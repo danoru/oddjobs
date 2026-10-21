@@ -28,6 +28,7 @@
 import { chromium, type Page } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
+import { ensureE2eUsers, signInAs } from "./e2e-auth.mts";
 
 const ROOT = path.join(import.meta.dirname, "..");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
@@ -40,13 +41,6 @@ const VOW = "builder-test-vow";
 const MISSION = "builder-test-mission";
 const TEST_SLUGS = [HEIST, NIGHT, COPY, VOW, MISSION];
 
-function env(name: string): string {
-  if (process.env[name]) return process.env[name]!;
-  const file = path.join(ROOT, ".env");
-  const line = fs.existsSync(file) ? fs.readFileSync(file, "utf8").match(new RegExp(`^${name}=(.*)$`, "m")) : null;
-  if (!line) throw new Error(`Set ${name} (or put it in .env)`);
-  return line[1].trim().replace(/^"|"$/g, "");
-}
 
 function check(ok: unknown, what: string) {
   if (!ok) throw new Error(`FAILED: ${what}`);
@@ -59,11 +53,11 @@ async function shot(page: Page, name: string) {
   await page.screenshot({ path: path.join(SHOTS, `${name}.png`) });
 }
 
+await ensureE2eUsers();
 const browser = await chromium.launch();
 const gmCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
 {
-  const r = await gmCtx.request.post(`${BASE}/api/login`, { data: { password: env("GM_PASSWORD") } });
-  if (!r.ok()) throw new Error(`Login failed (${r.status()}) — is the dev server running at ${BASE}?`);
+  await signInAs(gmCtx, BASE, "admin");
 }
 /** Whether the server keeps one-shots in the database (TEAROFF_STORE=db) rather than content/. */
 const IN_DB = ((await (await gmCtx.request.get(`${BASE}/api/admin/oneshots`)).json()) as { gate?: { kind?: string } }).gate?.kind === "db";
@@ -403,7 +397,7 @@ try {
     check(written.notices?.[0]?.title === "AUDITORS EXPECTED AT DUSK" && written.coins?.tossesPerAct === 2, "the notice and the coin settings are published");
   }
 
-  const board = await textOf("/");
+  const board = await textOf("/board");
   check(board.includes("Builder Test Heist"), "the new 5e one-shot is on the home board");
   const job = await textOf(`/${HEIST}`);
   check(job.includes("Ada Quill") && job.includes("Bram Stone") && job.includes("????"), "its job page shows the posters (Cora behind her alias)");
@@ -637,7 +631,7 @@ try {
   await type("oneshot.title", "Builder Test Night, Again");
   await saved();
   await publish(COPY);
-  check((await textOf("/")).includes("Builder Test Night, Again"), "the edited copy is on the board");
+  check((await textOf("/board")).includes("Builder Test Night, Again"), "the edited copy is on the board");
   await page.goto(`${BASE}/admin`, { waitUntil: "networkidle" });
   await page.locator(`[data-slug="${COPY}"]`).getByRole("button", { name: "Unpublish" }).click();
   await page.locator(`[data-slug="${COPY}"] [data-status="draft"]`).waitFor({ timeout: 30000 });
@@ -648,12 +642,12 @@ try {
     if (gone !== 404) await page.waitForTimeout(1500);
   }
   check(gone === 404, `after unpublishing, its job page is gone (${gone})`);
-  check(!(await textOf("/")).includes("Builder Test Night, Again"), "…and so is its posting on the board");
+  check(!(await textOf("/board")).includes("Builder Test Night, Again"), "…and so is its posting on the board");
   await shot(page, "07-admin-list");
 
   // ======================= Players can't get in =======================
   const playerCtx = await browser.newContext();
-  await playerCtx.request.post(`${BASE}/api/login`, { data: { password: env("APP_PASSWORD") } });
+  await signInAs(playerCtx, BASE, "player");
   const player = await playerCtx.newPage();
   for (const url of ["/admin", `/admin/${HEIST}`, `/admin/preview/${HEIST}`]) {
     await player.goto(`${BASE}${url}`);
@@ -673,7 +667,7 @@ try {
   }
   const stranger = await browser.newContext();
   const r = await stranger.request.get(`${BASE}/api/admin/oneshots`, { maxRedirects: 0 });
-  check(r.status() === 307 || r.status() === 403, "someone not signed in can't reach the admin API");
+  check(r.status() === 401, "someone not signed in can't reach the admin API");
   await playerCtx.close();
   await stranger.close();
   check(

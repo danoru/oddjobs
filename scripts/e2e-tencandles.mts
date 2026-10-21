@@ -16,20 +16,13 @@
 import { chromium, type BrowserContext, type Page } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
+import { ensureE2eUsers, signInAs, type E2eWho } from "./e2e-auth.mts";
 
-const ROOT = path.join(import.meta.dirname, "..");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
 const SLUG = "lights-out-at-marrowby";
 const SHOTS = process.env.SHOTS ? path.resolve(process.env.SHOTS) : null;
 const N = 3;
 
-function env(name: string): string {
-  if (process.env[name]) return process.env[name]!;
-  const file = path.join(ROOT, ".env");
-  const line = fs.existsSync(file) ? fs.readFileSync(file, "utf8").match(new RegExp(`^${name}=(.*)$`, "m")) : null;
-  if (!line) throw new Error(`Set ${name} (or put it in .env)`);
-  return line[1].trim().replace(/^"|"$/g, "");
-}
 
 function check(ok: unknown, what: string) {
   if (!ok) throw new Error(`FAILED: ${what}`);
@@ -42,17 +35,17 @@ async function shot(page: Page, name: string) {
   await page.screenshot({ path: path.join(SHOTS, `${name}.png`), fullPage: true });
 }
 
+await ensureE2eUsers();
 const browser = await chromium.launch({
   args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream", "--autoplay-policy=no-user-gesture-required"],
 });
 
-async function signedIn(password: string, phone = false): Promise<BrowserContext> {
+async function signedIn(who: E2eWho, phone = false): Promise<BrowserContext> {
   const ctx = await browser.newContext({
     viewport: phone ? { width: 390, height: 844 } : { width: 1280, height: 900 },
     permissions: ["microphone"],
   });
-  const r = await ctx.request.post(`${BASE}/api/login`, { data: { password } });
-  if (!r.ok()) throw new Error(`Login failed (${r.status()}) — is the server running at ${BASE}?`);
+  await signInAs(ctx, BASE, who);
   return ctx;
 }
 
@@ -60,7 +53,7 @@ const pages: Page[] = [];
 
 try {
   // ---- The GM opens a table ----
-  const gmCtx = await signedIn(env("GM_PASSWORD"));
+  const gmCtx = await signedIn("admin");
   const gm = await gmCtx.newPage();
   pages.push(gm);
   gm.on("dialog", (d) => void d.accept());
@@ -80,7 +73,7 @@ try {
   // ---- Three phones join and sit ----
   const phones: Page[] = [];
   for (let i = 0; i < N; i++) {
-    const ctx = await signedIn(env("APP_PASSWORD"), true);
+    const ctx = await signedIn("player", true);
     const p = await ctx.newPage();
     p.on("dialog", (d) => void d.accept());
     pages.push(p);

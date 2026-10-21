@@ -6,7 +6,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveDbUrls } from "@/lib/dbUrl";
 import { db } from "@/lib/prisma";
-import { AUTH_COOKIE, createToken } from "@/lib/auth";
+import { installTestUsers, sessionCookies } from "@/lib/testAuth";
 import type { OneShotDoc } from "@/lib/oneShotCheck";
 import { DbSpellStore } from "./dbSpellStore";
 import { DbStore, KEEP_REVISIONS } from "./dbStore";
@@ -14,6 +14,10 @@ import { FileStore } from "./fileStore";
 import { importOneShots, importSpells, importSurvivors } from "./importContent";
 import { readSurvivors, saveSurvivors } from "./survivorStore";
 import { PublishError, StoreError } from "./types";
+import { OwnedStore } from "./owned";
+import { DbOwnerBook } from "./owners";
+import { Accounts, AccountError, toViewer } from "@/lib/users.server";
+import { RateLimiter } from "@/lib/rateLimit.server";
 import { handler as actionRoute } from "@/pages/api/admin/oneshots/[slug]/[action]";
 import { handler as survivorRoute } from "@/pages/api/admin/survivors";
 
@@ -22,7 +26,8 @@ import { handler as survivorRoute } from "@/pages/api/admin/survivors";
  * schema of its own, `tearoff_test`, which this file migrates and empties:
  * the real tables are never touched. Every database test lives in this one
  * file, because `prisma dev` takes one connection at a time and vitest runs
- * files in parallel. Without a reachable database the tests are skipped
+ * files in parallel. That includes accounts (phase 10): invites, reset links,
+ * the door's rate limit, and who owns which one-shot. Without a reachable database the tests are skipped
  * (loudly); start one with `pnpm db:dev`.
  */
 
@@ -73,6 +78,7 @@ const gitDoc = async (slug: string) => (await files.get(slug))!.published!;
 beforeAll(() => {
   if (!up) return;
   process.env.AUTH_SECRET = "test-secret";
+  installTestUsers();
   process.env.DATABASE_URL = withSchema(urls.url!);
   process.env.DIRECT_URL = withSchema(urls.directUrl!);
   execSync("pnpm exec prisma migrate deploy", { cwd: ROOT, env: process.env, stdio: "pipe" });
@@ -85,6 +91,10 @@ beforeEach(async () => {
   await c.oneShot.deleteMany();
   await c.spell.deleteMany();
   await c.survivor.deleteMany();
+  await c.authAttempt.deleteMany();
+  await c.oneShotOwner.deleteMany();
+  await c.user.deleteMany();
+  await c.invite.deleteMany();
 });
 
 afterAll(async () => {
@@ -281,7 +291,7 @@ describe.skipIf(!up)("the shared world in the database", () => {
     const records = [record("the-drowned-bell/wren/2026-10-21")];
     for (const role of ["table", null] as const) {
       const res = await call(survivorRoute, { role, method: "POST", body: { records } });
-      expect(res.statusCode).toBe(403);
+      expect(res.statusCode).toBe(role ? 403 : 401);
     }
     expect(await readSurvivors()).toEqual([]);
     const res = await call(survivorRoute, { role: "gm", method: "POST", body: { records } });
@@ -324,8 +334,8 @@ describe.skipIf(!up)("history over the API", () => {
     await store.import("night", doc("First"));
     await store.saveDraft("night", doc("Second"));
     for (const role of ["table", null] as const) {
-      expect((await call(actionRoute, { role, method: "GET", query: { slug: "night", action: "history" } }, store)).statusCode).toBe(403);
-      expect((await call(actionRoute, { role, method: "POST", query: { slug: "night", action: "restore" }, body: { revision: "x" } }, store)).statusCode).toBe(403);
+      expect((await call(actionRoute, { role, method: "GET", query: { slug: "night", action: "history" } }, store)).statusCode).toBe(role ? 403 : 401);
+      expect((await call(actionRoute, { role, method: "POST", query: { slug: "night", action: "restore" }, body: { revision: "x" } }, store)).statusCode).toBe(role ? 403 : 401);
     }
     const h = await call(actionRoute, { role: "gm", method: "GET", query: { slug: "night", action: "history" } }, store);
     const revisions = (h.body as { revisions: { id: string; title: string }[] }).revisions;
@@ -358,7 +368,7 @@ async function call<S>(
   opts: { role: "gm" | "table" | null; method: string; query?: Record<string, string>; body?: unknown },
   injected?: S,
 ): Promise<Res> {
-  const cookies: Record<string, string> = opts.role ? { [AUTH_COOKIE]: await createToken(opts.role) } : {};
+  const cookies = await sessionCookies(opts.role);
   const out: Res = { statusCode: 200, body: undefined, revalidated: [] };
   const res = {
     status(code: number) {
@@ -384,3 +394,202 @@ async function call<S>(
   await route(req as unknown as NextApiRequest, res as unknown as NextApiResponse, injected);
   return out;
 }
+
+// ---- Accounts (phase 10) ----
+
+const PW = "a long enough password";
+const at = (iso: string) => () => new Date(iso);
+
+async function person(username: string, extra: { role?: "admin" | "member"; author?: boolean; canInvite?: boolean } = {}) {
+  return new Accounts().createUser({ username, password: PW, displayName: username, ...extra });
+}
+
+async function refusedWith(p: Promise<unknown>, status: number, message?: RegExp) {
+  const e = await p.then(
+    () => null,
+    (err: unknown) => err,
+  );
+  expect(e).toBeInstanceOf(AccountError);
+  expect((e as AccountError).status).toBe(status);
+  if (message) expect((e as AccountError).message).toMatch(message);
+}
+
+describe.skipIf(!up)("invites", () => {
+  it("lets one person in with a single-use invite, then refuses it", async () => {
+    const admin = toViewer(await person("Barkeep", { role: "admin" }));
+    const accounts = new Accounts();
+    const { code } = await accounts.makeInvite(admin, { maxUses: 1, days: 1, grantsAuthor: true });
+    const wren = await accounts.join(code, { username: "Wren", password: PW, displayName: "Wren", pronouns: "she/her" }, "ip-1");
+    expect(wren).toMatchObject({ username: "Wren", usernameLower: "wren", author: true, role: "member", invitedById: admin.id, pronouns: "she/her" });
+    await refusedWith(accounts.join(code, { username: "Second", password: PW, displayName: "Second" }, "ip-1"), 410, /used up/);
+    expect(await db().user.findUnique({ where: { usernameLower: "second" } })).toBeNull();
+    expect((await db().invite.findUnique({ where: { code } }))!.uses).toBe(1);
+  });
+
+  it("counts uses on a multi-use invite and stops at the limit", async () => {
+    const admin = toViewer(await person("Barkeep", { role: "admin" }));
+    const accounts = new Accounts();
+    const { code } = await accounts.makeInvite(admin, { maxUses: 2, days: 7 });
+    await accounts.join(code, { username: "one", password: PW, displayName: "One" }, "ip");
+    await accounts.join(code, { username: "two", password: PW, displayName: "Two" }, "ip");
+    await refusedWith(accounts.join(code, { username: "three", password: PW, displayName: "Three" }, "ip"), 410, /used up/);
+  });
+
+  it("refuses an expired or taken-down invite, and a name that's taken in any case", async () => {
+    const admin = toViewer(await person("Barkeep", { role: "admin" }));
+    const accounts = new Accounts({ now: at("2026-10-21T12:00:00Z") });
+    const { code } = await accounts.makeInvite(admin, { maxUses: 5, days: 1 });
+    const later = new Accounts({ now: at("2026-10-22T12:00:01Z") });
+    await refusedWith(later.join(code, { username: "late", password: PW, displayName: "Late" }, "ip"), 410, /expired/);
+    expect((await later.inviteInfo(code)).problem).toMatch(/expired/);
+
+    const now = new Accounts();
+    const fresh = await now.makeInvite(admin, { maxUses: 5, days: 1 });
+    await refusedWith(now.join(fresh.code, { username: "BARKEEP", password: PW, displayName: "Copycat" }, "ip"), 409, /already/);
+    // The refused sign-up didn't use the invite up.
+    expect((await db().invite.findUnique({ where: { code: fresh.code } }))!.uses).toBe(0);
+    const inv = await db().invite.findUnique({ where: { code: fresh.code } });
+    await now.revokeInvite(admin, inv!.id);
+    await refusedWith(now.join(fresh.code, { username: "after", password: PW, displayName: "After" }, "ip"), 410, /taken down/);
+  });
+
+  it("lets a member an admin allows make single-use, week-long invites without the badge", async () => {
+    const member = toViewer(await person("Pip", { canInvite: true }));
+    const nobody = toViewer(await person("Moss"));
+    const accounts = new Accounts();
+    await refusedWith(accounts.makeInvite(nobody, {}), 403);
+    const inv = await accounts.makeInvite(member, { maxUses: 10, days: 30, grantsAuthor: true });
+    const row = await db().invite.findUnique({ where: { code: inv.code } });
+    expect(row).toMatchObject({ maxUses: 1, grantsAuthor: false });
+    expect(row!.expiresAt.getTime() - row!.createdAt.getTime()).toBeLessThanOrEqual(7 * 24 * 3600 * 1000 + 5000);
+    expect((await accounts.listInvites(member)).map((i) => i.code)).toEqual([inv.code]);
+  });
+});
+
+describe.skipIf(!up)("signing in", () => {
+  it("checks the password, case-insensitively on the name", async () => {
+    await person("Rook");
+    const accounts = new Accounts();
+    expect((await accounts.authenticate("ROOK", PW, "ip")).ok).toBe(true);
+    expect(await accounts.authenticate("rook", "wrong password!", "ip")).toEqual({ ok: false, reason: "bad" });
+    expect(await accounts.authenticate("nobody", PW, "ip")).toEqual({ ok: false, reason: "bad" });
+  });
+
+  it("shuts the door on a name after five wrong passwords, even for the right one, and opens it again later", async () => {
+    await person("Rook");
+    let t = Date.parse("2026-10-21T12:00:00Z");
+    const limiter = new RateLimiter(db, () => t);
+    const accounts = new Accounts({ limiter });
+    for (let i = 0; i < 5; i++) expect((await accounts.authenticate("rook", `wrong ${i} password`, "ip-a")).ok).toBe(false);
+    expect(await accounts.authenticate("rook", PW, "ip-b")).toEqual({ ok: false, reason: "limited" });
+    t += 16 * 60 * 1000;
+    expect((await accounts.authenticate("rook", PW, "ip-b")).ok).toBe(true);
+  });
+
+  it("refuses a closed account, and its session stops counting", async () => {
+    const admin = toViewer(await person("Barkeep", { role: "admin" }));
+    const moss = await person("Moss");
+    const accounts = new Accounts();
+    expect(await accounts.viewer(moss.id, 0)).not.toBeNull();
+    await accounts.setAccess(admin, moss.id, { disabled: true });
+    expect(await accounts.viewer(moss.id, 0)).toBeNull();
+    expect(await accounts.viewer(moss.id, 1)).toBeNull();
+    expect(await accounts.authenticate("moss", PW, "ip")).toEqual({ ok: false, reason: "bad" });
+  });
+});
+
+describe.skipIf(!up)("reset links and passwords", () => {
+  it("work once, end every session, and set the new password", async () => {
+    const admin = toViewer(await person("Barkeep", { role: "admin" }));
+    const rook = await person("Rook");
+    const accounts = new Accounts();
+    const { token } = await accounts.makeReset(admin, rook.id);
+    expect(await accounts.resetInfo(token)).toEqual({ problem: null, username: "Rook" });
+    // Only the hash is kept.
+    expect(JSON.stringify(await db().passwordReset.findMany())).not.toContain(token);
+    await accounts.useReset(token, "a brand new password", "ip");
+    expect(await accounts.viewer(rook.id, 0)).toBeNull();
+    expect(await accounts.viewer(rook.id, 1)).not.toBeNull();
+    expect((await accounts.authenticate("rook", "a brand new password", "ip")).ok).toBe(true);
+    expect((await accounts.authenticate("rook", PW, "ip")).ok).toBe(false);
+    await refusedWith(accounts.useReset(token, "another new password", "ip"), 410, /already been used/);
+    await refusedWith(accounts.useReset("not-a-token", "another new password", "ip"), 410);
+  });
+
+  it("expire, and a newer link replaces an older one", async () => {
+    const admin = toViewer(await person("Barkeep", { role: "admin" }));
+    const rook = await person("Rook");
+    const accounts = new Accounts({ now: at("2026-10-21T12:00:00Z") });
+    const first = await accounts.makeReset(admin, rook.id);
+    expect((await new Accounts({ now: at("2026-10-23T12:00:01Z") }).resetInfo(first.token)).problem).toMatch(/expired/);
+    const second = await accounts.makeReset(admin, rook.id);
+    expect((await accounts.resetInfo(first.token)).problem).toMatch(/expired/);
+    expect((await accounts.resetInfo(second.token)).problem).toBeNull();
+    await refusedWith(accounts.makeReset(toViewer(rook), admin.id), 403);
+  });
+
+  it("changing your own password needs the current one and signs you out elsewhere", async () => {
+    const rook = await person("Rook");
+    const accounts = new Accounts();
+    await refusedWith(accounts.changePassword(rook.id, "not my password", "a brand new password"), 400);
+    await refusedWith(accounts.changePassword(rook.id, PW, "short"), 400);
+    const after = await accounts.changePassword(rook.id, PW, "a brand new password");
+    expect(after.tokenVersion).toBe(1);
+  });
+});
+
+describe.skipIf(!up)("the people page's rules", () => {
+  it("keeps one admin, and an admin can't demote or close themselves", async () => {
+    const admin = toViewer(await person("Barkeep", { role: "admin" }));
+    const pip = await person("Pip");
+    const accounts = new Accounts();
+    await refusedWith(accounts.setAccess(admin, admin.id, { role: "member" }), 409);
+    await refusedWith(accounts.setAccess(admin, admin.id, { disabled: true }), 409);
+    await refusedWith(accounts.setAccess(toViewer(pip), admin.id, { role: "member" }), 403);
+    const promoted = await accounts.setAccess(admin, pip.id, { role: "admin", author: true });
+    expect(promoted).toMatchObject({ role: "admin", author: true, tokenVersion: 0 });
+    // Now there are two, Pip can be demoted again, and losing admin ends Pip's sessions.
+    const demoted = await accounts.setAccess(admin, pip.id, { role: "member" });
+    expect(demoted).toMatchObject({ role: "member", tokenVersion: 1 });
+  });
+});
+
+describe.skipIf(!up)("ownership in the database", () => {
+  it("records who made a one-shot, and lets authors touch only their own", async () => {
+    const admin = toViewer(await person("Barkeep", { role: "admin" }));
+    const quill = toViewer(await person("Quill", { author: true }));
+    const nib = toViewer(await person("Nib", { author: true }));
+    const store = new DbStore({ spells: async () => ({}) });
+    await new OwnedStore(store, quill).import("quills-night", doc("Quill's Night"));
+    await new OwnedStore(store, nib).saveDraft("nibs-night", doc("Nib's Night"));
+    expect((await db().oneShot.findUnique({ where: { slug: "quills-night" } }))!.ownerId).toBe(quill.id);
+    expect((await db().oneShot.findUnique({ where: { slug: "nibs-night" } }))!.ownerId).toBe(nib.id);
+
+    const asQuill = new OwnedStore(store, quill);
+    expect((await asQuill.list()).map((s) => s.slug)).toEqual(["quills-night"]);
+    await expect(asQuill.saveDraft("nibs-night", doc("Mine now"))).rejects.toMatchObject({ status: 403 });
+    await expect(asQuill.delete("nibs-night")).rejects.toMatchObject({ status: 403 });
+    await expect(asQuill.restore!("nibs-night", "x")).rejects.toMatchObject({ status: 403 });
+    await expect(asQuill.history!("nibs-night")).rejects.toMatchObject({ status: 404 });
+    expect((await store.get("nibs-night"))!.draft!.oneshot.title).toBe("Nib's Night");
+    expect((await new OwnedStore(store, admin).list()).length).toBe(2);
+  });
+
+  it("hands everything unowned to the first admin", async () => {
+    await new DbStore({ spells: async () => ({}) }).import("old-night", doc("From before accounts"));
+    expect((await db().oneShot.findUnique({ where: { slug: "old-night" } }))!.ownerId).toBeNull();
+    const admin = await person("Barkeep", { role: "admin" });
+    expect(await new Accounts().claimUnowned(admin.id)).toBe(1);
+    expect((await db().oneShot.findUnique({ where: { slug: "old-night" } }))!.ownerId).toBe(admin.id);
+  });
+
+  it("keeps a file one-shot's owner in the database too", async () => {
+    const quill = await person("Quill", { author: true });
+    const book = new DbOwnerBook();
+    await book.set("some-night", quill.id);
+    expect(await book.get("some-night")).toBe(quill.id);
+    expect((await book.all()).get("some-night")).toBe(quill.id);
+    await book.set("some-night", null);
+    expect(await book.get("some-night")).toBeNull();
+  });
+});
