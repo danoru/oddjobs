@@ -1,13 +1,13 @@
 {
   "id": "tearoff-sync",
-  "title": "Tear-Off Table Sync",
-  "description": "Shows the Tear-Off board for your table inside Foundry and, when a player tears a poster, gives them the matching actor and a private journal with their character's secret.",
+  "title": "Oddjobs Table Sync",
+  "description": "Shows the Oddjobs board for your table inside Foundry and, when a player tears a poster, gives them the matching actor and a private journal with their character's secret.",
   "version": "0.1.0",
   "compatibility": {
     "minimum": "12",
     "verified": "13"
   },
-  "authors": [{ "name": "Tear-Off" }],
+  "authors": [{ "name": "Oddjobs" }],
   "esmodules": ["scripts/main.js"],
   "styles": ["styles/tearoff.css"],
   "relationships": {

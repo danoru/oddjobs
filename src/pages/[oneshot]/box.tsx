@@ -77,7 +77,7 @@ export default function BoxPage({ os, pub, book }: Props) {
   return (
     <>
       <Head>
-        <title>{`The whole box · ${os.title} · Tear-Off`}</title>
+        <title>{`The whole box · ${os.title} · Oddjobs`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>

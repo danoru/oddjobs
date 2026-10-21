@@ -1,7 +1,7 @@
 import * as Sync from "./sync.js";
 
 /**
- * The "Tear-Off board" window (GM only): every poster for the current table,
+ * The "Oddjobs board" window (GM only): every poster for the current table,
  * who tore it, and whether the matching actor has been handed over.
  *
  * ApplicationV2 without Handlebars: we override _renderHTML to build the
@@ -77,7 +77,7 @@ export class TearoffBoard extends ApplicationV2 {
     id: "tearoff-board",
     classes: ["tearoff-board"],
     tag: "section",
-    window: { title: "Tear-Off board", icon: "fa-solid fa-scroll", resizable: true },
+    window: { title: "Oddjobs board", icon: "fa-solid fa-scroll", resizable: true },
     position: { width: 520, height: 560 },
     actions: { refresh: onRefresh, assign: onAssign, openActor: onOpenActor },
   };
@@ -106,7 +106,7 @@ export class TearoffBoard extends ApplicationV2 {
 
     let body;
     if (!String(code ?? "").trim()) {
-      body = `<p class="tearoff-empty">No table code yet. Open Game Settings, then Configure Settings, then Tear-Off Table Sync, and enter the five-character code from the GM page.</p>`;
+      body = `<p class="tearoff-empty">No table code yet. Open Game Settings, then Configure Settings, then Oddjobs Table Sync, and enter the five-character code from the GM page.</p>`;
     } else if (!table) {
       body = `<p class="tearoff-empty">${error ? "" : "Loading the board..."}</p>`;
     } else {

@@ -52,7 +52,7 @@ export function CharacterPage({ os: base, id }: { os: PublicOneShot; id: string 
   return (
     <>
       <Head>
-        <title>{`${c.name} · ${os.title} · Tear-Off`}</title>
+        <title>{`${c.name} · ${os.title} · Oddjobs`}</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: seated ? 16 : 8 }}>
         <SiteHeader back={{ href: `/${os.slug}`, label: os.title }} reading />

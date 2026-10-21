@@ -49,7 +49,7 @@ export default function PreviewPage({ slug, page, os, problems }: Props) {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Head>
-          <title>Preview · Tear-Off</title>
+          <title>Preview · Oddjobs</title>
         </Head>
         <Alert severity="warning">
           The saved version of <Link href={`/admin/${slug}`}>{slug}</Link> doesn&apos;t pass the checks yet, so it can&apos;t be shown as players

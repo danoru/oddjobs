@@ -1,4 +1,6 @@
-# Tear-Off
+# Oddjobs
+
+*Formerly Tear-Off.* The repo folder, browser storage keys, login cookie and Foundry module id still say `tearoff` on purpose, so saved claims, logins and imported Foundry actors keep working.
 
 A tavern notice board of ready-made one-shot **casts**. Each one-shot is a job posting; its characters are posters with a hook, ties to each other, a stake in *this* adventure and a private secret. Players tear a poster off to claim a character, then print it, send it to Foundry, rebuild it in D&D Beyond, or tweak it.
 
@@ -264,7 +266,7 @@ The first thing to compare is each class item's `advancement` array: dnd5e 4.x/5
 
 ### Table sync module
 
-`tools/foundry/tearoff-sync/` is a Foundry module (v12/v13, dnd5e) that shows the Tear-Off board for a table inside Foundry. When a player tears a poster, it gives the matching Foundry user ownership of the imported actor (matched on `flags.tearoff`) and a private journal with their secret. It talks to `GET /api/foundry/tables/<code>` with `Authorization: Bearer $FOUNDRY_TOKEN`. That route skips the site cookie, returns CORS headers, and only includes secrets for claimed characters. See the module's README. It hasn't been run in a real Foundry yet.
+`tools/foundry/tearoff-sync/` is a Foundry module (v12/v13, dnd5e) that shows the Oddjobs board for a table inside Foundry. When a player tears a poster, it gives the matching Foundry user ownership of the imported actor (matched on `flags.tearoff`) and a private journal with their secret. It talks to `GET /api/foundry/tables/<code>` with `Authorization: Bearer $FOUNDRY_TOKEN`. That route skips the site cookie, returns CORS headers, and only includes secrets for claimed characters. See the module's README. It hasn't been run in a real Foundry yet.
 
 ## D&D Beyond
 

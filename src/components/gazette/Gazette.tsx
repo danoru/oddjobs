@@ -82,7 +82,7 @@ export function Gazette({ os, ep }: { os: PublicAnyOneShot; ep: Epilogue }) {
         )}
       </div>
       <div className={s.foot}>
-        Printed the morning after {os.title} · {shown.filter((c) => ep.entries[c.id].playedBy).length > 0 ? "Correspondents: " + shown.map((c) => ep.entries[c.id].playedBy).filter(Boolean).join(", ") : "Tear-Off"}
+        Printed the morning after {os.title} · {shown.filter((c) => ep.entries[c.id].playedBy).length > 0 ? "Correspondents: " + shown.map((c) => ep.entries[c.id].playedBy).filter(Boolean).join(", ") : "Oddjobs"}
       </div>
     </article>
   );

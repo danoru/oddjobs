@@ -135,7 +135,7 @@ export function TentsView({ os: base, only }: { os: PublicOneShot; only?: string
   return (
     <>
       <Head>
-        <title>{`Tents & tokens · ${who} · Tear-Off`}</title>
+        <title>{`Tents & tokens · ${who} · Oddjobs`}</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={back} reading />

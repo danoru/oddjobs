@@ -244,7 +244,7 @@ export default function SpellsPage({ spells, gate, wanted }: Props) {
   return (
     <>
       <Head>
-        <title>Spell book · Tear-Off</title>
+        <title>Spell book · Oddjobs</title>
         <meta name="robots" content="noindex" />
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>

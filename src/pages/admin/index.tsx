@@ -101,7 +101,7 @@ export default function AdminPage({ oneshots, gate }: Props) {
   return (
     <>
       <Head>
-        <title>Builder · Tear-Off</title>
+        <title>Builder · Oddjobs</title>
         <meta name="robots" content="noindex" />
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>

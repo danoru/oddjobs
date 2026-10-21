@@ -68,7 +68,7 @@ export default function ChroniclePage({ nights, error }: Props) {
   return (
     <>
       <Head>
-        <title>The chronicle · Tear-Off</title>
+        <title>The chronicle · Oddjobs</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={{ href: "/", label: "the board" }} />

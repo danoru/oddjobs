@@ -63,7 +63,7 @@ export default function BoardPage({ jobs, survivors }: { jobs: Summary[]; surviv
   return (
     <>
       <Head>
-        <title>Tear-Off · the board</title>
+        <title>Oddjobs · the board</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader />

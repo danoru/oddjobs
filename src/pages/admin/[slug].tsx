@@ -39,7 +39,7 @@ export default function BuilderPage(props: BuilderProps) {
   return (
     <>
       <Head>
-        <title>{`Builder · ${title} · Tear-Off`}</title>
+        <title>{`Builder · ${title} · Oddjobs`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <Container maxWidth={false} sx={{ pb: 8, pt: 2, maxWidth: 1800 }}>

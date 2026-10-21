@@ -55,7 +55,7 @@ export function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Su
   return (
     <>
       <Head>
-        <title>{`${os.title} · Tear-Off`}</title>
+        <title>{`${os.title} · Oddjobs`}</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={{ href: "/", label: "the board" }} />

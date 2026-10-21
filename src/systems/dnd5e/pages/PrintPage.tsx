@@ -31,7 +31,7 @@ export function PrintCastPage({ os: base }: { os: PublicOneShot }) {
   return (
     <>
       <Head>
-        <title>{`Print · ${os.title} · Tear-Off`}</title>
+        <title>{`Print · ${os.title} · Oddjobs`}</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={{ href: `/${os.slug}`, label: os.title }} reading />

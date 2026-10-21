@@ -24,7 +24,7 @@ export default function FlyerPage({ os: base }: { os: PublicAnyOneShot }) {
   return (
     <>
       <Head>
-        <title>{`Flyer · ${os.title} · Tear-Off`}</title>
+        <title>{`Flyer · ${os.title} · Oddjobs`}</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={{ href: `/${os.slug}`, label: os.title }} />

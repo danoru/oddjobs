@@ -1,17 +1,17 @@
-# Tear-Off Table Sync (Foundry module)
+# Oddjobs Table Sync (Foundry module)
 
-Shows the Tear-Off board for your table inside Foundry. When a player tears a poster on the site, the module gives that player ownership of the matching actor and a private "Secret: <name>" journal.
+Shows the Oddjobs board for your table inside Foundry. When a player tears a poster on the site, the module gives that player ownership of the matching actor and a private "Secret: <name>" journal.
 
 Foundry v12 minimum, verified on v13, dnd5e system. GM client only; players need nothing installed.
 
 ## Install
 
 1. Copy this whole folder (`tearoff-sync`) into your Foundry **Data/modules** folder, so you have `Data/modules/tearoff-sync/module.json`.
-2. Restart Foundry (or reload the setup screen), open your world, and enable **Tear-Off Table Sync** under Manage Modules.
+2. Restart Foundry (or reload the setup screen), open your world, and enable **Oddjobs Table Sync** under Manage Modules.
    (A manifest URL for one-click install can come later.)
-3. On the Tear-Off server set `FOUNDRY_TOKEN` to a long random string (see `.env.example`) and redeploy. Without it the API answers 503.
-4. In Foundry: Game Settings, Configure Settings, Tear-Off Table Sync:
-   - **Tear-Off site URL**: e.g. `https://tearoff.example.com`
+3. On the Oddjobs server set `FOUNDRY_TOKEN` to a long random string (see `.env.example`) and redeploy. Without it the API answers 503.
+4. In Foundry: Game Settings, Configure Settings, Oddjobs Table Sync:
+   - **Oddjobs site URL**: e.g. `https://oddjobs.example.com`
    - **Foundry token**: the same string as `FOUNDRY_TOKEN`. This one is stored only in the GM's browser, so enter it once on each device you GM from.
    - **Table code**: the five-character code from the GM page (clear it to stop syncing)
    - **Auto-assign torn characters**: on by default

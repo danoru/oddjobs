@@ -20,7 +20,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
   return (
     <>
       <Head>
-        <title>Tear-Off</title>
+        <title>Oddjobs</title>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
       <ThemeProvider theme={theme}>

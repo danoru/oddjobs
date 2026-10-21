@@ -30,7 +30,7 @@ export function DhPrintCastPage({ os }: { os: PublicDhOneShot }) {
   return (
     <>
       <Head>
-        <title>{`Print · ${os.title} · Tear-Off`}</title>
+        <title>{`Print · ${os.title} · Oddjobs`}</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={{ href: `/${os.slug}`, label: os.title }} reading />
@@ -65,7 +65,7 @@ export function DhCardsView({ os, only }: { os: PublicDhOneShot; only?: string }
   return (
     <>
       <Head>
-        <title>{`Cards · ${who} · Tear-Off`}</title>
+        <title>{`Cards · ${who} · Oddjobs`}</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={back} reading />
@@ -187,7 +187,7 @@ export function DhTentsView({ os, only }: { os: PublicDhOneShot; only?: string }
   return (
     <>
       <Head>
-        <title>{`Tents & tokens · ${who} · Tear-Off`}</title>
+        <title>{`Tents & tokens · ${who} · Oddjobs`}</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={back} reading />

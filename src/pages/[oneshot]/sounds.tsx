@@ -25,7 +25,7 @@ export default function SoundsPage({ slug, title, sounds }: Props) {
   return (
     <>
       <Head>
-        <title>{`Sounds · ${title} · Tear-Off`}</title>
+        <title>{`Sounds · ${title} · Oddjobs`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <Container maxWidth="md" sx={{ pb: 0 }}>

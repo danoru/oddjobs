@@ -45,7 +45,7 @@ export default function LoginPage() {
       >
         <Stack spacing={2}>
           <Typography variant="h2" align="center" sx={{ fontSize: 34, color: "var(--wax)" }}>
-            Tear-Off
+            Oddjobs
           </Typography>
           <Typography align="center" sx={{ fontFamily: "var(--font-print)", fontSize: 18 }}>
             {forGm ? "Only the GM goes behind the screen. Speak the GM's word." : "Speak the word at the door."}

@@ -174,7 +174,7 @@ export function foundryActor(c: Character, os: Pick<OneShot, "slug" | "title" | 
     "<h3>Ties</h3>",
     ...c.story.ties.map((t) => `<p><strong>${esc(t.to)}:</strong> ${esc(t.text)}</p>`),
     `<h3>Secret</h3>${p(c.story.secret)}`,
-    `<p><em>From the one-shot “${esc(os.title)}” on Tear-Off.</em></p>`,
+    `<p><em>From the one-shot “${esc(os.title)}” on Oddjobs.</em></p>`,
   ]
     .filter(Boolean)
     .join("");

@@ -2,7 +2,7 @@ import { MODULE_ID, restart, start } from "./sync.js";
 import { openBoard } from "./board.js";
 
 /**
- * Tear-Off Table Sync: entry point. Registers the settings and the scene
+ * Oddjobs Table Sync: entry point. Registers the settings and the scene
  * control button, and starts the poller on the GM's client.
  */
 
@@ -16,8 +16,8 @@ Hooks.once("init", () => {
   };
 
   game.settings.register(MODULE_ID, "siteUrl", {
-    name: "Tear-Off site URL",
-    hint: "Where Tear-Off is hosted, e.g. https://tearoff.example.com (no trailing path).",
+    name: "Oddjobs site URL",
+    hint: "Where Oddjobs is hosted, e.g. https://oddjobs.example.com (no trailing path).",
     scope: "world",
     config: true,
     type: String,
@@ -26,7 +26,7 @@ Hooks.once("init", () => {
   });
   game.settings.register(MODULE_ID, "token", {
     name: "Foundry token",
-    hint: "Must match FOUNDRY_TOKEN on the Tear-Off server. Stored only in this browser, so each GM device enters it once.",
+    hint: "Must match FOUNDRY_TOKEN on the Oddjobs server. Stored only in this browser, so each GM device enters it once.",
     scope: "client",
     config: true,
     type: String,
@@ -63,7 +63,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
   if (!game.user.isGM) return;
   const tool = {
     name: "tearoff",
-    title: "Tear-Off board",
+    title: "Oddjobs board",
     icon: "fa-solid fa-scroll",
     button: true,
     order: 100,

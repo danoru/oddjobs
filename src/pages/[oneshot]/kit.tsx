@@ -37,7 +37,7 @@ export default function KitPage({ os }: Props) {
   return (
     <>
       <Head>
-        <title>{`Table kit · ${os.title} · Tear-Off`}</title>
+        <title>{`Table kit · ${os.title} · Oddjobs`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>

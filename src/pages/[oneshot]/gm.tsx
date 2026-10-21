@@ -60,7 +60,7 @@ export default function GmPage({ os: base }: Props) {
   return (
     <>
       <Head>
-        <title>{`GM · ${os.title} · Tear-Off`}</title>
+        <title>{`GM · ${os.title} · Oddjobs`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>

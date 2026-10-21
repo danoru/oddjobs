@@ -31,7 +31,7 @@ export function PlayPage({ os }: { os: PublicTcOneShot }) {
   return (
     <>
       <Head>
-        <title>{`At the table · ${os.title} · Tear-Off`}</title>
+        <title>{`At the table · ${os.title} · Oddjobs`}</title>
         <meta name="robots" content="noindex" />
       </Head>
       <Container maxWidth="md" sx={{ pb: 8 }}>

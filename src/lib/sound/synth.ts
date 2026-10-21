@@ -1,5 +1,5 @@
 /**
- * Tear-Off soundboard engine. Every sound is synthesised with the Web Audio
+ * Oddjobs soundboard engine. Every sound is synthesised with the Web Audio
  * API (noise buffers, filters, oscillators, LFOs): no audio files, no licences.
  *
  * Shape of things:

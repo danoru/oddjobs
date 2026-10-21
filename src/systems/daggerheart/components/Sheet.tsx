@@ -289,7 +289,7 @@ export function SheetFront({
       </div>
       <div className={s.footer}>
         <span>{oneshotTitle}</span>
-        <span>Tear-Off · front</span>
+        <span>Oddjobs · front</span>
       </div>
     </section>
   );
@@ -412,7 +412,7 @@ export function SheetBack({
       </div>
       <div className={s.footer}>
         <span>{oneshotTitle}</span>
-        <span>Tear-Off · back</span>
+        <span>Oddjobs · back</span>
       </div>
     </section>
   );

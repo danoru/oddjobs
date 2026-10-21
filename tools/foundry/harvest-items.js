@@ -1,8 +1,8 @@
 /**
- * Tear-Off — Foundry harvest macro.
+ * Oddjobs — Foundry harvest macro.
  *
  * Run once in your own Foundry world (dnd5e system) as a Script macro.
- * It dumps two things the Tear-Off exporter needs to graduate from "lite" to
+ * It dumps two things the Oddjobs exporter needs to graduate from "lite" to
  * full compendium items:
  *
  *   1. Every Item in the compendiums listed below (classes, subclasses,
@@ -10,7 +10,7 @@
  *   2. Version info: Foundry core + dnd5e system version.
  *
  * It downloads a single file, tearoff-harvest.json. Commit it to
- * data/foundry/ in the Tear-Off repo. Nothing in your world is changed.
+ * data/foundry/ in the Oddjobs repo. Nothing in your world is changed.
  *
  * Also export one fully built character per ruleset you use
  * (right-click actor → Export Data) and put those in data/foundry/reference/.
@@ -44,15 +44,15 @@
   for (const id of PACKS) {
     const pack = game.packs.get(id);
     if (!pack) {
-      console.log(`Tear-Off harvest: pack ${id} not found, skipping`);
+      console.log(`Oddjobs harvest: pack ${id} not found, skipping`);
       continue;
     }
     const docs = await pack.getDocuments();
     out.packs[id] = docs.map((d) => ({ uuid: d.uuid, ...d.toObject() }));
-    ui.notifications.info(`Tear-Off: read ${docs.length} items from ${id}`);
+    ui.notifications.info(`Oddjobs: read ${docs.length} items from ${id}`);
   }
 
   const json = JSON.stringify(out);
   saveDataToFile(json, "application/json", "tearoff-harvest.json");
-  ui.notifications.info("Tear-Off: harvest downloaded. Commit it to data/foundry/.");
+  ui.notifications.info("Oddjobs: harvest downloaded. Commit it to data/foundry/.");
 })();

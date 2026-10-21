@@ -56,7 +56,7 @@ export default function TapestryPage({ os }: { os: PublicAnyOneShot }) {
   return (
     <>
       <Head>
-        <title>{`The tapestry · ${os.title} · Tear-Off`}</title>
+        <title>{`The tapestry · ${os.title} · Oddjobs`}</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={{ href: `/${os.slug}`, label: os.title }} />

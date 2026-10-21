@@ -20,7 +20,7 @@ export function SiteHeader({ back, reading = false }: { back?: { href: string; l
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, minWidth: 0 }}>
-          <Link href="/" style={{ textDecoration: "none" }} aria-label="Tear-Off: back to the board">
+          <Link href="/" style={{ textDecoration: "none" }} aria-label="Oddjobs: back to the board">
             <Typography
               component="span"
               variant="h1"
@@ -37,7 +37,7 @@ export function SiteHeader({ back, reading = false }: { back?: { href: string; l
                 textShadow: "0 2px 0 #1c140e",
               }}
             >
-              Tear-Off
+              Oddjobs
             </Typography>
           </Link>
           {back && (

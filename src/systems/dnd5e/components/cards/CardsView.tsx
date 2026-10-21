@@ -50,7 +50,7 @@ export function CardsView({ os: base, only, book }: { os: PublicOneShot; only?: 
   return (
     <>
       <Head>
-        <title>{`Cards · ${who} · Tear-Off`}</title>
+        <title>{`Cards · ${who} · Oddjobs`}</title>
       </Head>
       <Container maxWidth="lg" sx={{ pb: 8 }}>
         <SiteHeader back={back} reading />

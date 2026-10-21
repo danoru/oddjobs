@@ -1,5 +1,5 @@
 /**
- * Tear-Off table sync: polls the Tear-Off site for the current table and, on
+ * Oddjobs table sync: polls the Oddjobs site for the current table and, on
  * the active GM's client, hands torn characters to the players who tore them.
  *
  * Only Foundry's public client API (v12/v13) is used. Spots where the code
@@ -43,7 +43,7 @@ function emit() {
     try {
       fn();
     } catch (e) {
-      console.error("Tear-Off sync | listener failed", e);
+      console.error("Oddjobs sync | listener failed", e);
     }
   }
 }
@@ -105,13 +105,13 @@ async function fetchTable(cfg) {
   }
   if (res.status === 401) throw new Error("The site rejected the token. Check it matches FOUNDRY_TOKEN.");
   if (res.status === 503) throw new Error("The site has no FOUNDRY_TOKEN set.");
-  if (res.status === 404) throw new Error(`No Tear-Off table with code ${cfg.code}.`);
+  if (res.status === 404) throw new Error(`No Oddjobs table with code ${cfg.code}.`);
   if (!res.ok) throw new Error(`The site answered ${res.status}.`);
   let data;
   try {
     data = await res.json();
   } catch {
-    throw new Error("The site's answer was not JSON. Is the URL the Tear-Off site?");
+    throw new Error("The site's answer was not JSON. Is the URL the Oddjobs site?");
   }
   if (!data || !Array.isArray(data.cast)) throw new Error("Unexpected answer from the site.");
   return data;
@@ -225,7 +225,7 @@ async function apply(row, oneshot) {
 
   if (granted) {
     await ChatMessage.create({
-      speaker: { alias: "Tear-Off" },
+      speaker: { alias: "Oddjobs" },
       whisper: game.users.filter((u) => u.isGM).map((u) => u.id),
       content: `<p><strong>${esc(user.name)}</strong> tore <strong>${esc(actor.name)}</strong> and now owns the actor. Their secret is in the journal "Secret: ${esc(actor.name)}".</p>`,
     });
@@ -280,7 +280,7 @@ function warnUnmatched(table) {
     const key = `${table.oneshot}|${entry.id}|${normName(entry.claimedBy)}|${row.status}`;
     if (notified.has(key)) continue;
     notified.add(key);
-    ui.notifications.warn(`Tear-Off: ${text}`);
+    ui.notifications.warn(`Oddjobs: ${text}`);
   }
 }
 
@@ -291,7 +291,7 @@ async function applyAll(table) {
     try {
       await apply(row, table.oneshot);
     } catch (e) {
-      console.error(`Tear-Off sync | could not assign ${row.entry.id}`, e);
+      console.error(`Oddjobs sync | could not assign ${row.entry.id}`, e);
     }
   }
 }
@@ -304,8 +304,8 @@ export async function assignOne(characterId) {
   try {
     await apply(row, state.table.oneshot);
   } catch (e) {
-    console.error(`Tear-Off sync | could not assign ${characterId}`, e);
-    ui.notifications.warn(`Tear-Off: could not assign ${row.entry.name}. See the console.`);
+    console.error(`Oddjobs sync | could not assign ${characterId}`, e);
+    ui.notifications.warn(`Oddjobs: could not assign ${row.entry.name}. See the console.`);
   }
   state.rows = analyse(state.table);
   emit();
@@ -318,7 +318,7 @@ function fail(message) {
   // Tell the GM once per distinct problem, then stay quiet while it persists.
   if (lastWarned !== message) {
     lastWarned = message;
-    ui.notifications.warn(`Tear-Off: ${message}`);
+    ui.notifications.warn(`Oddjobs: ${message}`);
   }
   emit();
 }
@@ -355,7 +355,7 @@ export async function refresh() {
     state.rows = analyse(table);
     emit();
   } catch (e) {
-    console.error("Tear-Off sync | poll failed", e);
+    console.error("Oddjobs sync | poll failed", e);
     fail("Something went wrong while syncing. See the console.");
   } finally {
     running = false;
