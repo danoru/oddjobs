@@ -14,6 +14,8 @@ import { PrintCastPage } from "@/systems/dnd5e/pages/PrintPage";
 import { PremadePage } from "@/systems/tencandles/pages/PremadePage";
 import { CharacterPage as DhCharacterPage } from "@/systems/daggerheart/pages/CharacterPage";
 import { DhPrintCastPage } from "@/systems/daggerheart/pages/Printables";
+import { CharacterPage as PaCharacterPage } from "@/systems/paranoia/pages/CharacterPage";
+import { PaPrintCastPage } from "@/systems/paranoia/pages/Printables";
 
 type Props =
   | { slug: string; page: string | null; os: PublicAnyOneShot; problems: null }
@@ -69,6 +71,10 @@ export default function PreviewPage({ slug, page, os, problems }: Props) {
         <JobPage os={os} cameos={[]} />
       ) : page === "print" && os.system === "dnd5e" ? (
         <PrintCastPage os={os} />
+      ) : page === "print" && os.system === "paranoia" ? (
+        <PaPrintCastPage os={os} />
+      ) : os.system === "paranoia" ? (
+        <PaCharacterPage os={os} id={page} />
       ) : page === "print" && os.system === "daggerheart" ? (
         <DhPrintCastPage os={os} />
       ) : os.system === "daggerheart" ? (

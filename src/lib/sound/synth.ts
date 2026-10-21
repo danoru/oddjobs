@@ -790,6 +790,43 @@ const glass: Stinging = (env, rig, out) => {
   return end + 0.2;
 };
 
+/** A bright, helpful three-note chime, the kind a public-address system makes before it talks. */
+const chime: Stinging = (env, rig, out) => {
+  const c = env.ctx;
+  const t = c.currentTime + 0.01;
+  const notes = [784, 988, 1319];
+  notes.forEach((f, i) => {
+    const at = t + i * 0.22;
+    const g = rig.keep(G(c, 0));
+    pluck(g.gain, at, 0.16, 0.004, 0.9);
+    g.connect(out);
+    osc(env, rig, "sine", f, at, 1.1, g).connect(g);
+    osc(env, rig, "triangle", f * 2, at, 0.5, g).connect(g);
+  });
+  return 0.22 * notes.length + 1;
+};
+
+/** A two-tone klaxon, three times: something in the corridor is very wrong. */
+const alarm: Stinging = (env, rig, out) => {
+  const c = env.ctx;
+  const t = c.currentTime + 0.01;
+  const g = rig.keep(G(c, 0));
+  const lp = rig.keep(F(c, "lowpass", 2400));
+  wire(g, lp, out);
+  const o = osc(env, rig, "square", 660, t, 2.5, g);
+  o.connect(g);
+  for (let i = 0; i < 3; i++) {
+    const at = t + i * 0.8;
+    o.frequency.setValueAtTime(660, at);
+    o.frequency.setValueAtTime(495, at + 0.4);
+    g.gain.setValueAtTime(TINY, at);
+    g.gain.linearRampToValueAtTime(0.07, at + 0.02);
+    g.gain.setValueAtTime(0.07, at + 0.74);
+    g.gain.linearRampToValueAtTime(TINY, at + 0.78);
+  }
+  return 2.6;
+};
+
 /** A brief crowd swell with a few whoops. */
 const cheer: Stinging = (env, rig, out) => {
   const c = env.ctx;
@@ -915,6 +952,8 @@ export const STINGER_PRESETS: Record<SoundStinger, StingerPreset> = {
   whoosh: { wet: 0.15, play: whoosh },
   scream: { wet: 0.65, play: scream },
   snuff: { wet: 0.1, play: snuff },
+  chime: { wet: 0.25, play: chime },
+  alarm: { wet: 0.15, play: alarm },
 };
 
 // ---------------------------------------------------------------------------

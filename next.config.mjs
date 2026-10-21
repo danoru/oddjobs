@@ -13,6 +13,8 @@ const nextConfig = {
     "/api/foundry/tables/*": ["./content/**/*.json"],
     // Sealed letters resolve their text from content on each request.
     "/api/tables/*/letters": ["./content/**/*.json"],
+    // Paranoia's naughty sides are handed out per player from content on each request.
+    "/api/tables/*/secrets": ["./content/**/*.json"],
     // Live table play finds the one-shot's system (and a module's intro) in content.
     "/api/tables/*/game": ["./content/**/*.json"],
     // The event log resolves acts, rumors and notices from content; the tapestry, the box and the chronicle read it too.

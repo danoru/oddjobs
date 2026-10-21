@@ -28,6 +28,7 @@ import { Mech5e } from "./panels/Mech5e";
 import { Levels5e } from "./panels/Levels5e";
 import { TcStages } from "./panels/TcStages";
 import { MechDh } from "./panels/MechDh";
+import { MechParanoia } from "./panels/MechParanoia";
 import s from "./Admin.module.css";
 
 type View = { kind: "oneshot" } | { kind: "character"; index: number };
@@ -48,7 +49,7 @@ const nameOf = (c: Record<string, unknown> | undefined, i: number) =>
 /** Which section of a scope a path belongs to (for counts and jumping). */
 function sectionOf(sections: EditorSection[], rel: DocPath): EditorSection | undefined {
   const key = rel.join(".");
-  if (rel[0] === "mech") return sections.find((x) => x.panel === "mech5e" || x.panel === "mechDh");
+  if (rel[0] === "mech") return sections.find((x) => x.panel === "mech5e" || x.panel === "mechDh" || x.panel === "mechParanoia");
   if (rel[0] === "variants") return sections.find((x) => x.panel === "levels5e");
   return (
     sections.find((x) => x.fields?.some((f) => key === f || key.startsWith(`${f}.`) || f.startsWith(`${key}.`))) ??
@@ -560,6 +561,8 @@ export function Builder({ slug, initial, status: initialStatus, hasPublished, sp
                         <Mech5e index={view.index} level={mechLevel} onLevel={setMechLevel} />
                       ) : sec.panel === "mechDh" ? (
                         <MechDh index={view.index} />
+                      ) : sec.panel === "mechParanoia" ? (
+                        <MechParanoia index={view.index} />
                       ) : undefined
                     }
                   />

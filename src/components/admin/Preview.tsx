@@ -4,6 +4,9 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import * as dnd5e from "@/systems/dnd5e/schema";
 import * as tencandles from "@/systems/tencandles/schema";
 import * as daggerheart from "@/systems/daggerheart/schema";
+import * as paranoia from "@/systems/paranoia/schema";
+import { NaughtySide, PublicSide } from "@/systems/paranoia/components/Sheet";
+import { treasonNames } from "@/systems/paranoia/rules";
 import { SheetBack as DhSheetBack, SheetFront as DhSheetFront } from "@/systems/daggerheart/components/Sheet";
 import { SKINS, type Skin } from "@/lib/schema";
 import { SYSTEMS } from "@/systems/registry";
@@ -31,7 +34,7 @@ class PreviewBoundary extends Component<{ children: ReactNode; resetKey: string 
   }
 }
 
-type Parsed = { index: number; c: PublicCharacter | PublicTcCharacter | daggerheart.Character };
+type Parsed = { index: number; c: PublicCharacter | PublicTcCharacter | daggerheart.Character | paranoia.Character };
 
 /**
  * What players will get, drawn with the real components as you type: the
@@ -45,7 +48,7 @@ export function Preview({ slug, selected, level }: { slug: string; selected: num
   const [pick, setPick] = useState<number | null>(null);
   const skin: Skin = (SKINS as readonly unknown[]).includes(doc.oneshot.skin) ? (doc.oneshot.skin as Skin) : "noticeboard";
   const words = SKIN_WORDS[skin];
-  const charSchema = system === "dnd5e" ? dnd5e.characterSchema : system === "daggerheart" ? daggerheart.characterSchema : tencandles.characterSchema;
+  const charSchema = system === "dnd5e" ? dnd5e.characterSchema : system === "daggerheart" ? daggerheart.characterSchema : system === "paranoia" ? paranoia.characterSchema : tencandles.characterSchema;
 
   const parsed: Parsed[] = useMemo(
     () =>
@@ -169,6 +172,20 @@ function SheetPreview({ index, parsed, level }: { index: number | null; parsed: 
   const { doc, system } = useEditor();
   const found = parsed.find((p) => p.index === index);
   if (!found) return <p className={s.paused}>Pick a character that parses to see their sheet.</p>;
+  if (system === "paranoia") {
+    const c = found.c as paranoia.Character;
+    const title = typeof doc.oneshot.title === "string" ? doc.oneshot.title : "";
+    const objectives = Array.isArray(doc.oneshot.objectives) ? (doc.oneshot.objectives as string[]).filter((o) => typeof o === "string") : [];
+    const levels = (doc.oneshot.houseRules as { treasonLevels?: number } | undefined)?.treasonLevels === 6 ? 6 : 5;
+    return (
+      <PreviewBoundary resetKey={JSON.stringify(c).length + ""}>
+        <div className={s.sheetScale}>
+          <PublicSide c={c} team={typeof doc.oneshot.team === "string" ? doc.oneshot.team : ""} objectives={objectives} oneshotTitle={title} wanted={treasonNames({ treasonLevels: levels })} />
+          <NaughtySide c={c} naughty={c.naughty} oneshotTitle={title} />
+        </div>
+      </PreviewBoundary>
+    );
+  }
   if (system === "daggerheart") {
     const c = found.c as daggerheart.Character;
     const names = Object.fromEntries(parsed.map((p) => [p.c.id, p.c.name]));

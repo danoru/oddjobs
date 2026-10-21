@@ -12,7 +12,8 @@
  *   cards   — 9 to a page (4 in large print), each character from a fresh page, and no card's text overflows
  *   tents   — 2 to a page
  * Sheets and cards are also checked in high-contrast and dyslexia-friendly modes,
- * for 5e (every level variant) and Daggerheart one-shots.
+ * for 5e (every level variant), Daggerheart and Paranoia one-shots. Paranoia's public
+ * print view is one face per Troubleshooter (the naughty sides are in the GM's box).
  * Exits 1 on any failure.
  */
 import { chromium, type Page } from "playwright";
@@ -22,6 +23,7 @@ import { loadOneShot, loadSpellBook, publishedSlugs } from "../src/lib/content";
 import { cardsFor, paginate } from "../src/systems/dnd5e/cards";
 import { levelsOf, withVariant } from "../src/systems/dnd5e/variants";
 import { cardsFor as dhCardsFor } from "../src/systems/daggerheart/cards";
+import { cardsFor as paCardsFor } from "../src/systems/paranoia/cards";
 
 const ROOT = path.join(import.meta.dirname, "..");
 const BASE = process.env.BASE_URL ?? "http://localhost:3004";
@@ -86,13 +88,15 @@ for (const mode of MODES) {
     const large = Boolean(mode.reading.large);
     const perPage = large ? 4 : 9;
     const layouts =
-      base.system === "daggerheart"
-        ? [{ level: base.level, n: base.cast.length, cardPages: base.cast.reduce((sum, c) => sum + paginate(dhCardsFor(c), perPage).length, 0) }]
+      base.system === "paranoia"
+        ? [{ level: 0, n: base.cast.length, faces: 1, cardPages: base.cast.reduce((sum, c) => sum + paginate(paCardsFor(c, null, ["feature", "item"]), perPage).length, 0) }]
+        : base.system === "daggerheart"
+        ? [{ level: base.level, n: base.cast.length, faces: 2, cardPages: base.cast.reduce((sum, c) => sum + paginate(dhCardsFor(c), perPage).length, 0) }]
         : levelsOf(base).map(({ level }) => {
             const os = withVariant(base, level);
-            return { level, n: os.cast.length, cardPages: os.cast.reduce((sum, c) => sum + paginate(cardsFor(c, os.ruleset, book), perPage).length, 0) };
+            return { level, n: os.cast.length, faces: 2, cardPages: os.cast.reduce((sum, c) => sum + paginate(cardsFor(c, os.ruleset, book), perPage).length, 0) };
           });
-    for (const { level, n, cardPages } of layouts) {
+    for (const { level, n, faces, cardPages } of layouts) {
       await context.addInitScript(
         ([s, l, r]) => {
           localStorage.setItem(`tearoff:level:${s}`, String(l));
@@ -104,8 +108,8 @@ for (const mode of MODES) {
       for (const format of ["Letter", "A4"] as const) {
         const tag = `${slug} L${level} ${format} ${mode.name}`;
         const sheets = await render(page, `${slug}/print`, format);
-        if (large) report(sheets.pages <= 4 * n, `${tag} sheets`, `${sheets.pages} pages (≤ ${4 * n})`);
-        else report(sheets.pages === 2 * n, `${tag} sheets`, `${sheets.pages} pages (want ${2 * n})`);
+        if (large) report(sheets.pages <= 2 * faces * n, `${tag} sheets`, `${sheets.pages} pages (≤ ${2 * faces * n})`);
+        else report(sheets.pages === faces * n, `${tag} sheets`, `${sheets.pages} pages (want ${faces * n})`);
 
         const cards = await render(page, `${slug}/cards`, format);
         report(

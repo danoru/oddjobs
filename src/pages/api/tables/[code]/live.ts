@@ -8,11 +8,13 @@ import { normalizeCode } from "@/lib/tables";
 import { appendEvents, peopleAt, playerIdOf, toLiveRow } from "@/lib/tables.server";
 import { coinFor, SYSTEMS } from "@/systems/registry";
 import { sheetLimits } from "@/systems/daggerheart/derive";
+import { sheetLimits as paranoiaSheets } from "@/systems/paranoia/derive";
 
 /**
  * The table's event log (src/lib/live.ts): dice, notes, the bell, act cards,
  * the spotlight, rumors, the town board and coins (and Daggerheart's duality
- * dice, Hope, Fear and slots).
+ * dice, Hope, Fear and slots; Paranoia's NODE dice, records, treason reports
+ * and Friend Computer).
  * GET ?after=<id>[&as=table|player] — events after the cursor, as the asker
  *   may see them, plus who's at the table (by handle) and which rolls are
  *   hidden from the asker right now. `?as=table` is the TV's view (even in the
@@ -89,6 +91,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     coin: coinFor(os),
     dice: SYSTEMS[os.system].dice,
     ...(os.system === "daggerheart" ? { sheets: sheetLimits(os.cast) } : {}),
+    ...(os.system === "paranoia" ? { paranoia: { sheets: paranoiaSheets(os.cast), houseRules: os.houseRules } } : {}),
     rng: cryptoRng,
   });
   if (!result.ok) return reply(rows, 409, result.error);

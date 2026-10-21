@@ -160,6 +160,24 @@ export default function GmPage({ os: base }: Props) {
             </div>
           )}
 
+          {os.system === "paranoia" && (
+            <div className={s.note} style={{ ["--tilt" as string]: "0.3deg", marginTop: 32 }} aria-label="The briefing">
+              <span className={s.brassPin} aria-hidden="true" />
+              <h2 className={s.noteTitle}>The briefing</h2>
+              <Typography sx={{ ...mono, whiteSpace: "pre-wrap" }}>{os.briefing}</Typography>
+              <Typography sx={{ ...mono, mt: 1.5 }}>
+                <b>Mission objectives ({os.team}):</b>
+              </Typography>
+              <ul className={s.yarnList}>
+                {os.objectives.map((o) => (
+                  <li key={o} style={mono}>
+                    {o}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {os.gmNotes && (
             <div className={s.note} style={{ ["--tilt" as string]: "-0.3deg", marginTop: 32 }}>
               <span className={s.pin} aria-hidden="true" />
@@ -184,7 +202,28 @@ export default function GmPage({ os: base }: Props) {
                   <span>{posterTag(c)}</span>
                   {claimedBy[c.id]?.name && <span>played by {claimedBy[c.id].name}</span>}
                 </div>
-                {"secret" in c.story ? (
+                {"naughty" in c ? (
+                  <>
+                    <Typography sx={mono}>
+                      <b>Tonight:</b> {c.story.stake}
+                    </Typography>
+                    <Typography sx={{ ...mono, mt: 1, color: "var(--wax)" }} data-testid={`gm-naughty-${c.id}`}>
+                      <b>{c.naughty.society}</b> · mutant power <b>{c.naughty.mutantPower.name}</b>
+                    </Typography>
+                    <ul className={s.yarnList} style={{ marginTop: 4 }}>
+                      {[c.naughty.societyObjective, ...c.naughty.objectives].filter(Boolean).map((o) => (
+                        <li key={o} style={mono}>
+                          {o}
+                        </li>
+                      ))}
+                    </ul>
+                    {c.naughty.secret && (
+                      <Typography sx={{ ...mono, mt: 1, color: "var(--wax)" }}>
+                        <b>Secret:</b> {c.naughty.secret}
+                      </Typography>
+                    )}
+                  </>
+                ) : "secret" in c.story ? (
                   <>
                     <Typography sx={mono}>
                       <b>Tonight:</b> {c.story.stake}

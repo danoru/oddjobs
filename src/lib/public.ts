@@ -2,17 +2,21 @@ import type { OneShotWithCast } from "./schema";
 import type * as dnd5e from "@/systems/dnd5e/schema";
 import type * as tencandles from "@/systems/tencandles/schema";
 import type * as daggerheart from "@/systems/daggerheart/schema";
+import type * as paranoia from "@/systems/paranoia/schema";
 
 /**
  * What player-facing pages get: everything except the GM's notes, letters,
  * NPC fallbacks, act cards, rumors and town-board presets — and, per system,
  * whatever else only the GM reads (a Ten Candles module and its suggested
- * truths, Daggerheart adversaries). Acts, rumors and notices reach players only through the table's
+ * truths, Daggerheart adversaries, Paranoia's naughty sides, briefing and
+ * announcements). Acts, rumors and notices reach players only through the table's
  * event log (src/lib/live.ts), once the GM shows, deals or pins them.
  */
 export type PublicCharacter = Omit<dnd5e.Character, "ifUnclaimed">;
 export type PublicTcCharacter = Omit<tencandles.Character, "ifUnclaimed">;
 export type PublicDhCharacter = Omit<daggerheart.Character, "ifUnclaimed">;
+/** A Troubleshooter without the naughty side: at a table, each player gets only their own (/api/tables/<code>/secrets). */
+export type PublicPaCharacter = Omit<paranoia.Character, "ifUnclaimed" | "naughty">;
 
 type GmOnly = "gmNotes" | "letters" | "acts" | "rumors" | "notices";
 /** What players may know about the GM-only extras: only that rumors are there to be drawn. */
@@ -24,13 +28,17 @@ export type PublicTcOneShot = Omit<tencandles.OneShotWithCast, GmOnly | "cast" |
 export type PublicDhOneShot = Omit<daggerheart.OneShotWithCast, GmOnly | "cast" | "adversaries"> & Flags & {
   cast: PublicDhCharacter[];
 };
-export type PublicAnyOneShot = PublicOneShot | PublicTcOneShot | PublicDhOneShot;
+export type PublicPaOneShot = Omit<paranoia.OneShotWithCast, GmOnly | "cast" | "briefing" | "announcements"> & Flags & {
+  cast: PublicPaCharacter[];
+};
+export type PublicAnyOneShot = PublicOneShot | PublicTcOneShot | PublicDhOneShot | PublicPaOneShot;
 
 const clean = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 
 export function toPublic(os: dnd5e.OneShotWithCast): PublicOneShot;
 export function toPublic(os: tencandles.OneShotWithCast): PublicTcOneShot;
 export function toPublic(os: daggerheart.OneShotWithCast): PublicDhOneShot;
+export function toPublic(os: paranoia.OneShotWithCast): PublicPaOneShot;
 export function toPublic(os: OneShotWithCast): PublicAnyOneShot;
 export function toPublic(os: OneShotWithCast): PublicAnyOneShot {
   if (os.system === "tencandles") {
@@ -38,6 +46,12 @@ export function toPublic(os: OneShotWithCast): PublicAnyOneShot {
     const { gmNotes, letters, acts, rumors, notices, cast, module, suggestedTruths, ...rest } = os;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return clean({ ...rest, hasRumors: rumors.length >= 2, cast: cast.map(({ ifUnclaimed, ...c }) => c) });
+  }
+  if (os.system === "paranoia") {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { gmNotes, letters, acts, rumors, notices, cast, briefing, announcements, ...rest } = os;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return clean({ ...rest, hasRumors: rumors.length >= 2, cast: cast.map(({ ifUnclaimed, naughty, ...c }) => c) });
   }
   if (os.system === "daggerheart") {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

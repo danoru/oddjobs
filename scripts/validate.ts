@@ -5,7 +5,8 @@
  *   pnpm validate <slug>     — just one
  *
  * Every 5e level variant is checked too, and its key numbers printed under the base.
- * Daggerheart casts print Evasion, HP, Stress, Armor, thresholds and the domain cards.
+ * Daggerheart casts print Evasion, HP, Stress, Armor, thresholds and the domain cards;
+ * Paranoia teams print clone names, stats and each naughty side in a word.
  *
  * Exits 1 on the first broken one-shot, printing every problem found in it.
  */
@@ -13,6 +14,7 @@ import { listSlugs, loadOneShot } from "../src/lib/content";
 import { derive, classLine } from "../src/systems/dnd5e/derive";
 import { levelsOf, withVariant } from "../src/systems/dnd5e/variants";
 import { derive as deriveDh, signed } from "../src/systems/daggerheart/derive";
+import { cloneName, stats as paranoiaStats } from "../src/systems/paranoia/derive";
 
 const slugs = process.argv.slice(2).length ? process.argv.slice(2) : listSlugs();
 let failed = false;
@@ -25,6 +27,14 @@ for (const slug of slugs) {
         `ok  ${slug} (Ten Candles, ${m.areas.length} areas, ${m.stages.length} stages, ${base.cast.length} pre-mades, ${base.suggestedTruths.length} suggested truths, ${base.skin})`,
       );
       for (const c of base.cast) console.log(`    ${c.name.padEnd(22)} ${c.poster.header.padEnd(10)} ${c.story.concept.slice(0, 60)}`);
+      continue;
+    }
+    if (base.system === "paranoia") {
+      console.log(`ok  ${slug} (Paranoia, team ${base.team}, ${base.cast.length} Troubleshooters, ${base.announcements.length} announcements, ${base.skin})`);
+      for (const c of base.cast) {
+        const st = Object.entries(paranoiaStats(c.mech)).map(([k, v]) => `${k.slice(0, 3)} ${v}`).join(" ");
+        console.log(`    ${cloneName(c.mech).padEnd(22)} ${c.mech.serviceGroup.padEnd(36)} ${st}  · ${c.naughty.society} / ${c.naughty.mutantPower.name}`);
+      }
       continue;
     }
     if (base.system === "daggerheart") {

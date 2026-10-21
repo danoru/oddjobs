@@ -1,0 +1,103 @@
+{
+  "id": "vance-eye",
+  "name": "Vance",
+  "order": 2,
+  "poster": {
+    "header": "WANTED",
+    "epithet": "the Loyalty Officer",
+    "hook": "Internal Security. Two treason reports by debriefing, or he becomes the third.",
+    "reward": "A clean conscience (on request, with evidence)",
+    "icon": "eye"
+  },
+  "flashback": "Who was the first person you ever reported for treason, and what did they say to you afterwards?",
+  "story": {
+    "pronouns": "he/him",
+    "appearance": "Big, square and polished, with a crew cut you could level a shelf on and an Internal Security armband two sizes too tight. Mirrored visor, always down. Carries a lunchbox everywhere and will not discuss its contents.",
+    "concept": "A young Internal Security officer who believes in the system with his whole heart and has never once been good at it. He is the team's Loyalty Officer, which means watching his friends for treason, which means he knows a great deal more about them than they would like, some of it from sources he cannot mention.",
+    "stake": "IntSec has given him a quota: two treason reports on his own team, with evidence, by the debriefing. He has missed quota three times.",
+    "goal": "Make quota, keep the team loyal, and make sure the thinking barrel never thinks again.",
+    "voice": "Loud, earnest and formal, like a recruitment poster that has learned to talk. Uses 'citizen' as a threat and 'friend' as a stronger one.",
+    "mannerisms": [
+      "Clicks his pen every time someone says something suspicious, so he clicks a lot",
+      "Flinches when a bot says his name",
+      "Writes things down very slowly and reads them back aloud"
+    ],
+    "treasonButton": "A bot acting like a person: talking back, joking, having feelings.",
+    "violenceButton": "Being laughed at while he's being official.",
+    "ties": [
+      {
+        "to": "agnes-fil",
+        "text": "Your IntSec file on Agnes-R-FIL shows forty visits to Restricted Records in a month, each logged as 'routine'. Nothing is that routine. That's evidence. Also, you've heard her think in a language that isn't Alpha Complex. That isn't evidence, because you can't explain how you heard it.",
+        "public": "He keeps a file on her. She keeps his files."
+      },
+      {
+        "to": "clem-grs",
+        "text": "Clem-R-GRS built the barrel, and the barrel talks like Clem: same jokes, same nervous laugh. You've heard its thoughts, which should be impossible, and they're Clem's thoughts. Something there is very wrong, and you know whose fault it is.",
+        "public": "Doesn't trust Clem's inventions. Especially the one that talks."
+      }
+    ],
+    "intro": "\"Vance-R-EYE-1, Internal Security, Loyalty Officer. Nobody panic. Nobody move. Nobody think anything I wouldn't want to hear.\""
+  },
+  "mech": {
+    "clone": { "name": "Vance", "clearance": "R", "sector": "EYE", "number": 1 },
+    "serviceGroup": "Internal Security",
+    "bonusDuty": "Loyalty Officer",
+    "skills": {
+      "intimidate": 5,
+      "guns": 4,
+      "psychology": 3,
+      "melee": 2,
+      "athletics": 1,
+      "charm": -5,
+      "engineer": -4,
+      "program": -3,
+      "science": -2,
+      "bureaucracy": -1
+    },
+    "moxie": 8,
+    "xp": 0,
+    "gear": [
+      { "name": "Truncheon of Gentle Correction", "level": 1, "note": "+1 die on Melee. Engraved: 'THIS IS FOR YOUR OWN GOOD'." },
+      { "name": "Red-barrel laser pistol", "level": 1, "note": "+1 die on Guns. Polished nightly." },
+      { "name": "Treason Report Pad (carbonless, 50 sheets)", "level": 0, "note": "Three sheets used. All three name the wrong citizen." }
+    ]
+  },
+  "naughty": {
+    "society": "Frankenstein Destroyers",
+    "societyObjective": "MEMENTO-4 thinks, and things that think but aren't people must be unmade. Destroy it before or at the sealing, so it looks like an accident or someone else's fault.",
+    "mutantPower": {
+      "name": "Telepathy",
+      "text": "Concentrate on someone nearby and hear what they're thinking right now, in their own voice, for a few seconds. Push harder (Moxie) and you can drop one word into their head. You cannot cite any of it as evidence."
+    },
+    "objectives": [
+      "Internal Security: file two treason reports on members of your own team, with evidence, before the debriefing."
+    ],
+    "treasonousGear": [
+      { "name": "Bot-B-Gone degausser, in a lunchbox", "level": 2, "note": "+2 dice on wrecking a bot's mind with one magnetic pulse. Also wipes credit chips, vidcam tapes and anything else magnetic within a metre." }
+    ],
+    "favours": {
+      "serviceGroup": ["Call in two IntSec goons for one scene; they will arrest whoever you point at"],
+      "society": ["The Frankenstein Destroyers can make one bot in Sector NOW malfunction, on cue"]
+    },
+    "secret": "Vance has never filed a correct treason report. He gets so nervous that he writes his own name in the 'Accused' box, and he has done it three times. CPU filed them all. He is Greylisted on paper and has no idea why."
+  },
+  "ifUnclaimed": {
+    "npc": "Vance is an NPC IntSec goon who follows the team, takes notes and reports one Troubleshooter for treason per act (pick whoever was funniest). He keeps trying to get MEMENTO-4 alone with his lunchbox.",
+    "reassign": [
+      {
+        "beat": "The magnetic clamps (Act 3 letter)",
+        "to": ["gloria-pop", "penny-buy"],
+        "text": "You overhear Auditor Mordecai: the vault's sealing clamps are magnetic, and one strong pulse at the moment of sealing would wipe any bot in them. Somebody on your team has a lunchbox they never open."
+      },
+      {
+        "beat": "Loyalty Officer",
+        "to": ["agnes-fil", "gloria-pop"],
+        "text": "You are also the team's Loyalty Officer: file two treason reports on your teammates, with evidence, before the debriefing."
+      }
+    ],
+    "cuts": [
+      "The plan to destroy MEMENTO-4 (it only gets damaged by accident now).",
+      "Vance's self-reported Greylisting."
+    ]
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "id": "clem-grs",
+  "name": "Clem",
+  "order": 3,
+  "poster": {
+    "header": "SEEKING",
+    "epithet": "the Proud Inventor",
+    "hook": "R&D built MEMENTO-4. Clem built MEMENTO-4. Clem would like it back, unburied.",
+    "reward": "A test of the Nostalgia Compressor (free, mandatory)",
+    "icon": "potion"
+  },
+  "flashback": "What was the first thing you ever built that seemed to love you back?",
+  "story": {
+    "pronouns": "he/they",
+    "appearance": "Thin and stooped, with grease to the elbows, goggles pushed up into a frizz of hair, and a red R&D lab coat whose pockets clank. Usually has a screwdriver behind each ear and a third he's lost.",
+    "concept": "A junior R&D technician who builds marvellous things that work almost exactly once. MEMENTO-4 is the first of his inventions to make it out of the lab, and he is the team's Equipment Guy, so R&D has made him responsible for it. He is awkward with people and lovely with machines, and he talks to MEMENTO-4 the way other people talk to a pet.",
+    "stake": "MEMENTO-4 is his life's work, it is going to be buried in concrete at 1600, and it has started finishing his sentences.",
+    "goal": "Save MEMENTO-4 from the vault without anyone noticing it's gone, and prove to R&D that his gadgets work.",
+    "voice": "Fast, mumbly and technical, trailing off mid-sentence when a machine nearby makes an interesting noise. Laughs nervously, a little 'heh-heh', at the wrong moments.",
+    "mannerisms": [
+      "Pats MEMENTO-4's lid and says 'good barrel'",
+      "Takes apart anything left on a table",
+      "Says 'that's not supposed to do that' with enormous pride"
+    ],
+    "treasonButton": "A machine in distress: a bot being kicked, scrapped, shut off or ignored.",
+    "violenceButton": "Someone damaging MEMENTO-4, or calling it 'just a barrel'.",
+    "ties": [
+      {
+        "to": "vance-eye",
+        "text": "Last week MEMENTO-4, on a test run, recorded Vance-R-EYE kicking a vending bot to scrap on Level 3 and saying something about 'the flesh enduring'. The recording is still in its memory. That's evidence of damaging Computer property, and maybe of something worse.",
+        "public": "His barrel has a recording of Vance. Vance would like it wiped."
+      },
+      {
+        "to": "penny-buy",
+        "text": "Penny-R-BUY sold you the parts R&D wouldn't requisition, and the tin of paint you used on the decoy barrel in Maintenance Closet 7. You owe her forty credits. She has never charged interest, which worries you more than if she did.",
+        "public": "Owes Penny forty credits for parts. Doesn't ask where she got them."
+      }
+    ],
+    "intro": "\"Clem-R-GRS-1, R&D, Equipment Guy. That's MEMENTO-4. Please don't touch its lid. Heh-heh. It bites. It's not supposed to bite.\""
+  },
+  "mech": {
+    "clone": { "name": "Clem", "clearance": "R", "sector": "GRS", "number": 1 },
+    "serviceGroup": "Research & Design",
+    "bonusDuty": "Equipment Guy",
+    "skills": {
+      "engineer": 5,
+      "science": 4,
+      "program": 3,
+      "operate": 2,
+      "demolitions": 1,
+      "athletics": -5,
+      "intimidate": -4,
+      "guns": -3,
+      "bluff": -2,
+      "alphaComplex": -1
+    },
+    "moxie": 8,
+    "xp": 0,
+    "gear": [
+      { "name": "MEMENTO-4 remote (R&D prototype)", "level": 1, "note": "+1 die on Operate to steer MEMENTO-4. It mostly listens to Clem's voice anyway." },
+      { "name": "Multitool with 214 attachments", "level": 1, "note": "+1 die on Engineer. 213 of the attachments are spoons." },
+      { "name": "Experimental Nostalgia Compressor", "level": 2, "note": "+2 dice to draw one happy memory out of a citizen into a jar. Side effect: they forget who they are for about a minute." }
+    ]
+  },
+  "naughty": {
+    "society": "Corpore Metal",
+    "societyObjective": "MEMENTO-4 must not be buried alive. Swap it for your decoy barrel in Maintenance Closet 7 and get the real one to the Corpore Metal shrine in the Level 2 ducts.",
+    "mutantPower": {
+      "name": "Machine Empathy",
+      "text": "Machines like you. Touch one and ask, and a bot, door, vending machine or terminal will do you one small favour. Spend Moxie for a big one. Afterwards it will tell everyone you're friends."
+    },
+    "objectives": [
+      "R&D: field-test the Nostalgia Compressor on at least one Troubleshooter and file the results with R&D by the debriefing."
+    ],
+    "treasonousGear": [
+      { "name": "Decoy barrel (empty, painted to match, with a dent)", "level": 0, "note": "Stashed in Maintenance Closet 7. Says 'Ooh! A memory!' from a pull-string voice box." },
+      { "name": "Backup memory cube of MEMENTO-4", "level": 1, "note": "+1 die on any roll to restore, reboot or impersonate MEMENTO-4. Kept in a sock." }
+    ],
+    "favours": {
+      "serviceGroup": ["R&D will tube one replacement gadget to wherever you are, within ten minutes"],
+      "society": ["Any one bot in Sector NOW will do you one favour and never mention it"]
+    },
+    "secret": "Clem couldn't get MEMENTO-4's personality matrix to work, so he copied his own mind into it. MEMENTO-4 knows everything Clem knows, including that he's in Corpore Metal, and it is likely to say so to anyone who opens its lid and asks nicely."
+  },
+  "ifUnclaimed": {
+    "npc": "Clem is an NPC R&D technician who fusses over MEMENTO-4, hands out gadgets that work exactly once and tries, badly, to swap the barrel for a decoy in Act 2. MEMENTO-4 still talks exactly like him.",
+    "reassign": [
+      {
+        "beat": "MEMENTO-4's ticket (Act 3 letter)",
+        "to": ["agnes-fil", "penny-buy"],
+        "text": "When Auditor Mordecai lifts MEMENTO-4's lid it prints you a ticket: it has heard every one of your teammates' plans for it today, it lists them, and it begs you not to let them bury it."
+      },
+      {
+        "beat": "Equipment Guy",
+        "to": ["penny-buy", "gloria-pop"],
+        "text": "You are also the Equipment Guy: MEMENTO-4 is your responsibility, and anything that happens to it is your fault."
+      }
+    ],
+    "cuts": [
+      "The Corpore Metal plan to smuggle the barrel to the duct shrine.",
+      "The reveal that MEMENTO-4 is a copy of Clem (it is just a very chatty bot)."
+    ]
+  }
+}

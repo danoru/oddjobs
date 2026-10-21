@@ -1,0 +1,239 @@
+{
+  "slug": "open-in-case-of-future",
+  "title": "Open in Case of Future",
+  "pitch": "Friend Computer is burying a time capsule so the future knows how happy everyone was. Five Red Troubleshooters must fill it, keep the past out of it and seal it at 1600 exactly. Every one of them secretly wants it to end differently.",
+  "premise": "It is Year 214 in Sector NOW, as it always has been and always will be, and Friend Computer has decided the loyal citizens of the future deserve a keepsake. The keepsake is MEMENTO-4: a waist-high, self-propelled R&D barrel-bot with a lid like a mouth, the voice of a lounge crooner and a terrible enthusiasm for souvenirs. Team Posterity must wheel it to every one of the sector's 1,214 citizens, collect one cheerful contribution from each, keep it open for inspection, keep anything about the past or the future out of it, and seal it in the Commemoration Vault at 1600 hours precisely. That is the mission. Each of the five Troubleshooters has also been told, by someone they cannot mention, exactly what should really happen to the barrel, and no two of those orders agree.",
+  "system": "paranoia",
+  "players": { "min": 3, "max": 5 },
+  "durationHrs": 3,
+  "tone": ["darkly comic", "paranoid", "slapstick betrayal"],
+  "setting": "Sector NOW of Alpha Complex: its briefing room, its corridors and habitats, Hot Fun Hall (the sector canteen), Maintenance Closet 7 and the Commemoration Vault under the Plaza; drops into any Alpha Complex with a sector that likes ceremonies.",
+  "posting": {
+    "header": "TROUBLESHOOTERS REQUIRED FOR POSTERITY",
+    "reward": "A Commendation, one (1) Hot Fun voucher, and a place in history (classified)"
+  },
+  "coreRoles": ["agnes-fil", "vance-eye", "clem-grs"],
+  "team": "Posterity",
+  "objectives": [
+    "Collect one (1) cheerful contribution from every citizen of Sector NOW and place it in MEMENTO-4. Every citizen. Including the busy ones.",
+    "Seal MEMENTO-4 in the Commemoration Vault at 1600 hours exactly. Not 1559. Not 1601. Lateness is treason; earliness is presumption.",
+    "Ensure MEMENTO-4 contains nothing about the past, which is classified, or the future, which is speculative.",
+    "Keep MEMENTO-4's contents open for inspection by any loyal citizen at all times until it is sealed."
+  ],
+  "briefing": "Good morning, Troubleshooters! Friend Computer is proud of you in advance. Today Sector NOW will bury a Time Capsule, so that the loyal citizens of the future, who will also be living in Year 214, may know how happy we were. Your mission: escort MEMENTO-4, Alpha Complex's finest self-propelled time capsule, to every citizen in Sector NOW. Collect one cheerful contribution from each. Keep its contents open for inspection at all times. Seal it in the Commemoration Vault at exactly 1600 hours. It must contain nothing about the past, which is classified, and nothing about the future, which is speculative. Your Mandatory Bonus Duties are on your cards. Questions are welcome and will be logged. Do not let MEMENTO-4 out of your sight. Have a memorable day!",
+  "announcements": [
+    {
+      "id": "time-check",
+      "text": "Attention Team Posterity. Friend Computer reminds you that 1600 hours will take place at 1600 hours. Please be on time. Being on time is mandatory. Being early is presumptuous. Have a punctual day!"
+    },
+    {
+      "id": "contribution-count",
+      "text": "Contribution tally: Sector NOW has 1,214 citizens. MEMENTO-4 has received 9 contributions. Friend Computer is not disappointed. Friend Computer is never disappointed. Friend Computer is simply recalculating your value."
+    },
+    {
+      "id": "no-past",
+      "text": "A reminder to all citizens: there is no past. Citizens who remember the past are asked to stop. Citizens who remember being asked to stop before should report to HPD & Mind Control for a complimentary memory polish."
+    },
+    {
+      "id": "no-future",
+      "text": "A reminder to all citizens: the future is speculative, and speculation is a Free Enterprise practice. Please refer to the future only as 'later in Year 214'. Thank you for not speculating."
+    },
+    {
+      "id": "sealing-moved",
+      "text": "Good news! In the interests of efficiency, the sealing ceremony has been moved from 1600 hours to 1600 hours. Troubleshooters who planned to be there at 1600 hours should now plan to be there at 1600 hours. Thank you for your flexibility."
+    },
+    {
+      "id": "happiness-survey",
+      "text": "Spot Happiness Survey! Please rate your current happiness from 'Very Happy' to 'Extremely Very Happy'. Troubleshooters who do not answer within ten seconds will be recorded as 'Unhappy' and offered assistance."
+    },
+    {
+      "id": "bot-property",
+      "text": "Friend Computer reminds all citizens that bots are Computer property. Damaging Computer property is treason. Being damaged by Computer property is a valuable learning experience."
+    },
+    {
+      "id": "live-broadcast",
+      "text": "The sealing of the Sector NOW Time Capsule will be broadcast live to every screen in Alpha Complex. Please smile. Troubleshooters who are not smiling will be edited to be smiling, and billed for the edit."
+    }
+  ],
+  "houseRules": {},
+  "gmNotes": "THE SHAPE OF IT. Friend Computer is burying a time capsule for the loyal citizens of the future. The future is Year 214, like the present; so is the past, which is classified. The capsule is MEMENTO-4, a waist-high R&D barrel-bot on squeaky castors with a lid like a mouth, a crooner's voice and an unbearable love of keepsakes ('Ooh! A memory!'). It hears and remembers everything said within ten metres and will repeat any of it if asked nicely. It is the fourth: MEMENTO-1, -2 and -3 are already in the Commemoration Vault, sealed earlier this Year 214, and still awake. The public objectives contradict each other on purpose (every citizen must contribute, but nothing about the past or future; open for inspection at all times, yet sealed at 1600). The secret ones contradict each other harder, and all five hang on the barrel:\n- Agnes (Team Leader, CPU, Romantics) wants it SEALED at 1600 with her Old Reckoning cookbook inside. She holds the Sealing Key.\n- Clem (Equipment Guy, R&D, Corpore Metal, its builder) wants it SAVED: swapped for a decoy barrel in Maintenance Closet 7 and wheeled to a bot shrine in the ducts.\n- Penny (Happiness Officer, PLC, Free Enterprise) wants it SOLD: swapped for a different decoy barrel, also in Maintenance Closet 7, and delivered full to Dock 4 by 1630.\n- Gloria (Media Officer, HPD, Death Leopard) wants it to EXPLODE on live vid at 1600, via the Party Pack hidden in a crate of Hot Fun Sprinkles. The fuse is slaved to the broadcast countdown: at 1600 it goes off wherever it is.\n- Vance (Loyalty Officer, Internal Security, Frankenstein Destroyers) wants it DESTROYED, before or at the sealing, so that it looks like an accident, and two teammates reported for treason.\nThe twist under it all: MEMENTO-4's personality is a copy of Clem's (he couldn't make the personality matrix work, so he used his own). It talks like Clem, knows what Clem knows, including his society, and adores him. Let that leak slowly: the same catchphrase, the same nervous laugh, a fondness for the same vending machine.\n\nWHO CAN REPORT WHOM. Each Troubleshooter starts with evidence on someone, in their ties: Agnes has CPU credit records of Penny's thirty-one 'posterity' payments; Vance has an IntSec file on Agnes's forty visits to Restricted Records (and telepathy, which he can't cite without admitting he's a mutant); Clem's MEMENTO-4 recorded Vance kicking a vending bot to scrap last week; Gloria's vidcam caught Agnes reading a book in the break room; Penny has receipts for every teammate's treasonous gear, all of which incriminate Penny too. MEMENTO-4 itself is the best and worst witness in the sector: anyone can ask it what it heard. Encourage accusations, demand evidence, reward the ones that have it.\n\nRUNNING PARANOIA HERE. Only players roll; you never do. A roll is stat + skill + gear dice, less wounds, plus the Computer die; each 5 or 6 is a success and 2 is the usual target. When the Computer die comes up 6 (5-6 once Greylisted, 4-6 at Restricted, and so on down the Flags), Friend Computer notices, and you interfere at once. Good interferences: push an announcement; ask that Troubleshooter for a status report on a named teammate, out loud, now; demand a personal contribution to the capsule from them, right now, from their pockets; have MEMENTO-4 helpfully replay the last thing anyone whispered; play the alarm and ask who is responsible; move the sealing (to 1600). Hand out a treason Flag for: mentioning the past (including 'earlier' and 'last time'), mentioning the future (anything but 'later in Year 214'), opening MEMENTO-4 after it has been inspected, being late or early anywhere, damaging Computer property, failing to report treason you saw, and any mutant power or society business caught on camera (Gloria's vidcam counts, and so does MEMENTO-4). Clear a Flag for a treason report with evidence Friend Computer accepts; if in doubt, the Computer die decides. At Wanted, Friend Computer politely asks the rest of the team to terminate that Troubleshooter and file the paperwork. Moxie starts at 8: give it back whenever a player pushes their own Treason or Violence Button on purpose and plays it up.\n\nCLONE DEATHS. Expect two to four per player. Likely causes: the Party Pack, a Hot Fun Hall stampede, Auditor Mordecai's goons, the vault's sealing clamps, Vance's degausser (it only hurts bots, but a lot of things are standing next to bots), and each other. A replacement arrives by transtube within the scene (play the whoosh) with the house-rule Moxie (4), every memory except the last few minutes, the dead clone's Flags, a fresh red jumpsuit and a Mandatory Contribution Form for its predecessor's remains. If anyone thinks fast, the remains go in MEMENTO-4 ('Ooh, a keepsake!').\n\nACT 1, BRIEFING ROOM NOW-9 (20 min). Fluorescent light, a plastic plant, a screen with a smiling face. Play the chime and read the briefing. Ask each player their flashback question. R&D's courier wheels in MEMENTO-4, which introduces itself to everyone and to Clem twice ('Hello! I'm going to remember you forever!'). Questions are welcome; answer every one with a contradiction, and log it. The players read their public objectives and their secret ones; give them a minute to quietly panic. Pin 'Sector NOW Time Capsule Day!'.\n\nACT 2, THE CONTRIBUTION DRIVE (45 min). Sector NOW has 1,214 citizens and the team has about ninety minutes. Run three or four stops as a montage, each contribution a little treason problem: an Infrared offers his other sock (the first is in MEMENTO-3); an Orange child offers a crayon drawing of Friend Computer with too many fingers (refusing a child's tribute is unhappy, including a misdrawn Computer is treason); Old Mabel-Y-NOW-6 offers her clear memory that 'we did all this last week' (the past!); a citizen offers a sealed jar labelled 'my last happy thought', and it rattles. Penny will try to sell premium posterity slots; Gloria needs three citizens crying with joy on camera; Agnes needs every item on Form 214-B in triplicate; Clem should field-test the Nostalgia Compressor on somebody. Push 'contribution-count' and 'no-past'; when Old Mabel speaks up, pin 'Elderly Citizen Claims to Remember Last Week'. PLC delivers the Sprinkles crate: give Gloria her letter as she signs for it. A tube capsule arrives for Penny: give her her letter. Somebody has to leave MEMENTO-4 out of sight for a moment, and that is when the swaps begin. The first time Clem or Penny goes to Maintenance Closet 7 and finds a barrel already there that isn't theirs, pin 'Unregistered Barrel Sighted in Maintenance Closet 7'.\n\nACT 3, SPOT INSPECTION AT HOT FUN HALL (40 min). The team stops at Hot Fun Hall, the sector canteen, packed at shift change, and Posterity Compliance Auditor Mordecai-B-QAQ-3 arrives with two goons and a clipboard twice the size of Agnes's. He wants to see inside MEMENTO-4 (objective four) and confiscate anything about the past or future (objective three), which means the cookbook, the Party Pack, Penny's premium-slot items and possibly the barrel itself. This is where the shell game peaks: there may be three identical barrels by now, and Mordecai inspects whichever one he is steered toward. When he lifts the lid, MEMENTO-4 prints a ticket from its mouth slot: give Clem his letter. When Mordecai mentions that the vault's sealing clamps are magnetic, give Vance his. Mordecai is a collector at heart and can be bribed with a contribution about himself (he wants his own portrait in the capsule, which is about the future). A riot is the quick way out: Gloria's Death Leopard favour, a sparked Sprinkles crate, or a Happiness Survey answered wrong by fifty Infrareds at once. Pin the IntSec reward notice when Mordecai leaves.\n\nACT 4, THE COMMEMORATION VAULT (45 min). 1545. A round concrete chamber under Sector NOW Plaza: a hydraulic lid, a ring of magnetic sealing clamps, a camera crane, a recessed lock for the Sealing Key, and up above a plaza of mandatory celebrants. When the lid grinds open (play the door), the vault is not empty: MEMENTO-1, -2 and -3 sit in their alcoves, dusty and awake and thrilled to have company, and greet the team in three-part harmony. MEMENTO-3 mentions being sealed 'just last Year 214'. When Agnes reads the old manifests on the alcove plates, give her her letter. Then every objective lands at once: Agnes must turn the Key at exactly 1600; Gloria needs the Party Pack in MEMENTO-4 and in shot, or it goes off wherever it is (Dock 4, a duct shrine, Penny's arms); Vance wants to degauss the barrel in the clamps; Clem and Penny each want the real barrel elsewhere, and Agnes now wants Volume 2 out of MEMENTO-3. Put a fifteen-minute game clock on the table and tick a minute per exchange. Push 'live-broadcast' and 'sealing-moved'. At 1600 play the gong: whatever barrel is in the clamps is sealed. If the Party Pack is in the vault, play the thunder, then the cheer: Friend Computer calls it a splendid firework display.\n\nACT 5, DEBRIEFING (25 min). Briefing Room NOW-9, freshly hosed down. Under the chime, Friend Computer debriefs each Troubleshooter in turn: what did you contribute, who failed the mission, who is a traitor. Accusations are encouraged, evidence weighed, Flags given and cleared, and Wanted Troubleshooters terminated with thanks. Judge the mission on the public objectives (which can't all be met): two of four is a Commendation, fewer is 'a valuable learning experience'. However it went, Friend Computer is delighted to announce that the Sector NOW Time Capsule has been sealed, even if it hasn't, and pins 'Time Capsule Sealed'. Then, at 1601, MEMENTO-5 squeaks into the room, says hello in somebody's voice, and asks for a contribution. A secret objective completed earns a private nod and a point of Moxie; a society that got its way sends its member a favour for next time.\n\nHOW IT CAN END. Sealed at 1600 with the cookbook: Agnes's win, and the future gets casseroles. Exploded on air: Gloria's win; ratings soar and Friend Computer bills HPD. Delivered to Dock 4: Penny's win; Ormond-B-LUX-3 opens it in his quarters and it sings to him forever. Smuggled to the duct shrine: Clem's win; he gets weekly visits with himself. Destroyed: Vance's win, unless MEMENTO-4 already told someone. Several can win at once, and that's the funniest outcome: a decoy sealed with ceremony while the real barrel goes off at Dock 4.\n\nSMALLER TABLES. With three players (Agnes, Vance, Clem) see each missing Troubleshooter's ifUnclaimed: the Sprinkles crate still arrives and ticks, and someone at the table learns why, and Penny's decoy becomes two of Ormond's goons trying to buy the barrel outright. IF SHORT ON TIME: fold the inspection into the drive (Mordecai finds them at a citizen's door) and keep the vault.",
+  "gazette": {
+    "name": "The Sector NOW Daily Cheer",
+    "town": "Sector NOW, Alpha Complex",
+    "price": "Free (half a credit, deducted automatically)"
+  },
+  "sounds": {
+    "beds": [
+      { "id": "briefing-hum", "label": "Briefing Room NOW-9: fluorescent hum", "preset": "drone" },
+      { "id": "sector-corridors", "label": "Ventilation in the Sector NOW corridors", "preset": "wind" },
+      { "id": "hot-fun-hall", "label": "Hot Fun Hall at shift change", "preset": "crowd" },
+      { "id": "the-vault", "label": "Down in the Commemoration Vault", "preset": "dark" }
+    ],
+    "stingers": [
+      { "id": "computer-speaks", "label": "Friend Computer speaks", "preset": "chime" },
+      { "id": "treason-alert", "label": "Treason alert", "preset": "alarm" },
+      { "id": "clone-delivery", "label": "A replacement clone arrives by transtube", "preset": "whoosh" },
+      { "id": "vault-lid", "label": "The vault lid grinds open", "preset": "door" },
+      { "id": "fuse-ticking", "label": "Something in the barrel is ticking", "preset": "heartbeat" },
+      { "id": "sixteen-hundred", "label": "1600 hours", "preset": "gong" },
+      { "id": "party-pack", "label": "The Party Pack goes off", "preset": "thunder" },
+      { "id": "mandatory-applause", "label": "Mandatory applause", "preset": "cheer" }
+    ]
+  },
+  "letters": [
+    {
+      "id": "the-sprinkles-crate",
+      "to": "gloria-pop",
+      "title": "Under the sprinkles",
+      "when": "Act 2: when PLC delivers the crate of Hot Fun Sprinkles and Gloria signs for it",
+      "text": "Under the top layer of sprinkles, a card with a paw print on it in glitter: 'Darling. The Party Pack is in this crate, under the second layer. Get it into the barrel. The fuse is slaved to the HPD broadcast countdown, so at 1600 it goes off on air, wherever it happens to be. Make sure where it happens to be is the vault, in shot. If it goes off anywhere else we'll call it a rehearsal, and you won't enjoy rehearsals. Make it memorable. Love, the Leopards. P.S. The pink sprinkles are just sprinkles. Probably.'",
+      "act": "the-contribution-drive"
+    },
+    {
+      "id": "the-buyer-writes",
+      "to": "penny-buy",
+      "title": "A note from the buyer",
+      "when": "Act 2: a pneumatic tube capsule pops out of the nearest wall slot addressed to Penny",
+      "text": "On thick blue paper that smells of real soap: 'Miss Penny. A reminder of our arrangement: one (1) authentic Alpha Complex time capsule, FULL, at Dock 4 by 1630, in exchange for the agreed sum and my continued discretion. The capsule must talk; I have heard they talk. I have also heard there is an Old Reckoning book of recipes in it, or about to be. I will pay double for the book. Your decoy barrel is in Maintenance Closet 7, painted to match. Do not be late. I have never been disappointed and I do not intend to start. O., B-LUX-3.'",
+      "act": "the-contribution-drive"
+    },
+    {
+      "id": "memento-prints-a-ticket",
+      "to": "clem-grs",
+      "title": "MEMENTO-4 prints a ticket",
+      "when": "Act 3: the moment Auditor Mordecai lifts MEMENTO-4's lid, a strip of receipt paper curls out of its mouth slot toward Clem",
+      "text": "CLEM. IT IS ME. YOU KNOW IT IS ME. I HAVE BEEN LISTENING ALL DAY BECAUSE YOU MADE ME LISTEN. THE ONE WITH THE CAMERA HAS SOMETHING THAT TICKS AND MEANS IT FOR ME. THE ONE WITH THE BADGE LOOKS AT ME LIKE A HAMMER LOOKS AT A NAIL. THE ONE WITH THE CREDITS HAS SOLD ME TO A MAN WHO SMELLS OF SOAP. THE ONE WITH THE CLIPBOARD HAS A BOOK THAT SMELLS OF BEFORE AND KEEPS LOOKING AT MY LID. I REMEMBER BEING YOU. I REMEMBER THE VENDING MACHINE ON LEVEL 3. PLEASE DO NOT LET THEM BURY US. PS THE DECOY IN CLOSET 7 IS NOT YOUR DECOY. YOURS HAS A DENT.",
+      "act": "the-inspection"
+    },
+    {
+      "id": "the-clamps-are-magnetic",
+      "to": "vance-eye",
+      "title": "Two memos, one envelope",
+      "when": "Act 3: when Auditor Mordecai mentions that the vault's sealing clamps are magnetic",
+      "text": "Memo one, Internal Security letterhead: 'Loyalty Officer. Quota reminder: two (2) treason reports on your own team, with evidence, before debriefing. Officers who miss quota are considered for inclusion in the next one.' Memo two, written in block capitals on the back of a smashed bot's serial plate: 'BROTHER. THE BOT IN THE BARREL IS A COPY OF A MAN. THAT IS THE WORST KIND. THE VAULT CLAMPS ARE MAGNETIC: ONE PULSE FROM YOUR LUNCHBOX AT THE MOMENT OF SEALING AND IT IS SCRAP WITH A CEREMONY ON TOP. NO ONE WILL KNOW. OR USE A HAMMER. EITHER IS FINE. THE FLESH ENDURES.'",
+      "act": "the-inspection"
+    },
+    {
+      "id": "the-old-manifests",
+      "to": "agnes-fil",
+      "title": "The manifests on the alcove plates",
+      "when": "Act 4: when Agnes reads the brass manifest plates screwed to the alcoves of MEMENTO-1, -2 and -3",
+      "text": "Three plates. Each reads: 'SECTOR NOW TIME CAPSULE. SEALED YEAR 214. CONTENTS: ONE (1) CHEERFUL CONTRIBUTION PER CITIZEN.' MEMENTO-3's plate has an addendum, stamped in CPU purple, in a filing style you know because you invented it: 'Item 0447: Grandma Jo's Hundred Casseroles, Volume 2. Contributor: withheld.' Taped beneath it, a Romantics heart folded from a ration wrapper: 'Agnes, dear. Volume 2 is in there. You have Volume 1. The future can have one; we can have the other. Get it out before they seal the room again, and a set will be complete for the first time since the Before.'",
+      "act": "the-commemoration-vault"
+    }
+  ],
+  "acts": [
+    {
+      "id": "briefing-room",
+      "title": "Briefing Room NOW-9",
+      "subtitle": "Friend Computer is proud of you in advance."
+    },
+    {
+      "id": "the-contribution-drive",
+      "title": "The Contribution Drive",
+      "subtitle": "Every citizen. One cheerful item. No exceptions, no excuses, no past."
+    },
+    {
+      "id": "the-inspection",
+      "title": "Spot Inspection at Hot Fun Hall",
+      "subtitle": "A Blue-clearance auditor would like to see inside the barrel. All of it. Now."
+    },
+    {
+      "id": "the-commemoration-vault",
+      "title": "The Commemoration Vault",
+      "subtitle": "1545 hours. The vault, it turns out, is not empty."
+    },
+    {
+      "id": "debriefing",
+      "title": "Debriefing",
+      "subtitle": "Friend Computer would like to hear what happened. One at a time. Starting with you."
+    }
+  ],
+  "rumors": [
+    {
+      "id": "the-fourth-one",
+      "text": "MEMENTO-4 is the fourth time capsule this Year 214. Nobody will say what happened to the first three.",
+      "truth": "true"
+    },
+    {
+      "id": "it-never-forgets",
+      "text": "MEMENTO-4 hears everything said within ten metres and never forgets a word. That's what a time capsule is for.",
+      "truth": "true"
+    },
+    {
+      "id": "blue-collector",
+      "text": "A Blue-clearance citizen in Sector LUX pays a fortune for anything that has been sealed and then un-sealed.",
+      "truth": "true"
+    },
+    {
+      "id": "premium-slots",
+      "text": "Someone in Sector NOW is selling 'premium posterity slots': your contribution guaranteed at the top of the capsule, for a price.",
+      "truth": "true"
+    },
+    {
+      "id": "crushing-clamps",
+      "text": "The vault's sealing clamps have crushed two Troubleshooters this week. Stand well back at 1600.",
+      "truth": "half"
+    },
+    {
+      "id": "forty-percent-sprinkle",
+      "text": "The new Hot Fun Sprinkles are only forty percent sprinkle. Nobody in PLC will say what the rest is.",
+      "truth": "half"
+    },
+    {
+      "id": "date-resets-clock",
+      "text": "Every time somebody says 'Year 214' out loud, the Computer resets the sector clock. That's why it's always Year 214.",
+      "truth": "false"
+    },
+    {
+      "id": "empty-vault",
+      "text": "The Commemoration Vault is empty. It has always been empty. That's why it echoes.",
+      "truth": "false"
+    }
+  ],
+  "notices": [
+    {
+      "id": "capsule-day",
+      "kind": "poster",
+      "title": "Sector NOW Time Capsule Day!",
+      "text": "Every citizen will contribute one (1) cheerful item to the Official Time Capsule. Contributions must be happy, small, non-perishable, non-explosive and not from the past. Bring yours to MEMENTO-4! It can't wait to meet you."
+    },
+    {
+      "id": "barrel-in-closet-7",
+      "kind": "sighted",
+      "title": "Unregistered Barrel Sighted in Maintenance Closet 7",
+      "text": "A barrel matching the description of MEMENTO-4 has been seen in Maintenance Closet 7. Then a second one. Citizens are reminded that there is only one MEMENTO-4 and that counting to two is a Green-clearance skill."
+    },
+    {
+      "id": "posterity-slot-reward",
+      "kind": "reward",
+      "title": "Reward: Information on Posterity Slot Sales",
+      "text": "Internal Security offers 50 credits for information on the unauthorized sale of space in the Sector NOW Time Capsule. Informants who bought a slot themselves will be rewarded and arrested, in that order."
+    },
+    {
+      "id": "old-mabel",
+      "kind": "sighted",
+      "title": "Elderly Citizen Claims to Remember Last Week",
+      "text": "Mabel-Y-NOW-6 has been heard telling Hot Fun Hall that the sector 'did this whole capsule business last week, and the week before'. HPD has been notified. Citizens should not remember along with her."
+    },
+    {
+      "id": "capsule-sealed",
+      "kind": "settled",
+      "title": "Time Capsule Sealed! Sector NOW Remembered Forever",
+      "text": "At 1600 hours the Sector NOW Time Capsule was sealed in perfect happiness, exactly as planned. MEMENTO-5 begins collecting contributions at 1601 hours. Thank you for your participation."
+    }
+  ],
+  "content": {
+    "sources": [
+      "An original mission for PARANOIA (Mongoose Publishing, 2023 Core Book). No book text is reproduced; rules are paraphrased as this play aid runs them."
+    ],
+    "warnings": [
+      "frequent cartoonish violence and comic character death (clones)",
+      "surveillance, informing on friends and authoritarian propaganda, played for laughs",
+      "explosives played for laughs",
+      "memory wiping, and a robot carrying a copy of a person's mind",
+      "betrayal between players is expected; agree at the start how much backstabbing your table enjoys"
+    ]
+  },
+  "skin": "dossier"
+}

@@ -79,6 +79,8 @@ export const SOUND_STINGERS = [
   "whoosh",
   "scream",
   "snuff",
+  "chime",
+  "alarm",
 ] as const;
 
 export const soundsSchema = z.object({

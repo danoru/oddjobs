@@ -86,7 +86,7 @@ export function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Su
               {os.premise}
             </p>
             <div className={s.meta} data-part="meta">
-              {os.system !== "tencandles" && <span>Level {os.level}</span>}
+              {"level" in os && <span>Level {os.level}</span>}
               <span>
                 {os.players.min}–{os.players.max} players
               </span>
@@ -113,7 +113,7 @@ export function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Su
                   Print every sheet
                 </Button>
                 <Button component={Link} href={`/${os.slug}/cards`} variant="outlined" size="small" startIcon={<StyleIcon />} sx={inkButton}>
-                  {os.system === "daggerheart" ? "Domain & item cards" : "Spell & item cards"}
+                  {os.system === "daggerheart" ? "Domain & item cards" : os.system === "paranoia" ? "Clone ID & gear cards" : "Spell & item cards"}
                 </Button>
                 <Button component={Link} href={`/${os.slug}/tents`} variant="outlined" size="small" startIcon={<BadgeIcon />} sx={inkButton}>
                   Name tents &amp; tokens

@@ -4,6 +4,10 @@ import { SOUND_STINGERS, type Act, type NoticeKind, type Rumor, type RumorTruth 
 import { NOTICE_KINDS } from "./coreSchema";
 import type { CoinMeta, DiceKind } from "@/systems/registry";
 import { foldTallies, rollDuality, rollTallies, type DualityData, type SheetLimits, type TallyData } from "@/systems/daggerheart/live";
+import { foldParanoia, nodePool, nodeTallies, rollNode, type NodeData, type PTallyData } from "@/systems/paranoia/live";
+import type { ParanoiaSheets } from "@/systems/paranoia/derive";
+import { computerThreshold } from "@/systems/paranoia/rules";
+import { SKILL_KEYS, STATS, type HouseRules } from "@/systems/paranoia/schema";
 
 /**
  * The table's event log: everything that happens at a table outside a
@@ -28,7 +32,10 @@ import { foldTallies, rollDuality, rollTallies, type DualityData, type SheetLimi
  *     known to each other by an opaque handle.
  * Daggerheart's duality rolls and the Hope, Fear and slots they move are
  * rows here too (src/systems/daggerheart/live.ts); they're the whole table's,
- * so they're never hidden.
+ * so they're never hidden. So are Paranoia's NODE rolls, Moxie, wounds,
+ * treason and clones (src/systems/paranoia/live.ts), and Friend Computer's
+ * announcements. A Paranoia treason report is the GM's alone: its accuser
+ * sees their own, and everyone else only that one was filed.
  */
 
 // ---- People --------------------------------------------------------------------
@@ -72,6 +79,8 @@ export const LIVE_KINDS = [
   "death",
   "candle",
   "tally",
+  "accuse",
+  "computer",
 ] as const;
 export type LiveKind = (typeof LIVE_KINDS)[number];
 
@@ -215,6 +224,26 @@ export const liveAction = z.discriminatedUnion("type", [
     delta: z.number().int().min(-12).max(12).refine((n) => n !== 0, "no change"),
     to: handle.optional(),
   }),
+  /** Paranoia: roll stat + skill + gear and the Computer die; the server reads the sheet, wounds and treason. */
+  z.object({
+    type: z.literal("node"),
+    label,
+    stat: z.enum(STATS),
+    skill: z.enum(SKILL_KEYS).nullable().default(null),
+    gear: z.number().int().min(0).max(5).default(0),
+  }),
+  /** Paranoia: Moxie, wounds or a clone (your own, or anyone's for the GM); treason and XP are the GM's. */
+  z.object({
+    type: z.literal("pmark"),
+    track: z.enum(["moxie", "wounds", "treason", "clone", "xp"]),
+    delta: z.number().int().min(-500).max(500).refine((n) => n !== 0, "no change"),
+    to: handle.optional(),
+  }),
+  /** Paranoia: report a teammate's treason to the Computer (the GM). */
+  z.object({ type: z.literal("accuse"), to: handle, text: z.string().trim().min(1).max(300) }),
+  /** Paranoia: Friend Computer says something to every phone and the TV. */
+  /** (A mission's briefing can run to a few paragraphs.) */
+  z.object({ type: z.literal("computer"), text: z.string().trim().min(1).max(1500) }),
   /** Daggerheart: the GM gains or spends Fear. */
   z.object({
     type: z.literal("fear"),
@@ -240,6 +269,8 @@ export interface LiveContext {
   dice: DiceKind;
   /** Daggerheart: each character's slots and Experiences, by character id. */
   sheets?: Record<string, SheetLimits>;
+  /** Paranoia: each Troubleshooter's skills and starting clone, and the house rules. */
+  paranoia?: { sheets: ParanoiaSheets; houseRules: HouseRules };
   rng: () => number;
 }
 
@@ -493,6 +524,47 @@ export function applyLive(a: LiveAction, actor: LiveActor, ctx: LiveContext): Li
       const name = who.character ?? who.name;
       return row("tally", { characterId: who.characterId, track: a.track, delta: a.delta, why: gm ? "the GM" : "ticked", name } satisfies TallyData, by, who.playerId);
     }
+    case "node": {
+      if (ctx.dice !== "node" || !ctx.paranoia) return fail("This table doesn't roll NODE");
+      if (gm) return fail("Only players roll; the Computer's side never does");
+      if (!me?.characterId) return fail("Accept an assignment (tear a poster) before you roll");
+      const sheet = ctx.paranoia.sheets[me.characterId];
+      if (!sheet) return fail("Your Troubleshooter isn't on this mission");
+      const marks = foldParanoia(ctx.rows, ctx.paranoia.sheets, ctx.paranoia.houseRules).marks[me.characterId];
+      if (marks.clone > 6) return fail("You're out of clones");
+      if (marks.wounds >= 4) return fail("You're dead. Next clone first");
+      const node = nodePool(sheet.skills, a.stat, a.skill, a.gear, marks.wounds);
+      const threshold = computerThreshold(marks.treason);
+      const r = rollNode(ctx.rng, node, threshold);
+      const name = me.character ?? me.name;
+      const data: NodeData = { system: "node", who: name, characterId: me.characterId, label: a.label, stat: a.stat, skill: a.skill, node, ...r };
+      return { ok: true, rows: [newRow("roll", data, by), ...nodeTallies(r, me.characterId, name, ctx.paranoia.houseRules).map((t) => newRow("tally", t, by))] };
+    }
+    case "pmark": {
+      if (ctx.dice !== "node" || !ctx.paranoia) return fail("Nothing to mark at this table");
+      if (!gm && (a.track === "treason" || a.track === "xp")) return fail(a.track === "treason" ? "Only the Computer awards treason" : "Only the Computer hands out XP Points");
+      const who = gm ? (a.to ? person(a.to) : null) : me;
+      if (gm && !who) return fail("Whose record?");
+      if (!gm && a.to && a.to !== me?.handle) return fail("You can only mark your own sheet");
+      if (!who?.characterId || !ctx.paranoia.sheets[who.characterId]) return fail("Accept an assignment first");
+      if (!gm && a.track === "clone" && a.delta !== 1) return fail("Only the Computer can un-decant a clone");
+      const name = who.character ?? who.name;
+      const why = a.track === "clone" ? "a new clone" : gm ? "the Computer" : "ticked";
+      return row("tally", { characterId: who.characterId, track: a.track, delta: a.delta, why, name } satisfies PTallyData, by, who.playerId);
+    }
+    case "accuse": {
+      if (ctx.dice !== "node") return fail("There's nobody to report to here");
+      if (!me) return fail(gm ? "The Computer doesn't file reports; it reads them" : "Accept an assignment first");
+      const to = person(a.to);
+      if (!to?.characterId) return fail("No Troubleshooter by that name");
+      if (to.playerId === me.playerId) return fail("Report yourself? The Computer appreciates your honesty, but no");
+      return row("accuse", { fromName: me.character ?? me.name, toName: to.character ?? to.name, text: a.text }, by, to.playerId);
+    }
+    case "computer": {
+      if (ctx.dice !== "node") return fail("There's no Computer at this table");
+      if (!gm) return fail("Only Friend Computer speaks for Friend Computer");
+      return row("computer", { text: a.text }, null);
+    }
     case "fear": {
       if (ctx.dice !== "duality") return fail("No Fear at this table");
       if (!gm) return fail("Only the GM holds Fear");
@@ -581,6 +653,10 @@ export function viewEvent(r: LiveRow, viewer: Viewer, ctx: ViewContext, hidden: 
     case "tick":
     case "hide":
       return gm ? { ...base, to: party(r.toPlayer, ctx.people, null), forMe: false, data: r.data } : null;
+    case "accuse":
+      // The Computer (GM) reads every report; its author sees their own; everyone else, that one was filed.
+      if (gm || mine) return { ...base, to: party(r.toPlayer, ctx.people, null), forMe: false, data: r.data };
+      return { ...base, by: null, to: null, mine: false, forMe: false, redacted: true, data: null };
     case "rumor": {
       if (!gm && !toYou) return null;
       const ids = (r.data as { ids: string[] }).ids;

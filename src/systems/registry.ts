@@ -2,10 +2,12 @@ import type { SystemId } from "@/lib/schema";
 import type * as dnd5e from "./dnd5e/schema";
 import type * as tencandles from "./tencandles/schema";
 import type * as daggerheart from "./daggerheart/schema";
+import type * as paranoia from "./paranoia/schema";
 import type { SystemEditor } from "@/lib/editor/types";
 import { editor as dnd5eEditor } from "./dnd5e/editor";
 import { editor as tencandlesEditor } from "./tencandles/editor";
 import { editor as daggerheartEditor } from "./daggerheart/editor";
+import { editor as paranoiaEditor } from "./paranoia/editor";
 
 /**
  * What each game system brings, in one place. Shared pages ask this which
@@ -44,9 +46,10 @@ export interface SpotlightBeat {
  * log); `pool`: the system's own reducer rolls (Ten Candles' d6 pool), and the
  * phone only adds shake-to-roll and the TV's tray; `duality`: the phone rolls
  * Daggerheart's Hope and Fear dice from the sheet through the log (and plain
- * damage dice), and each roll moves the Hope and Fear it earns.
+ * damage dice), and each roll moves the Hope and Fear it earns; `node`: the
+ * phone rolls Paranoia's stat + skill dice and the Computer die from the sheet.
  */
-export type DiceKind = "d20" | "pool" | "duality";
+export type DiceKind = "d20" | "pool" | "duality" | "node";
 
 /** What an inspiration coin stands for at this table, or null when the system has none. */
 export interface CoinMeta {
@@ -133,19 +136,41 @@ export const SYSTEMS: Record<SystemId, SystemMeta> = {
     // on yourself, so it lives in the Hope tracker rather than a purse to toss.
     coins: false,
   },
+  paranoia: {
+    id: "paranoia",
+    label: "Paranoia",
+    badge: "Paranoia",
+    publisher: "Mongoose Publishing",
+    routes: { print: true, cards: true, tents: true, play: false, kit: false },
+    claimVerb: "ACCEPT ASSIGNMENT",
+    editor: paranoiaEditor,
+    dice: "node",
+    spotlight: [
+      { id: "mission", label: "Mission" },
+      { id: "treason-button", label: "Treason Button" },
+      { id: "violence-button", label: "Violence Button" },
+      { id: "society", label: "Society" },
+      { id: "mutation", label: "Mutation" },
+      { id: "letters", label: "Letters" },
+    ],
+    // XP Points are the Computer's to give; nobody tosses them across the table.
+    coins: false,
+  },
 };
 
 type AnyOneShotLike =
   | (Pick<dnd5e.OneShot, "system" | "ruleset" | "level"> & { variants?: { level: number }[]; homebrew?: boolean })
   | Pick<tencandles.OneShot, "system">
-  | Pick<daggerheart.OneShot, "system" | "level">;
+  | Pick<daggerheart.OneShot, "system" | "level">
+  | Pick<paranoia.OneShot, "system">;
 
 /** The line under a poster: class and level in 5e and Daggerheart; in Ten Candles, what's in their pockets (traits come at the table). */
 export function posterTag(
-  c: Pick<dnd5e.Character, "mech"> | Pick<tencandles.Character, "story"> | Pick<daggerheart.Character, "mech">,
+  c: Pick<dnd5e.Character, "mech"> | Pick<tencandles.Character, "story"> | Pick<daggerheart.Character, "mech"> | Pick<paranoia.Character, "mech">,
 ): string {
   if ("mech" in c) {
     const m = c.mech;
+    if ("clone" in m) return `${m.clone.name}-${m.clone.clearance}-${m.clone.sector}-${m.clone.number} · ${m.serviceGroup}`;
     if ("class" in m) return `${m.class} ${m.level} · ${m.subclass}`;
     return m.classes.map((k) => `${k.name} ${k.level}`).join(" / ");
   }

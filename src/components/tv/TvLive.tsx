@@ -6,6 +6,7 @@ import { PosterIcon } from "@/components/PosterIcon";
 import type { Poster } from "@/lib/coreSchema";
 import { roman } from "@/lib/box";
 import type { DualityData } from "@/systems/daggerheart/live";
+import type { NodeData } from "@/systems/paranoia/live";
 import { OutcomeWord } from "@/systems/daggerheart/components/Dice";
 import v from "./Live.module.css";
 
@@ -107,16 +108,20 @@ export function TvLive({
           {tray === "full" && latest?.data ? (
             <div key={latest.id} className={v.trayLatest}>
               <div className={v.trayWho}>{(latest.data as RollData).who}</div>
-              <DiceFaces data={latest.data as RollData | PoolRollData | DualityData} size={54} />
+              <DiceFaces data={latest.data as RollData | PoolRollData | DualityData | NodeData} size={54} />
               <div className={`${v.trayTotal} ${(latest.data as RollData).nat === 20 ? v.nat20 : (latest.data as RollData).nat === 1 ? v.nat1 : ""}`}>
-                {(latest.data as RollData | PoolRollData | DualityData).system !== "pool" ? (latest.data as RollData).total : ""}
+                {(latest.data as NodeData).system === "node"
+                  ? `${(latest.data as NodeData).successes}✓`
+                  : (latest.data as RollData | PoolRollData | DualityData).system !== "pool"
+                    ? (latest.data as RollData).total
+                    : ""}
               </div>
               {(latest.data as DualityData).system === "duality" && (
                 <div className={v.trayTotal} style={{ fontSize: "clamp(20px, 2.4vw, 36px)" }} data-testid="tv-duality-outcome">
                   <OutcomeWord data={latest.data as DualityData} />
                 </div>
               )}
-              <div className={v.trayLabel}>{rollWords(latest.data as RollData | PoolRollData | DualityData)}</div>
+              <div className={v.trayLabel}>{rollWords(latest.data as RollData | PoolRollData | DualityData | NodeData)}</div>
             </div>
           ) : null}
           {rolls.length > 0 && (
@@ -127,7 +132,7 @@ export function TvLive({
                     <i>A die rattles behind the screen.</i>
                   ) : (
                     <>
-                      <b>{(e.data as RollData).who}</b> · {rollWords(e.data as RollData | PoolRollData | DualityData)}
+                      <b>{(e.data as RollData).who}</b> · {rollWords(e.data as RollData | PoolRollData | DualityData | NodeData)}
                     </>
                   )}
                 </li>

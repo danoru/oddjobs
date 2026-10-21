@@ -1,0 +1,98 @@
+{
+  "id": "gloria-pop",
+  "name": "Gloria",
+  "order": 4,
+  "poster": {
+    "header": "HIRING",
+    "epithet": "the Media Officer",
+    "hook": "HPD is broadcasting the sealing live. Gloria is making sure nobody ever forgets it.",
+    "reward": "Your face on every screen in Alpha Complex",
+    "icon": "star"
+  },
+  "flashback": "What was the best thing that ever happened to you on camera?",
+  "story": {
+    "pronouns": "she/her",
+    "appearance": "Tall and glossy, with a lacquered red bob that does not move, perfect teeth and a vidcam on a shoulder rig like a second head. Her jumpsuit is regulation, but she has done something to it that makes it look expensive. A suspicious smudge of glitter on one cheekbone.",
+    "concept": "An HPD & Mind Control vid presenter assigned to Team Posterity as Media Officer, to film the sealing for the whole of Alpha Complex. On camera she is sunshine; off camera she is bored, restless and starved for something, anything, to happen.",
+    "stake": "The broadcast is hers. If it's dull, so is she, and HPD reassigns dull presenters to the weather.",
+    "goal": "Make the sealing the most watched, most talked-about broadcast in Sector NOW's history, with herself in the middle of it.",
+    "voice": "Two voices: a warm, bright, sing-song presenter voice for the camera, and a flat, fast, bored mutter for everyone else. Switches between them mid-sentence.",
+    "mannerisms": [
+      "Frames people with her fingers before talking to them",
+      "Calls 'and... cut' when a conversation bores her",
+      "Smiles at every camera she passes, including security cameras"
+    ],
+    "treasonButton": "Boredom: a quiet, orderly moment that nothing is happening in.",
+    "violenceButton": "Someone stepping in front of her shot.",
+    "ties": [
+      {
+        "to": "agnes-fil",
+        "text": "Your vidcam, left running in the CPU break room, caught Agnes-R-FIL reading a book. A real paper book with a picture of food on the cover. That footage is evidence. It is also the most interesting thing you've filmed all year, and you want her as the face of the ceremony.",
+        "public": "Wants Agnes as the face of the ceremony. Has footage."
+      },
+      {
+        "to": "penny-buy",
+        "text": "Penny-R-BUY got you the crate of Hot Fun Sprinkles. She doesn't know what's under the second layer, and you're fairly sure she doesn't want to.",
+        "public": "Penny gets her things. Gloria doesn't say what things."
+      }
+    ],
+    "intro": "\"Gloria-R-POP-1, HPD, Media Officer, and you're watching it live! Smile, everybody. No, bigger. Bigger. ...Ugh. Fine. Cut.\""
+  },
+  "mech": {
+    "clone": { "name": "Gloria", "clearance": "R", "sector": "POP", "number": 1 },
+    "serviceGroup": "HPD & Mind Control",
+    "bonusDuty": "Media Officer",
+    "skills": {
+      "charm": 5,
+      "bluff": 4,
+      "demolitions": 3,
+      "operate": 2,
+      "throw": 1,
+      "bureaucracy": -5,
+      "science": -4,
+      "stealth": -3,
+      "program": -2,
+      "psychology": -1
+    },
+    "moxie": 8,
+    "xp": 0,
+    "gear": [
+      { "name": "HPD vidcam with Mandatory Smile Filter", "level": 2, "note": "+2 dice to film, broadcast or edit. Everyone on it is smiling, whatever is happening to them." },
+      { "name": "Morale-grade megaphone", "level": 1, "note": "+1 die on Charm to a crowd. Plays a jingle when switched on." }
+    ]
+  },
+  "naughty": {
+    "society": "Death Leopard",
+    "societyObjective": "Make the sealing unforgettable: get the Party Pack from under the Sprinkles into MEMENTO-4, and have the capsule in the vault, on camera, at 1600.",
+    "mutantPower": {
+      "name": "Pyrokinesis",
+      "text": "Stare at something you can see and it gets hot: it smoulders, sparks, or bursts into flame. Small things are easy. Anything bigger than a ration tray costs Moxie and probably your eyebrows."
+    },
+    "objectives": [
+      "HPD: get at least three citizens crying with joy on camera, and make the Team Leader look good doing it."
+    ],
+    "treasonousGear": [
+      { "name": "Death Leopard bandana", "level": 0, "note": "Spotted, glittery, worn inside the jumpsuit collar where the camera can't see it." },
+      { "name": "Pocket lighter shaped like Friend Computer", "level": 1, "note": "+1 die on lighting things. Mostly an alibi for her pyrokinesis." }
+    ],
+    "favours": {
+      "serviceGroup": ["HPD can cut any one moment out of the broadcast, permanently"],
+      "society": ["Death Leopard can start a riot in any crowd: a small one, with music"]
+    },
+    "secret": "For a year HPD has had Gloria record Friend Computer's pre-taped announcements in Sector NOW. Every 'Have a nice day' in the sector is her voice. She can do a perfect Friend Computer, and she has never been told not to."
+  },
+  "ifUnclaimed": {
+    "npc": "Gloria is an NPC HPD presenter who follows the team with a vidcam, narrating, and makes everyone redo anything dramatic. The Sprinkles crate still arrives and ticks, with the Party Pack inside; see the reassigned beat for who finds out.",
+    "reassign": [
+      {
+        "beat": "The Sprinkles crate (Act 2 letter)",
+        "to": ["penny-buy", "vance-eye"],
+        "text": "The Hot Fun Sprinkles crate PLC delivered is ticking. Under the second layer is a Death Leopard Party Pack, its fuse slaved to the 1600 broadcast. It will go off at 1600, wherever it is."
+      }
+    ],
+    "cuts": [
+      "Gloria's Media Officer duty and the HPD crying quota.",
+      "The Death Leopard plan to have the explosion on camera (it simply goes off at 1600 wherever the crate is)."
+    ]
+  }
+}

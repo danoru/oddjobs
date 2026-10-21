@@ -7,7 +7,7 @@ import { Box, Button, Typography } from "@mui/material";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import { loadOneShot, publishedSlugs } from "@/lib/content";
-import { toPublic, type PublicAnyOneShot, type PublicDhOneShot, type PublicOneShot } from "@/lib/public";
+import { toPublic, type PublicAnyOneShot, type PublicDhOneShot, type PublicOneShot, type PublicPaOneShot } from "@/lib/public";
 import { SYSTEMS } from "@/systems/registry";
 import { CandlesTv } from "@/systems/tencandles/components/CandlesTv";
 import { useClaims, useLevel } from "@/lib/storage";
@@ -21,6 +21,9 @@ import { useLive } from "@/lib/useLive";
 import type { Character as DhCharacter } from "@/systems/daggerheart/schema";
 import { FearPool, noMarks, useTallies } from "@/systems/daggerheart/components/Table";
 import { MAX_HOPE } from "@/systems/daggerheart/srd";
+import { PaPosterRecord, PaTvOverlay } from "@/systems/paranoia/components/Tv";
+import { marksFor, useRecords } from "@/systems/paranoia/components/Table";
+import type { Character as PaCharacter, HouseRules } from "@/systems/paranoia/schema";
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: publishedSlugs().map((oneshot) => ({ params: { oneshot } })),
@@ -40,12 +43,15 @@ export default function TvPage({ os }: { os: PublicAnyOneShot }) {
   return os.system === "tencandles" ? <CandlesTv os={os} /> : <PosterTv os={os} />;
 }
 
-function PosterTv({ os }: { os: PublicOneShot | PublicDhOneShot }) {
+function PosterTv({ os }: { os: PublicOneShot | PublicDhOneShot | PublicPaOneShot }) {
   const { table, claimedBy, error } = useClaims(os.slug);
-  // Daggerheart: the GM's Fear and everyone's Hope and marks, from the same poll as the dice.
+  // Daggerheart: the GM's Fear and everyone's Hope and marks; Paranoia: everyone's record and
+  // Friend Computer. Both from the same poll as the dice.
   const dh = os.system === "daggerheart";
-  const live = useLive(dh ? table : null, "table", null);
+  const pa = os.system === "paranoia";
+  const live = useLive(dh || pa ? table : null, "table", null);
   const tallies = useTallies(live.events, dh ? (os.cast as DhCharacter[]) : NO_CAST);
+  const records = useRecords(live.events, pa ? (os.cast as unknown as PaCharacter[]) : NO_PA, pa ? os.houseRules : NO_RULES);
   const { level } = useLevel(os);
   const [qr, setQr] = useState("");
   const [sound, setSound] = useState(false);
@@ -156,6 +162,7 @@ function PosterTv({ os }: { os: PublicOneShot | PublicDhOneShot }) {
               >
                 <div className={s.header}>{c.poster.header}</div>
                 {dh && claim && <PosterMarks c={c as DhCharacter} marks={tallies.marks[c.id] ?? noMarks} />}
+                {pa && claim && <PaPosterRecord c={c as PublicPaOneShot["cast"][number]} marks={marksFor(records, c as unknown as PaCharacter)} h={os.houseRules} />}
                 <div className={s.icon}>
                   {c.portrait ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -178,7 +185,8 @@ function PosterTv({ os }: { os: PublicOneShot | PublicDhOneShot }) {
           })}
         </div>
 
-        <TvLive code={table} tray="full" icons={os.cast.map((c) => c.poster.icon)} sound={sound} live={dh ? live : undefined} />
+        <TvLive code={table} tray="full" icons={os.cast.map((c) => c.poster.icon)} sound={sound} live={dh || pa ? live : undefined} />
+        {pa && <PaTvOverlay events={live.events} baseline={live.baseline} cast={os.cast} />}
 
         <div className={s.bottom}>
           <span>
@@ -207,6 +215,8 @@ function PosterTv({ os }: { os: PublicOneShot | PublicDhOneShot }) {
 }
 
 const NO_CAST: DhCharacter[] = [];
+const NO_PA: PaCharacter[] = [];
+const NO_RULES: HouseRules = { treasonLevels: 5, computerMoxie: "none", cloneMoxie: "four", difficulty: 2 };
 
 /** Under a claimed Daggerheart poster: Hope held, Stress and Hit Points marked. */
 function PosterMarks({ c, marks }: { c: DhCharacter; marks: typeof noMarks }) {

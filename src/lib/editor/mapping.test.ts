@@ -190,7 +190,7 @@ describe("schema lookup for the form", () => {
 
 describe("live checks on a draft", () => {
   it("passes every real one-shot", () => {
-    for (const slug of ["the-drowned-bell", "lot-thirteen", "the-cooling-concord", "lights-out-at-marrowby", "a-vow-before-dawn"]) {
+    for (const slug of ["the-drowned-bell", "lot-thirteen", "the-cooling-concord", "lights-out-at-marrowby", "a-vow-before-dawn", "open-in-case-of-future"]) {
       const { issues, parsed } = checkDoc(realDoc(slug), spells);
       expect([slug, issues]).toEqual([slug, []]);
       expect(parsed?.slug).toBe(slug);
@@ -259,6 +259,19 @@ describe("Daggerheart checks in the builder", () => {
     const keys = checkDoc(broken, spells).issues.map((i) => i.path.join("."));
     expect(keys).toContain("cast.0.poster.hook");
     expect(keys).toContain("cast.1.mech.stress");
+  });
+});
+
+describe("Paranoia checks in the builder", () => {
+  it("points each problem at its field", () => {
+    const doc = realDoc("open-in-case-of-future");
+    const keyOf = (d: OneShotDoc) => checkDoc(d, spells).issues.map((i) => i.path.join("."));
+    const skills = doc.cast[1].mech as { skills: Record<string, number> };
+    const first = Object.keys(skills.skills).find((k) => skills.skills[k] === 5)!;
+    expect(keyOf(setAt(doc, ["cast", 1, "mech", "skills", first], 4))).toEqual(["cast.1.mech.skills"]);
+    const first0 = (doc.cast[0].mech as { clone: Record<string, unknown> }).clone;
+    expect(keyOf(setAt(doc, ["cast", 1, "mech", "clone"], { ...first0 }))).toEqual(["cast.1.mech.clone.name"]);
+    expect(keyOf(setAt(doc, ["cast", 1, "naughty", "society"], " "))).toEqual(["cast.1.naughty.society"]);
   });
 });
 

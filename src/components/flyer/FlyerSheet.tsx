@@ -34,7 +34,7 @@ export function FlyerSheet({ os, level, base, id }: { os: PublicAnyOneShot; leve
       <h1 className={f.title}>{os.title}</h1>
       <p className={f.premise}>{os.premise}</p>
       <div className={f.details}>
-        {os.system !== "tencandles" && <span>Level {os.level}</span>}
+        {"level" in os && <span>Level {os.level}</span>}
         <span>
           {os.players.min}–{os.players.max} players
         </span>

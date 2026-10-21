@@ -4,6 +4,7 @@ import type { SystemId } from "@/lib/schema";
 import * as dnd5e from "@/systems/dnd5e/schema";
 import * as tencandles from "@/systems/tencandles/schema";
 import * as daggerheart from "@/systems/daggerheart/schema";
+import * as paranoia from "@/systems/paranoia/schema";
 import { getAt } from "@/lib/store/doc";
 import type { FieldHint, Scope, SystemEditor } from "./types";
 
@@ -18,6 +19,7 @@ const SCHEMAS: Record<SystemId, { oneshot: z.ZodTypeAny; character: z.ZodTypeAny
   dnd5e: { oneshot: dnd5e.oneShotSchema, character: dnd5e.characterSchema, variant: dnd5e.variantCharacterSchema },
   tencandles: { oneshot: tencandles.oneShotSchema, character: tencandles.characterSchema },
   daggerheart: { oneshot: daggerheart.oneShotSchema, character: daggerheart.characterSchema },
+  paranoia: { oneshot: paranoia.oneShotSchema, character: paranoia.characterSchema },
 };
 
 export interface SchemaNode {

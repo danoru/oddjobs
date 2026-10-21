@@ -18,6 +18,11 @@ import type * as daggerheart from "@/systems/daggerheart/schema";
 import { SheetBack as DhSheetBack, SheetFront as DhSheetFront } from "@/systems/daggerheart/components/Sheet";
 import { cardsFor as dhCardsFor } from "@/systems/daggerheart/cards";
 import { DhTent } from "@/systems/daggerheart/pages/Printables";
+import type * as paranoia from "@/systems/paranoia/schema";
+import { NaughtySide, PublicSide } from "@/systems/paranoia/components/Sheet";
+import { cardsFor as paCardsFor } from "@/systems/paranoia/cards";
+import { PaTent } from "@/systems/paranoia/pages/Printables";
+import { treasonNames } from "@/systems/paranoia/rules";
 import { SiteHeader } from "@/components/SiteHeader";
 import { FlyerSheet } from "@/components/flyer/FlyerSheet";
 import { ActCards, BlankGazette, LetterEnvelopes, RumorSlips } from "@/components/box/BoxPrints";
@@ -53,12 +58,15 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
 export default function BoxPage({ os, pub, book }: Props) {
   const fiveE = os.system === "dnd5e" ? (os as dnd5e.OneShotWithCast) : null;
   const dh = os.system === "daggerheart" ? (os as daggerheart.OneShotWithCast) : null;
+  const pa = os.system === "paranoia" ? (os as paranoia.OneShotWithCast) : null;
   const names = Object.fromEntries(os.cast.map((c) => [c.id, c.name]));
   const contents = [
     ...(fiveE
       ? ["The tear-off flyer", `${os.cast.length} character sheets`, "Spell, item and feature cards", "Name tents"]
       : dh
         ? ["The tear-off flyer", `${os.cast.length} character sheets`, "Domain cards, weapons, armor and features", "Name tents"]
+        : pa
+          ? ["The tear-off flyer", `${os.cast.length} Troubleshooter sheets: public side, then naughty side (hand each over face down)`, "Clone IDs, gear, and each one's society, mutation and secret objective cards", "Name tents"]
         : ["The table kit: module, candle tracker, index cards, missing posters and flyer"]),
     ...(os.letters.length ? [`${os.letters.length} sealed letters, as fold-and-seal envelopes`] : []),
     ...(os.acts.length ? [`${os.acts.length} act cards`] : []),
@@ -114,6 +122,35 @@ export default function BoxPage({ os, pub, book }: Props) {
                   <div key={i} className={tentCss.page}>
                     {pair.map((c) => (
                       <Tent key={c.id} c={c} ruleset={fiveE.ruleset} />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : pa ? (
+            <>
+              <div className={b.section} data-box="flyer">
+                <FlyerSheet os={pub} level={0} base={pub} />
+              </div>
+              <div className={`${b.section} ${sheet.sheet}`} data-box="sheets">
+                {pa.cast.map((c) => (
+                  <Fragment key={c.id}>
+                    <PublicSide c={c} team={pa.team} objectives={pa.objectives} oneshotTitle={os.title} wanted={treasonNames(pa.houseRules)} />
+                    <NaughtySide c={c} naughty={c.naughty} oneshotTitle={os.title} />
+                  </Fragment>
+                ))}
+              </div>
+              <div className={`${b.section} ${cardCss.root}`} data-box="cards">
+                {pa.cast.map((c) => {
+                  const cards = paCardsFor(c, c.naughty);
+                  return cards.length ? <CardSheets key={c.id} cards={cards} large={false} label={`${c.name}'s cards`} /> : null;
+                })}
+              </div>
+              <div className={`${b.section} ${tentCss.root}`} data-box="tents">
+                {paginate(pa.cast, 2).map((pair, i) => (
+                  <div key={i} className={tentCss.page}>
+                    {pair.map((c) => (
+                      <PaTent key={c.id} c={c} />
                     ))}
                   </div>
                 ))}

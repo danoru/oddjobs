@@ -35,6 +35,7 @@ function defaultRoutes(): string[] {
   const first = all.find((os) => os.system === "dnd5e")!;
   const candles = all.filter((os) => os.system === "tencandles");
   const dh = all.filter((os) => os.system === "daggerheart");
+  const pa = all.filter((os) => os.system === "paranoia");
   return [
     "",
     ...slugs,
@@ -43,7 +44,7 @@ function defaultRoutes(): string[] {
     `${first.slug}/tents`,
     `${first.slug}/gm`,
     ...candles.flatMap((os) => [`${os.slug}/play`, `${os.slug}/kit`, `${os.slug}/gm`, `${os.slug}/tv`]),
-    ...dh.flatMap((os) => [`${os.slug}/${os.cast[0].id}`, `${os.slug}/cards`, `${os.slug}/tents`, `${os.slug}/gm`, `${os.slug}/tv`]),
+    ...[...dh, ...pa].flatMap((os) => [`${os.slug}/${os.cast[0].id}`, `${os.slug}/cards`, `${os.slug}/tents`, `${os.slug}/gm`, `${os.slug}/tv`]),
   ];
 }
 

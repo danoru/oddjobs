@@ -8,6 +8,7 @@ import { roman } from "@/lib/box";
 import { coinFor, SYSTEMS } from "@/systems/registry";
 import { DiceFaces, NotesCard, rollWords } from "@/components/table/TableToys";
 import { DhGmPanels } from "@/systems/daggerheart/components/GmPanels";
+import { PaGmPanels } from "@/systems/paranoia/components/Table";
 import t from "@/components/table/Toys.module.css";
 import s from "@/components/board/Board.module.css";
 
@@ -52,6 +53,7 @@ export function GmLive({
       {error && <p className={t.error} style={{ color: "#f0a49a" }}>{error}</p>}
       <div className={s.grid} style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))" }}>
         {os.system === "daggerheart" && <DhGmPanels os={os} live={live} />}
+        {os.system === "paranoia" && <PaGmPanels os={os} live={live} />}
         <BellPanel os={os} live={live} />
         <ActsPanel os={os} live={live} />
         <SpotlightPanel os={os} live={live} letters={letters} deliver={deliver} now={now} beats={meta.spotlight} />
@@ -393,8 +395,8 @@ function RollsPanel({ os, live }: { os: OneShotWithCast; live: Live }) {
     }, live.events.filter((e) => e.kind === "roll" && e.redacted === false).map((e) => e.id)),
   );
   const recent = live.fold.rolls.slice(-12).reverse();
-  // Daggerheart's GM rolls d20s for adversaries, like a 5e GM.
-  const d20 = SYSTEMS[os.system].dice !== "pool";
+  // Daggerheart's GM rolls d20s for adversaries, like a 5e GM; in Ten Candles and Paranoia the GM doesn't roll.
+  const d20 = SYSTEMS[os.system].dice === "d20" || SYSTEMS[os.system].dice === "duality";
 
   async function roll(e: React.FormEvent) {
     e.preventDefault();

@@ -2,6 +2,7 @@ import type { Epilogue } from "@/components/gazette/Gazette";
 import { FATE_LABEL } from "./legacy";
 import type { ActData, LiveEvent, NoteData, PoolRollData, RollData } from "./live";
 import type { DualityData } from "@/systems/daggerheart/live";
+import type { PTallyData } from "@/systems/paranoia/live";
 import type { TapestryEdits } from "./epilogueSchema";
 
 /**
@@ -14,7 +15,7 @@ import type { TapestryEdits } from "./epilogueSchema";
  * and note texts never reach it. The GM can drop or rename panels.
  */
 
-export type PanelKind = "claim" | "letter" | "nat20" | "nat1" | "crit" | "darkened" | "death" | "act" | "notes" | "coins" | "fate";
+export type PanelKind = "claim" | "letter" | "nat20" | "nat1" | "crit" | "clone" | "darkened" | "death" | "act" | "notes" | "coins" | "fate";
 
 export interface Panel {
   /** Stable, so the GM's edits stick: "claim:rook", "roll:42", "fate:rook"… */
@@ -72,6 +73,9 @@ export function buildTapestry(input: TapestryInput): Panel[] {
         timed.push({ id: `roll:${e.id}`, kind: "death", title: `${d.who} is lost to the dark`, caption: "the Last Stand fails", at: e.at, characterId: d.characterId });
       else if (d.system === "pool" && d.darkened)
         timed.push({ id: `roll:${e.id}`, kind: "darkened", title: "A candle goes dark", caption: `${d.who}'s roll fails`, at: e.at, characterId: d.characterId });
+    } else if (e.kind === "tally" && e.data && (e.data as PTallyData).track === "clone" && (e.data as PTallyData).delta > 0) {
+      const d = e.data as PTallyData;
+      timed.push({ id: `clone:${e.id}`, kind: "clone", title: `${d.name ?? "A Troubleshooter"} is terminated`, caption: "and the next clone is decanted", at: e.at, characterId: d.characterId });
     } else if (e.kind === "death") {
       const who = (e.data as { who: string }).who;
       timed.push({ id: `death:${e.id}`, kind: "death", title: `${who} chooses the dark`, caption: "and does not come back", at: e.at, characterId: null });

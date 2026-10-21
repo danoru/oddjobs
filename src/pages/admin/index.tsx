@@ -47,6 +47,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
 const SYSTEM_BLURB: Record<SystemId, string> = {
   dnd5e: "A cast of ready-made characters with sheets, cards and tents. 2014 or 2024 rules.",
   tencandles: "A module for the night: intro, Them, areas, stages by candlelight, truths, optional pre-mades.",
+  paranoia: "A mission for a team of Troubleshooters: clone names, the skill draft, naughty sides kept from player pages, Friend Computer's lines.",
   daggerheart: "A level-1 cast with classes, traits, domain cards and weapons checked against the SRD, plus GM-only adversaries.",
 };
 

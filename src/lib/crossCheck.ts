@@ -2,9 +2,11 @@ import type { CoreCharacter, OneShot } from "./schema";
 import type * as dnd5e from "@/systems/dnd5e/schema";
 import type * as tencandles from "@/systems/tencandles/schema";
 import type * as daggerheart from "@/systems/daggerheart/schema";
+import type * as paranoia from "@/systems/paranoia/schema";
 import { crossCheck as crossCheck5e } from "@/systems/dnd5e/content";
 import { crossCheck as crossCheckTc } from "@/systems/tencandles/content";
 import { crossCheck as crossCheckDh } from "@/systems/daggerheart/content";
+import { crossCheck as crossCheckPa } from "@/systems/paranoia/content";
 
 /**
  * Checks Zod alone can't see, for any system. Pure (no file I/O), so they run
@@ -64,6 +66,7 @@ export function crossCheck(os: OneShot, cast: CoreCharacter[]): string[] {
   const errs = coreCrossCheck(os, cast);
   if (os.system === "dnd5e") errs.push(...crossCheck5e(os, cast as dnd5e.Character[]));
   else if (os.system === "daggerheart") errs.push(...crossCheckDh(os, cast as daggerheart.Character[]));
+  else if (os.system === "paranoia") errs.push(...crossCheckPa(os, cast as paranoia.Character[]));
   else errs.push(...crossCheckTc(os, cast as tencandles.Character[]));
   return errs;
 }

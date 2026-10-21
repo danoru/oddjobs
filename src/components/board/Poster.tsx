@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useState } from "react";
 import ContentCutIcon from "@mui/icons-material/ContentCut";
 import type { Skin } from "@/lib/schema";
-import type { PublicCharacter, PublicDhCharacter, PublicTcCharacter } from "@/lib/public";
+import type { PublicCharacter, PublicDhCharacter, PublicPaCharacter, PublicTcCharacter } from "@/lib/public";
 import { posterTag, SYSTEMS } from "@/systems/registry";
 import type { ClaimInfo } from "@/lib/storage";
 import { roman, SKIN_WORDS } from "@/lib/skins";
@@ -34,7 +34,7 @@ export function Poster({
   tilt,
 }: {
   slug: string;
-  character: PublicCharacter | PublicTcCharacter | PublicDhCharacter;
+  character: PublicCharacter | PublicTcCharacter | PublicDhCharacter | PublicPaCharacter;
   core?: boolean;
   /** Who tore it, if anyone. */
   claim?: ClaimInfo;
@@ -51,7 +51,7 @@ export function Poster({
   const [justTorn, setJustTorn] = useState(false);
   const cls = posterTag(c);
   // A Ten Candles pre-made is taken, not torn down for a sheet.
-  const tearWords = ("mech" in c ? undefined : SYSTEMS.tencandles.claimVerb) ?? words.tear;
+  const tearWords = ("mech" in c ? ("clone" in c.mech ? SYSTEMS.paranoia.claimVerb : undefined) : SYSTEMS.tencandles.claimVerb) ?? words.tear;
   const shownName = revealName ? c.name : (c.poster.alias ?? c.name);
 
   function tear() {

@@ -1,0 +1,109 @@
+{
+  "id": "penny-buy",
+  "name": "Penny",
+  "order": 5,
+  "poster": {
+    "header": "REWARD",
+    "epithet": "the Happiness Officer",
+    "hook": "PLC. Hands out Hot Fun, smiles and, for a small fee, a guaranteed place in history.",
+    "reward": "Premium posterity slots, while stocks last",
+    "icon": "crown"
+  },
+  "flashback": "What's the most valuable thing you ever sold, and who did you sell it to?",
+  "story": {
+    "pronouns": "she/her",
+    "appearance": "Round, rosy and immaculate, with a smile that has been through quality control. A PLC satchel of Hot Fun portions over one shoulder, a requisition stamp on a lanyard, and a jumpsuit with far more pockets than regulation allows, none of them visible.",
+    "concept": "A Production, Logistics & Commissary distribution clerk who can get anything, for anyone, by Tuesday. As Happiness Officer she is meant to keep the team cheerful and fed. She does, and she charges for it, discreetly, with a loyalty card.",
+    "stake": "She has already sold MEMENTO-4, and thirty-one premium slots in it, and none of those deals survive the barrel being sealed in concrete.",
+    "goal": "Keep everyone happy, keep every customer satisfied, and come out of today richer than anyone at Red clearance has any right to be.",
+    "voice": "Warm, chatty and soothing, like a friendly vending machine. Every sentence leans toward a sale. Never says 'buy', always 'arrange'.",
+    "mannerisms": [
+      "Pats her pockets to check that everything is still in them",
+      "Offers a Hot Fun portion to anyone who looks unhappy, including the dead",
+      "Writes tiny numbers on the back of her hand and licks them off"
+    ],
+    "treasonButton": "A profit: anything that can be bought cheap here and sold dear there.",
+    "violenceButton": "Someone welching on a deal, or breaking something she's already sold.",
+    "ties": [
+      {
+        "to": "gloria-pop",
+        "text": "You arranged Gloria-R-POP's crate of Hot Fun Sprinkles, no questions asked. It was heavier than sprinkles, and it ticked when you lifted it. You have the receipt, with her thumbprint.",
+        "public": "Arranged a crate of sprinkles for Gloria. A heavy crate."
+      },
+      {
+        "to": "clem-grs",
+        "text": "Clem-R-GRS owes you forty credits for parts and paint, and you know exactly what the paint was for: a decoy barrel in Maintenance Closet 7. Yours is in there too. You have receipts for all of it.",
+        "public": "Clem owes her forty credits. She hasn't mentioned it. Yet."
+      },
+      {
+        "to": "vance-eye",
+        "text": "Vance-R-EYE's lunchbox didn't come with that lunch: you sold him the degausser inside it. A bot-wiping device, carried by the Loyalty Officer. Receipt, signed, in your third-best pocket.",
+        "public": "Sold Vance his lunchbox. He's very attached to it."
+      }
+    ],
+    "intro": "\"Penny-R-BUY-1, PLC, Happiness Officer! Hot Fun? First one's free. Second one's also free, technically. We'll talk.\""
+  },
+  "mech": {
+    "clone": { "name": "Penny", "clearance": "R", "sector": "BUY", "number": 1 },
+    "serviceGroup": "Production, Logistics & Commissary",
+    "bonusDuty": "Happiness Officer",
+    "skills": {
+      "bluff": 5,
+      "charm": 4,
+      "alphaComplex": 3,
+      "bureaucracy": 2,
+      "stealth": 1,
+      "science": -5,
+      "demolitions": -4,
+      "melee": -3,
+      "operate": -2,
+      "guns": -1
+    },
+    "moxie": 8,
+    "xp": 0,
+    "gear": [
+      { "name": "Hot Fun vending satchel (48 portions)", "level": 1, "note": "+1 die on Charm when you hand someone a snack. Portions may be 40% Hot Fun." },
+      { "name": "PLC requisition stamp", "level": 1, "note": "+1 die on Bureaucracy to make an object officially exist, or officially not." },
+      { "name": "Happiness pills (blister pack of 12)", "level": 0, "note": "Mandatory for citizens rated 'Unhappy'. She has sold six already." }
+    ]
+  },
+  "naughty": {
+    "society": "Free Enterprise",
+    "societyObjective": "MEMENTO-4 is pre-sold to Ormond-B-LUX-3. Swap it for your decoy barrel in Maintenance Closet 7 and get the real one, full, to Dock 4 by 1630.",
+    "mutantPower": {
+      "name": "Charm",
+      "text": "Talk to someone for a few moments and they decide you're their favourite person, and agree to something reasonable. Spend Moxie and it can be something unreasonable. It wears off in a few minutes, usually mid-sentence."
+    },
+    "objectives": [
+      "Your own business: get the items from the thirty-one premium posterity slots you sold into the top of MEMENTO-4, so no customer can say they didn't get what they paid for."
+    ],
+    "treasonousGear": [
+      { "name": "Ledger of premium posterity slots", "level": 0, "note": "Sold: 31. Delivered: 0. Includes one to Auditor Mordecai-B-QAQ-3, under a false name." },
+      { "name": "A second decoy barrel", "level": 0, "note": "Also in Maintenance Closet 7. No dent. Better paint job than Clem's, frankly." }
+    ],
+    "favours": {
+      "serviceGroup": ["PLC can make one crate appear in, or vanish from, any inventory in the sector"],
+      "society": ["Two of Ormond's goons will carry one heavy thing for you, anywhere, no questions"]
+    },
+    "secret": "Penny sold every one of her teammates the treasonous thing they're carrying today: Agnes's cookbook, Vance's degausser, Clem's decoy paint and Gloria's Sprinkles crate. She kept receipts, with names. Any of them could hang anyone on the team, Penny included."
+  },
+  "ifUnclaimed": {
+    "npc": "Penny is an NPC PLC clerk who trails the team handing out Hot Fun and selling things. In Act 2, two of Ormond-B-LUX-3's goons turn up and try to buy MEMENTO-4 from whoever looks greediest; in Act 4 they try to take it.",
+    "reassign": [
+      {
+        "beat": "The buyer's note (Act 2 letter)",
+        "to": ["gloria-pop", "clem-grs"],
+        "text": "A blue tube capsule finds you: a Blue-clearance collector, Ormond-B-LUX-3, will pay a fortune if MEMENTO-4 is at Dock 4 by 1630 instead of in the vault, and double for the Old Reckoning cookbook inside it."
+      },
+      {
+        "beat": "Happiness Officer",
+        "to": ["gloria-pop", "agnes-fil"],
+        "text": "You are also the Happiness Officer: hand out Hot Fun and keep every teammate's happiness rating at 'Very Happy' or better."
+      }
+    ],
+    "cuts": [
+      "The second decoy barrel in Maintenance Closet 7 (there's only Clem's).",
+      "The premium posterity slots, and Penny's receipts on the team."
+    ]
+  }
+}

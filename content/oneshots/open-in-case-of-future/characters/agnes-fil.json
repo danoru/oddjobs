@@ -1,0 +1,103 @@
+{
+  "id": "agnes-fil",
+  "name": "Agnes",
+  "order": 1,
+  "poster": {
+    "header": "NOTICE",
+    "epithet": "the Keeper of the Key",
+    "hook": "Team Leader. Holds the Sealing Key, Form 214-B in triplicate, and a grudge against typos.",
+    "reward": "Your contribution filed correctly, first time",
+    "icon": "book"
+  },
+  "flashback": "What's the one Old Reckoning word you've read that you would give anything to know the meaning of?",
+  "story": {
+    "pronouns": "she/her",
+    "appearance": "Small, upright and pressed to a crease, with a red jumpsuit she has had tailored (by regulation) and three pens clipped to the collar in ascending order of importance. Half-moon reading glasses on a chain. A binder labelled FORM 214-B that she never lets anyone else carry.",
+    "concept": "A CPU records clerk who has spent her whole life making sure Alpha Complex's paperwork matches Alpha Complex. She has been made Team Leader because she was the only one who read the briefing packet to the end, including the appendix. She is precise, prim, unflappable about the wrong things and secretly, helplessly in love with the past.",
+    "stake": "She holds the Sealing Key. If MEMENTO-4 isn't sealed at 1600 with its manifest in order, it is her signature on the failure.",
+    "goal": "Seal the capsule at exactly 1600, its Form 214-B perfect, and with one small, hopeful, utterly treasonous book inside it.",
+    "voice": "Clipped and courteous, like a recorded message that has learned to be disappointed in you. Calls everyone by their full clone name. Says 'noted' instead of 'I heard you'.",
+    "mannerisms": [
+      "Licks a thumb and turns pages that aren't there",
+      "Corrects other people's grammar during gunfights",
+      "Hums a tune nobody else in Alpha Complex knows, and stops the moment she notices"
+    ],
+    "treasonButton": "Anything old, handwritten or from Before: she has to touch it, read it, keep it.",
+    "violenceButton": "Someone defacing, crumpling or misfiling a form in front of her.",
+    "ties": [
+      {
+        "to": "penny-buy",
+        "text": "CPU credit records cross your desk. Penny-R-BUY has received thirty-one payments this week, each marked 'posterity', from citizens all over Sector NOW. That is evidence of unauthorized sale of capsule space, and you have it in your binder. It is also true that Penny sold you the cookbook, and might remember.",
+        "public": "She audits Penny's paperwork. Penny's paperwork is very creative."
+      },
+      {
+        "to": "vance-eye",
+        "text": "You processed Vance-R-EYE's last three treason reports. In every one, the accused's name was his own. You filed them anyway, because they were filled in correctly, and IntSec thinks he is a master of self-criticism. You could tell him. You could tell IntSec.",
+        "public": "She files his treason reports. All of them."
+      }
+    ],
+    "intro": "\"Agnes-R-FIL-1, Team Leader, CPU Records. I have the Key, the forms and the authority. Please contribute in an orderly fashion and initial here, here and here.\""
+  },
+  "mech": {
+    "clone": { "name": "Agnes", "clearance": "R", "sector": "FIL", "number": 1 },
+    "serviceGroup": "Central Processing Unit",
+    "bonusDuty": "Team Leader",
+    "skills": {
+      "bureaucracy": 5,
+      "alphaComplex": 4,
+      "stealth": 3,
+      "program": 2,
+      "psychology": 1,
+      "melee": -5,
+      "guns": -4,
+      "athletics": -3,
+      "intimidate": -2,
+      "demolitions": -1
+    },
+    "moxie": 8,
+    "xp": 0,
+    "gear": [
+      { "name": "The Sealing Key", "level": 0, "note": "Turns the vault lock at 1600. Do not lose it, lend it, or look at it too fondly." },
+      { "name": "Binder of Form 214-B (in triplicate)", "level": 1, "note": "+1 die on Bureaucracy when the right form exists. It always exists." },
+      { "name": "Red-barrel laser pistol", "level": 0, "note": "Standard issue. The safety catch is still in its packaging." }
+    ]
+  },
+  "naughty": {
+    "society": "Romantics",
+    "societyObjective": "Put 'Grandma Jo's Hundred Casseroles, Volume 1' inside MEMENTO-4 and see it sealed at 1600, so that somebody, some day, can cook something.",
+    "mutantPower": {
+      "name": "Invisibility",
+      "text": "Hold your breath and stay still and people's eyes slide off you; move slowly and you stay unseen for a few moments. Cameras and bots still see you perfectly well, which is a problem in Alpha Complex."
+    },
+    "objectives": [
+      "CPU: make MEMENTO-4's manifest (Form 214-B, in triplicate) match its contents exactly at the moment of sealing. Every item. Every citizen."
+    ],
+    "treasonousGear": [
+      { "name": "Grandma Jo's Hundred Casseroles, Volume 1", "level": 0, "note": "An Old Reckoning paperback, swollen with damp, hidden inside the Form 214-B binder. Page 51 has a gravy stain she thinks is holy." }
+    ],
+    "favours": {
+      "serviceGroup": ["CPU will lose one form, or find one, wherever and whenever you need it tonight"],
+      "society": ["A Romantic behind the counter at Hot Fun Hall will hide one small thing for you, no questions"]
+    },
+    "secret": "Agnes drafted CPU Directive 214-B, the regulation that classifies the past. She wrote it so that she would be one of the very few clerks cleared to read it. Every Old Reckoning scrap confiscated in Sector NOW comes across her desk, and she has read every one."
+  },
+  "ifUnclaimed": {
+    "npc": "Agnes is an NPC Team Leader who gives orders by clipboard and is useless in a fight. She hands the Sealing Key to whichever Troubleshooter seems most loyal (ask the table to vote) and spends the mission correcting forms. She still puts the cookbook in the barrel when no one is looking, and MEMENTO-4 will tell anyone who asks.",
+    "reassign": [
+      {
+        "beat": "The Sealing Key",
+        "to": ["vance-eye", "gloria-pop", "clem-grs"],
+        "text": "Friend Computer appoints you Team Leader. You hold the Sealing Key, which must turn the vault lock at exactly 1600, and you will be blamed if it doesn't."
+      },
+      {
+        "beat": "The old manifests (Act 4 letter)",
+        "to": ["penny-buy", "clem-grs"],
+        "text": "In the vault, the manifest plate on MEMENTO-3 lists an Old Reckoning cookbook, Volume 2. Someone would pay a fortune for it; someone else would be terminated for it."
+      }
+    ],
+    "cuts": [
+      "The cookbook as a secret objective (it is only an object in the barrel now).",
+      "Agnes's evidence on Penny's posterity payments."
+    ]
+  }
+}

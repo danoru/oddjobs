@@ -10,7 +10,9 @@
  * From nothing, in the UI: a 2024 5e one-shot with three characters and a
  * Ten Candles module with a pre-made, and a Daggerheart one-shot with two
  * characters, an adversary and the rules help (trait spread, the rules'
- * numbers, domain cards from the class's domains, a tier-1 weapon). Along the way it trips the checks on
+ * numbers, domain cards from the class's domains, a tier-1 weapon), and a
+ * Paranoia mission with two Troubleshooters (the skill draft, naughty sides
+ * that never reach a player page). Along the way it trips the checks on
  * purpose (a hook that's too long, a hand-typed HP, a public tie that echoes
  * the secret, missing fields), jumps to them from the problem list, fixes
  * them, publishes both and reads them back on the board and their sheets.
@@ -30,7 +32,8 @@ const HEIST = "builder-test-heist";
 const NIGHT = "builder-test-night";
 const COPY = "builder-test-night-copy";
 const VOW = "builder-test-vow";
-const TEST_SLUGS = [HEIST, NIGHT, COPY, VOW];
+const MISSION = "builder-test-mission";
+const TEST_SLUGS = [HEIST, NIGHT, COPY, VOW, MISSION];
 
 function env(name: string): string {
   if (process.env[name]) return process.env[name]!;
@@ -507,6 +510,90 @@ try {
   const kit = await textOf(`/${VOW}/kit-fenn`);
   check(kit.includes("Not Good Enough") && kit.includes("Evasion"), "Kit's sheet shows her domain cards and Evasion");
   check((await textOf(`/${VOW}/gm`)).includes("The Toll-Troll"), "the GM page has the adversary");
+
+  // ======================= A Paranoia mission from scratch =======================
+  await newOneShot("paranoia", "Builder Test Mission", MISSION);
+  await type("oneshot.posting.header", "TROUBLESHOOTERS REQUIRED. HAPPINESS MANDATORY.");
+  await type("oneshot.pitch", "Fetch a box from sector ZZZ. The box is ticking.");
+  await type("oneshot.premise", "Friend Computer has chosen you. Rejoice.");
+  await type("oneshot.posting.reward", "XP Points, possibly");
+  await type("oneshot.setting", "Alpha Complex");
+  await type("oneshot.team", "Team Builder");
+  await type("oneshot.players.min", "2");
+  await tag("oneshot.tone", "darkly comic");
+  await type("oneshot.briefing", "Citizens, retrieve the box. Do not open the box.");
+  await add("oneshot.objectives", "objective");
+  await type("oneshot.objectives.0", "Retrieve the box unopened");
+  for (const name of ["Mabel", "Otto"]) await addCharacter(name);
+  const draft: [string, number][] = [
+    ["bureaucracy", 5],
+    ["alphaComplex", 4],
+    ["psychology", 3],
+    ["bluff", 2],
+    ["guns", 1],
+    ["melee", -1],
+    ["athletics", -2],
+    ["demolitions", -3],
+    ["engineer", -4],
+    ["program", -5],
+  ];
+  const trouble = async (i: number, sector: string, other: string, society: string) => {
+    await openCharacter(i === 0 ? "mabel" : "otto");
+    await type(`cast.${i}.poster.epithet`, "the Diligent");
+    await type(`cast.${i}.poster.hook`, "Volunteered. Was not asked.");
+    await type(`cast.${i}.mech.clone.name`, i === 0 ? "Mabel" : "Otto");
+    await type(`cast.${i}.mech.clone.sector`, sector);
+    await type(`cast.${i}.mech.serviceGroup`, "Central Processing Unit");
+    await type(`cast.${i}.mech.bonusDuty`, i === 0 ? "Team Leader" : "Loyalty Officer");
+    for (const [k, v] of draft.slice(0, i === 0 ? 9 : 10)) {
+      await shell(`cast.${i}.mech.skills`).getByLabel(k === "alphaComplex" ? "Alpha Complex" : k.charAt(0).toUpperCase() + k.slice(1), { exact: true }).click();
+      await page.getByRole("option", { name: v > 0 ? `+${v}` : `−${-v}`, exact: true }).click();
+    }
+    for (const [f, v] of [
+      ["pronouns", "she/her"],
+      ["concept", "A clerk who reads every form."],
+      ["stake", "A promotion."],
+      ["goal", "Survive."],
+      ["appearance", "Ironed red."],
+      ["voice", "Clipped."],
+      ["treasonButton", "Someone mentions the Outdoors"],
+      ["violenceButton", "Anyone skips a form"],
+    ])
+      await type(`cast.${i}.story.${f}`, v);
+    await add(`cast.${i}.story.mannerisms`, "mannerism");
+    await type(`cast.${i}.story.mannerisms.0`, "Salutes the cameras");
+    await add(`cast.${i}.story.ties`, "tie");
+    await choose(`cast.${i}.story.ties.0.to`, other);
+    await type(`cast.${i}.story.ties.0.text`, "Same corridor.");
+    await type(`cast.${i}.naughty.society`, society);
+    await type(`cast.${i}.naughty.mutantPower.name`, "Charm");
+    await type(`cast.${i}.naughty.mutantPower.text`, "People like you, briefly and against their judgement.");
+    await add(`cast.${i}.naughty.objectives`, "objective");
+    await type(`cast.${i}.naughty.objectives.0`, `SECRET-OBJECTIVE-${i} open the box`);
+  };
+  await trouble(0, "MXT", "Otto", "Free Enterprise");
+  check(await issueAt("cast.0.mech.skills"), "Paranoia: a skill draft missing its −5 is flagged on the field");
+  check((await page.locator('[data-testid="draft-left"]').innerText()).includes("−5"), "…and the panel says which value is still to place");
+  await shell("cast.0.mech.skills").getByLabel("Program", { exact: true }).click();
+  await page.getByRole("option", { name: "−5", exact: true }).click();
+  check(!(await issueAt("cast.0.mech.skills")), "…placing it clears the flag");
+  check((await page.locator('[data-testid="stat-brains"]').innerText()) === "3", "stats follow the draft (Brains 3)");
+  check((await page.locator('[data-testid="clone-preview"]').innerText()).startsWith("Mabel-R-MXT-1"), "the clone name is previewed as Mabel-R-MXT-1");
+  await shot(page, "09-paranoia-mechanics");
+  await trouble(1, "MXT", "Mabel", "Communists");
+  await type("cast.1.mech.clone.name", "Mabel");
+  check(await issueAt("cast.1.mech.clone.name"), "two Troubleshooters can't share a clone name");
+  await type("cast.1.mech.clone.name", "Otto");
+  const paLeft = await issues();
+  if (paLeft) console.log(await page.locator("[data-issue-count]").innerText());
+  check(paLeft === 0, "the Paranoia mission passes every check");
+  await saved();
+  await publish(MISSION);
+  const missionJob = await textOf(`/${MISSION}`);
+  check(missionJob.includes("Builder Test Mission") && !missionJob.includes("SECRET-OBJECTIVE") && !missionJob.includes("Free Enterprise"), "its job page shows the team and no naughty side");
+  const sheetPage = await textOf(`/${MISSION}/mabel`);
+  check(sheetPage.includes("Mabel-R-MXT-1") && !sheetPage.includes("SECRET-OBJECTIVE-0"), "Mabel's sheet shows her clone name, not her secret objectives");
+  check((await textOf(`/${MISSION}/gm`)).includes("SECRET-OBJECTIVE-0"), "the GM page has the naughty sides");
 
   // ======================= Duplicate, edit, unpublish =======================
   await page.goto(`${BASE}/admin`, { waitUntil: "networkidle" });
