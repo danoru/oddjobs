@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev --port 3004",
     "build": "prisma generate && tsx scripts/validate.ts && next build",
-    "vercel-build": "prisma migrate deploy && prisma generate && tsx scripts/validate.ts && next build",
+    "vercel-build": "tsx scripts/db-env.mts prisma migrate deploy && prisma generate && tsx scripts/validate.ts && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -24,7 +24,9 @@
     "validate": "tsx scripts/validate.ts",
     "db:dev": "prisma dev --name tearoff --detach",
     "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy"
+    "db:deploy": "tsx scripts/db-env.mts prisma migrate deploy",
+    "db:deploy:remote": "tsx scripts/db-env.mts --remote prisma migrate deploy",
+    "db:status:remote": "tsx scripts/db-env.mts --remote prisma migrate status"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",

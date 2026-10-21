@@ -42,7 +42,8 @@ Without a database the site still works: claims just stay in each browser, as in
 | `pnpm build` | `prisma generate`, validate, then `next build` (fails on any broken one-shot) |
 | `pnpm db:dev` | Start a local Postgres server in the background (`prisma dev --name tearoff --detach`); stop it with `pnpm exec prisma dev stop tearoff` |
 | `pnpm db:migrate` | `prisma migrate dev`: make a new migration after editing `prisma/schema.prisma` |
-| `pnpm db:deploy` | Apply migrations to `DIRECT_URL` |
+| `pnpm db:deploy` | Apply migrations to the database in `.env` (the hosted one on Vercel) |
+| `pnpm db:status:remote` / `pnpm db:deploy:remote` | Check / migrate the hosted Supabase database from your machine |
 | `pnpm pdf [slug] [--a4]` | **Local only.** Render `public/pdf/<slug>-sheets`, `-cards`, `-tents` and `-flyer` PDFs (and `<slug>-l<N>-…` for each level variant; `<slug>-kit` and `-flyer` for Ten Candles) from a running server with Playwright. Never runs on Vercel. |
 | `pnpm a11y-check [route…]` | **Local only.** Run axe-core over the main pages (signed in as GM) and Tab through each, checking every focus stop shows a ring. Exits 1 on any problem. |
 | `pnpm parity snap <dir>` / `pnpm parity diff <a> <b>` | **Local only.** Snapshot every 5e page's visible text, every printable's PDF page count and a few screenshots, then compare two snapshots. Run it before and after a refactor: phase 4 used it to prove moving 5e into `src/systems/dnd5e/` changed nothing. |
@@ -273,12 +274,14 @@ D&D Beyond has no import API, so each sheet offers a **build recipe** (`src/syst
 
 ## Deploy
 
-GitHub (private repo — gated content may include non-SRD material) → Vercel. Set these in the Vercel project:
+GitHub → Vercel. Set these in the Vercel project:
 
 - `APP_PASSWORD`, `GM_PASSWORD` and `AUTH_SECRET`.
 - Optional: `FOUNDRY_TOKEN` (Foundry table sync).
 - Don't set `TEAROFF_CONTENT_WRITE` there: the deployed builder is read-only (Vercel's disk is too, and the store refuses to write whenever `VERCEL` is set).
-- `DATABASE_URL` (Supabase pooler, port 6543, `?pgbouncer=true&schema=tearoff`) and `DIRECT_URL` (port 5432, `?schema=tearoff`). It's the same Supabase project as world-gazetteer, in its own Postgres schema. `prisma migrate deploy` needs `DIRECT_URL`.
+- **Database:** connect Supabase from the Vercel project's Storage tab. Don't set `DATABASE_URL`/`DIRECT_URL` in Vercel: the app derives them from the integration's `POSTGRES_PRISMA_URL` (pooled, for the app) and `POSTGRES_URL_NON_POOLING` (direct, for migrations), adding `schema=tearoff` and serverless settings (`src/lib/dbUrl.ts`). Everything stays in the `tearoff` schema because Supabase exposes `public` through its REST API with the public anon key, and these tables have no row-level security.
 
-`vercel-build` runs `prisma migrate deploy`, then `prisma generate`, then validation, then `next build`.
+`vercel-build` runs `prisma migrate deploy` (through `scripts/db-env.mts`), then `prisma generate`, then validation, then `next build`.
+
+Locally, `.env` keeps `DATABASE_URL`/`DIRECT_URL` pointed at `prisma dev`, and those win, so development never touches the hosted database. To work on the hosted one deliberately: `pnpm db:status:remote` (read-only) and `pnpm db:deploy:remote` (apply migrations).
 
