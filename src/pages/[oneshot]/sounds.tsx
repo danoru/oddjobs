@@ -1,22 +1,18 @@
 import Head from "next/head";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import { Container } from "@mui/material";
-import { loadOneShot, publishedSlugs } from "@/lib/content";
 import { toPublic } from "@/lib/public";
 import type { Sounds } from "@/lib/schema";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Soundboard } from "@/components/sound/Soundboard";
-import { onlyIfOnDisk } from "@/lib/onDisk";
+import { publishedPaths, withPublished } from "@/lib/published";
 
 type Props = { slug: string; title: string; sounds: Sounds | null };
 
-export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: publishedSlugs().map((oneshot) => ({ params: { oneshot } })),
-  fallback: false,
-});
+export const getStaticPaths: GetStaticPaths = publishedPaths();
 
-export const getStaticProps: GetStaticProps<Props> = onlyIfOnDisk(async ({ params }) => {
-  const os = toPublic(loadOneShot(String(params!.oneshot)));
+export const getStaticProps: GetStaticProps<Props> = withPublished((full) => {
+  const os = toPublic(full);
   return { props: { slug: os.slug, title: os.title, sounds: os.sounds ?? null } };
 });
 

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { requestRole } from "@/lib/auth";
-import { loadOneShot } from "@/lib/content";
+import { tableOneShot } from "@/lib/source";
 import { db } from "@/lib/prisma";
 import { normalizeCode } from "@/lib/tables";
 import { applyEdits } from "@/lib/tapestry";
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!table) return res.status(404).json({ error: "No table with that code" });
   let os;
   try {
-    os = loadOneShot(table.oneshot);
+    os = await tableOneShot(table.oneshot);
   } catch {
     return res.status(404).json({ error: "That one-shot is gone" });
   }

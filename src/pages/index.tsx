@@ -3,11 +3,10 @@ import Head from "next/head";
 import { useMemo, useState } from "react";
 import type { GetStaticProps } from "next";
 import { Box, Container, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import { loadAll } from "@/lib/content";
+import { publishedOneShots, revalidateSeconds, survivors } from "@/lib/source";
 import { levelsOf } from "@/systems/dnd5e/variants";
 import { SYSTEMS } from "@/systems/registry";
 import { FATE_LABEL, type Survivor } from "@/lib/legacy";
-import { loadSurvivors } from "@/lib/legacy.server";
 import { SYSTEM_IDS, type OneShotWithCast, type SystemId } from "@/lib/schema";
 import { SiteHeader } from "@/components/SiteHeader";
 import { PosterIcon } from "@/components/PosterIcon";
@@ -24,11 +23,12 @@ type Summary = Pick<OneShotWithCast, "slug" | "title" | "pitch" | "players" | "d
 };
 
 export const getStaticProps: GetStaticProps<{ jobs: Summary[]; survivors: Survivor[] }> = async () => ({
+  revalidate: revalidateSeconds(),
   props: {
-    survivors: loadSurvivors()
+    survivors: (await survivors())
       .sort((a, b) => b.date.localeCompare(a.date))
       .slice(0, 8),
-    jobs: loadAll().map((os) => ({
+    jobs: (await publishedOneShots()).map((os) => ({
       slug: os.slug,
       title: os.title,
       pitch: os.pitch,

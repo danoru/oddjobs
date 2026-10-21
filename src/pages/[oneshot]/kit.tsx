@@ -3,7 +3,7 @@ import type { GetServerSideProps } from "next";
 import { Button, Container } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import { requestRole } from "@/lib/auth";
-import { loadOneShot } from "@/lib/content";
+import { requireOneShot } from "@/lib/source";
 import type { OneShotWithCast } from "@/systems/tencandles/schema";
 import { SiteHeader } from "@/components/SiteHeader";
 import { TableKit } from "@/systems/tencandles/components/TableKit";
@@ -24,7 +24,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
   if (!/^[a-z0-9-]+$/.test(slug)) return { notFound: true };
   let os;
   try {
-    os = loadOneShot(slug);
+    os = await requireOneShot(slug);
   } catch {
     return { notFound: true };
   }

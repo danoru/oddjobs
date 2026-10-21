@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { GetServerSideProps } from "next";
 import { Alert, Container } from "@mui/material";
 import { requestRole } from "@/lib/auth";
-import { loadSpellBook } from "@/lib/content";
+import { spellBook } from "@/lib/source";
 import { getStore } from "@/lib/store";
 import { isSafeId } from "@/lib/store/doc";
 import { checkDoc } from "@/lib/oneShotCheck";
@@ -37,7 +37,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
   const got = await getStore().get(slug);
   if (!got) return { notFound: true };
   res.setHeader("Cache-Control", "private, no-store");
-  const { issues, parsed } = checkDoc((got.draft ?? got.published)!, loadSpellBook());
+  const { issues, parsed } = checkDoc((got.draft ?? got.published)!, await spellBook());
   if (!parsed) return { props: { slug, page, os: null, problems: issues.map((i) => `${i.path.join(".")}: ${i.message}`) } };
   if (page && page !== "print" && !parsed.cast.some((c) => c.id === page)) return { notFound: true };
   if (page === "print" && parsed.system === "tencandles") return { notFound: true };

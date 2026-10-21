@@ -165,10 +165,10 @@ describe("spell book API", () => {
 });
 
 describe("loadSpellBook cache", () => {
-  it("picks up an edit to the file without a restart", () => {
+  it("picks up an edit to the file without a restart", async () => {
     const store = tempStore(true);
     expect(loadSpellBook(store.file)).not.toHaveProperty("Know North");
-    store.put("Know North", NEW_SPELL);
+    await store.put("Know North", NEW_SPELL);
     expect(loadSpellBook(store.file)["Know North"].level).toBe(1);
   });
 });

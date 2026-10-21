@@ -10,14 +10,16 @@ import { checkParsed, type SpellBook } from "./oneShotCheck";
 import { spellNames } from "@/systems/dnd5e/cards";
 
 /**
- * Content lives in git as JSON:
+ * The file loader. Content lives in git as JSON:
  *   content/oneshots/<slug>/oneshot.json
  *   content/oneshots/<slug>/characters/<id>.json
  * Everything is parsed with Zod and cross-checked; any problem throws, which
  * fails `next build` rather than shipping a broken sheet. `oneshot.json` says
  * which game system it is, and its characters are parsed with that system's
  * schema. The checks themselves are pure (./oneShotCheck.ts), so the builder can
- * run them on a draft; this file only adds the reading from disk.
+ * run them on a draft; this file only adds the reading from disk. Pages and
+ * APIs read through src/lib/source.ts, which uses this unless TEAROFF_STORE=db
+ * keeps the content in the database; scripts and the FileStore use it directly.
  */
 
 export { coreCrossCheck, crossCheck, RESERVED_IDS } from "./crossCheck";
@@ -177,8 +179,12 @@ function castsAtEveryLevel(os: Pick<dnd5e.OneShotWithCast, "cast" | "variants">)
   return [os.cast, ...os.variants.map((v) => v.cast.map((x) => ({ ...x, options: x.options ?? [] })))];
 }
 
-/** Just the spells a 5e one-shot uses at any level, for its cards pages. */
-export function spellBookFor(os: dnd5e.OneShotWithCast): Record<string, dnd5e.SpellInfo> {
-  const all = loadSpellBook();
+/** Just the spells a 5e one-shot uses at any level, out of a whole book. */
+export function spellBookFrom(os: dnd5e.OneShotWithCast, all: Record<string, dnd5e.SpellInfo>): Record<string, dnd5e.SpellInfo> {
   return Object.fromEntries(spellNames(castsAtEveryLevel(os)).map((n) => [n, all[n]]));
+}
+
+/** Just the spells a 5e one-shot uses at any level, from content/rules (scripts; pages ask src/lib/source.ts). */
+export function spellBookFor(os: dnd5e.OneShotWithCast): Record<string, dnd5e.SpellInfo> {
+  return spellBookFrom(os, loadSpellBook());
 }

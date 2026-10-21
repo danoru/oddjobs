@@ -41,7 +41,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
   const store = getSpellStore();
   res.setHeader("Cache-Control", "private, no-store");
   const wanted = typeof query.new === "string" && query.new.trim() ? query.new.trim().slice(0, 80) : null;
-  return { props: JSON.parse(JSON.stringify({ spells: store.list(), gate: store.gate(), wanted })) as Props };
+  return { props: JSON.parse(JSON.stringify({ spells: await store.list(), gate: store.gate(), wanted })) as Props };
 };
 
 const SCHOOLS = spellInfoSchema.shape.school.options;
@@ -361,8 +361,8 @@ export default function SpellsPage({ spells, gate, wanted }: Props) {
                 <DialogTitle id="delete-spell-title">Delete “{deleting}”?</DialogTitle>
                 <DialogContent>
                   <DialogContentText>
-                    It comes out of the spell book. A one-shot that still uses it keeps it from being deleted. Git still has whatever you
-                    committed.
+                    It comes out of the spell book. A one-shot that still uses it keeps it from being deleted.{" "}
+                    {gate.kind === "db" ? "content/rules/spells.json keeps the seed copy." : "Git still has whatever you committed."}
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions>

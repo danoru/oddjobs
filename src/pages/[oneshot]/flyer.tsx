@@ -2,20 +2,16 @@ import Head from "next/head";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import { Box, Button, Container, Typography } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
-import { loadOneShot, publishedSlugs } from "@/lib/content";
 import { toPublic, type PublicAnyOneShot } from "@/lib/public";
 import { useLevel } from "@/lib/storage";
 import { SiteHeader } from "@/components/SiteHeader";
 import { FlyerSheet } from "@/components/flyer/FlyerSheet";
-import { onlyIfOnDisk } from "@/lib/onDisk";
+import { publishedPaths, withPublished } from "@/lib/published";
 
-export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: publishedSlugs().map((oneshot) => ({ params: { oneshot } })),
-  fallback: false,
-});
+export const getStaticPaths: GetStaticPaths = publishedPaths();
 
-export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = onlyIfOnDisk(async ({ params }) => ({
-  props: { os: toPublic(loadOneShot(String(params!.oneshot))) },
+export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = withPublished((os) => ({
+  props: { os: toPublic(os) },
 }));
 
 /** The physical version of the board: a flyer with one tear-off strip per character. */

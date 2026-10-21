@@ -135,3 +135,61 @@ model Epilogue {
   tapestry  Json
   updatedAt DateTime @updatedAt
 }
+
+/// Authored content in the database (TEAROFF_STORE=db; src/lib/store/dbStore.ts).
+/// One row per one-shot, holding the builder's whole document as JSON: the
+/// draft being edited and the version players see. Either may be null, never
+/// both. `published` passed every check when it was written; readers parse it
+/// again anyway, so a bad row can't render. Documents are `json`, not `jsonb`,
+/// so their key order survives (an export reads like the files in git).
+model OneShot {
+  slug      String            @id
+  system    String
+  /// "draft" | "published" | "changed", as OneShotStatus.
+  status    String
+  /// The OneShotDoc being edited; null when there are no unpublished edits.
+  draft     Json?             @db.Json
+  /// The OneShotDoc players see; null until first published.
+  published Json?             @db.Json
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  history   OneShotRevision[]
+}
+
+/// A one-shot's history: what was saved, published, unpublished, imported,
+/// discarded or restored, with the whole document at that moment. Autosaves
+/// within a minute of each other share one row. Restoring one makes its
+/// document the draft again.
+model OneShotRevision {
+  id        String   @id @default(cuid())
+  slug      String
+  oneshot   OneShot  @relation(fields: [slug], references: [slug], onDelete: Cascade)
+  /// "save" | "publish" | "unpublish" | "import" | "discard" | "restore"
+  action    String
+  doc       Json     @db.Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug, createdAt])
+}
+
+/// The spell book in the database: one row per spell, keyed by name, holding
+/// the SpellInfo the cards print (content/rules/spells.json is the seed).
+model Spell {
+  name      String   @id
+  info      Json     @db.Json
+  updatedAt DateTime @updatedAt
+}
+
+/// The shared world in the database: one survivor record per character per
+/// game night (the epilogue's "save to the shared world"), as in content/legacy.
+model Survivor {
+  /// `<oneshot>/<character>/<yyyy-mm-dd>`
+  id        String   @id
+  oneshot   String
+  data      Json     @db.Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([oneshot])
+}

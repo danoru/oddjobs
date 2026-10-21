@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { Prisma } from "@prisma/client";
 import { requestRole } from "@/lib/auth";
-import { loadOneShot } from "@/lib/content";
+import { tableOneShot } from "@/lib/source";
 import { cryptoRng, type Actor, type Viewer } from "@/lib/game";
 import { db } from "@/lib/prisma";
 import { normalizeCode } from "@/lib/tables";
@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   let os;
   try {
-    os = loadOneShot(table.oneshot);
+    os = await tableOneShot(table.oneshot);
   } catch {
     return res.status(404).json({ error: "That one-shot is gone" });
   }

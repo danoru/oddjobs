@@ -3,13 +3,12 @@ import type { GetServerSideProps } from "next";
 import { Alert, Button, Container } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import { requestRole } from "@/lib/auth";
-import { loadOneShot } from "@/lib/content";
+import { requireOneShot, survivors } from "@/lib/source";
 import { db } from "@/lib/prisma";
 import { toPublic, type PublicAnyOneShot } from "@/lib/public";
 import { hasContent } from "@/lib/epilogueSchema";
 import { applyEdits, type Panel } from "@/lib/tapestry";
 import { NIGHT_INCLUDE, nightOf } from "@/lib/tapestry.server";
-import { loadSurvivors } from "@/lib/legacy.server";
 import { FATE_LABEL, type Survivor } from "@/lib/legacy";
 import { survivorsFrom } from "@/lib/epilogue";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -36,12 +35,12 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
   } catch {
     return { props: { nights: [], error: "The chronicle needs the table database, and it can't be reached." } };
   }
-  const legacy = loadSurvivors();
+  const legacy = await survivors();
   const nights: Night[] = [];
   for (const t of tables) {
     let os;
     try {
-      os = loadOneShot(t.oneshot);
+      os = await requireOneShot(t.oneshot);
     } catch {
       continue;
     }

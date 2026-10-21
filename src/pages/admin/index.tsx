@@ -229,6 +229,7 @@ export default function AdminPage({ oneshots, gate }: Props) {
               <DeleteDialog
                 target={dialog.target}
                 busy={busy}
+                inDb={gate.kind === "db"}
                 onClose={() => setDialog(null)}
                 onDelete={async () => {
                   const r = await call(`/api/admin/oneshots/${dialog.target.slug}`, {
@@ -355,14 +356,28 @@ function SlugDialog({
   );
 }
 
-function DeleteDialog({ target, busy, onClose, onDelete }: { target: OneShotSummary; busy: boolean; onClose: () => void; onDelete: () => void }) {
+function DeleteDialog({
+  target,
+  busy,
+  inDb,
+  onClose,
+  onDelete,
+}: {
+  target: OneShotSummary;
+  busy: boolean;
+  inDb: boolean;
+  onClose: () => void;
+  onDelete: () => void;
+}) {
   const [typed, setTyped] = useState("");
   return (
     <Dialog open onClose={onClose} fullWidth maxWidth="xs" aria-labelledby="delete-title">
       <DialogTitle id="delete-title">Delete “{target.title}”?</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          This removes the draft{target.status !== "draft" ? " and the published files" : ""}. Git still has whatever you committed. Type{" "}
+          {inDb
+            ? `This removes the draft${target.status !== "draft" ? ", takes it off the board" : ""} and deletes its history. Export it first to keep a copy. Type `
+            : `This removes the draft${target.status !== "draft" ? " and the published files" : ""}. Git still has whatever you committed. Type `}
           <strong>{target.slug}</strong> to confirm.
         </DialogContentText>
         <TextField

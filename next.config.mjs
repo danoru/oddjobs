@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Every other page is static, but the GM page reads content per request
-  // (src/lib/content.ts keeps content out of tracing), so ship it explicitly.
+  // With content as files (the default), player pages are built from it at build
+  // time, but the GM page reads it per request (src/lib/content.ts keeps content
+  // out of tracing), so ship it explicitly. (With TEAROFF_STORE=db everything
+  // reads the database instead and these files are just unused.)
   // The Foundry sync API reads content per request too. Loading a one-shot also
   // reads the spell book (every spell must have card text), so ship that as well.
   // Keys are globs, so a [param] segment is written as * ("[oneshot]" would be a character class).

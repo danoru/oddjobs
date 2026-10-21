@@ -16,12 +16,13 @@ import { freshId } from "@/lib/editor/core";
 import { unlistedKeys } from "@/lib/editor/schemaAt";
 import type { EditorSection } from "@/lib/editor/types";
 import type { SystemId } from "@/lib/schema";
-import type { OneShotStatus, WriteGate } from "@/lib/store/types";
+import type { OneShotStatus, RevisionSummary, WriteGate } from "@/lib/store/types";
 import { SYSTEMS } from "@/systems/registry";
 import { EditorContext, type EditorCtx } from "./EditorContext";
 import { Field } from "./Fields";
 import { Preview } from "./Preview";
 import { CommitNote } from "./CommitNote";
+import { HistoryPanel } from "./HistoryPanel";
 import { useChangedFiles } from "./changedFiles";
 import { parchmentTheme } from "./parchmentTheme";
 import { Mech5e } from "./panels/Mech5e";
@@ -64,6 +65,8 @@ export interface BuilderProps {
   hasPublished: boolean;
   spells: SpellBook;
   gate: WriteGate;
+  /** The store keeps a history of saves and publishes (the database does; with files, git is the history). */
+  hasHistory?: boolean;
 }
 
 /**
@@ -72,7 +75,7 @@ export interface BuilderProps {
  * right. Every change is checked (debounced) with the same checks the build
  * runs, and saved as a draft a moment after you stop typing.
  */
-export function Builder({ slug, initial, status: initialStatus, hasPublished, spells, gate }: BuilderProps) {
+export function Builder({ slug, initial, status: initialStatus, hasPublished, spells, gate, hasHistory = false }: BuilderProps) {
   const router = useRouter();
   const readOnly = !gate.writable;
   const [doc, setDoc] = useState<OneShotDoc>(() => withOrder(initial));
@@ -119,6 +122,8 @@ export function Builder({ slug, initial, status: initialStatus, hasPublished, sp
   const [savedJson, setSavedJson] = useState(() => JSON.stringify(withOrder(initial)));
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  /** Counts writes, so the history panel knows to look again. */
+  const [writes, setWrites] = useState(0);
   const dirty = !readOnly && docJson !== savedJson;
   const latest = useRef(docJson);
   useEffect(() => {
@@ -142,6 +147,7 @@ export function Builder({ slug, initial, status: initialStatus, hasPublished, sp
       }
       setSaveError(null);
       setSavedJson(json);
+      setWrites((n) => n + 1);
       setStatus((st) => (st === "published" ? "changed" : st));
       addChanged(body.changed);
       return true;
@@ -293,17 +299,27 @@ export function Builder({ slug, initial, status: initialStatus, hasPublished, sp
         await new Promise((done) => setTimeout(done, 700));
       }
       setStatus("published");
+      setWrites((n) => n + 1);
       setNotice({
         kind: "success",
-        text: (
-          <>
-            Published. It&apos;s on the board of this dev server now:{" "}
-            <Link href={`/${slug}`} target="_blank">
-              /{slug}
-            </Link>
-            . Commit the files for the deployed site.
-          </>
-        ),
+        text:
+          gate.kind === "db" ? (
+            <>
+              Published. It&apos;s on the board now:{" "}
+              <Link href={`/${slug}`} target="_blank">
+                /{slug}
+              </Link>
+              .
+            </>
+          ) : (
+            <>
+              Published. It&apos;s on the board of this dev server now:{" "}
+              <Link href={`/${slug}`} target="_blank">
+                /{slug}
+              </Link>
+              . Commit the files for the deployed site.
+            </>
+          ),
       });
     } finally {
       setPublishing(false);
@@ -317,6 +333,21 @@ export function Builder({ slug, initial, status: initialStatus, hasPublished, sp
     if (!r.ok) return setNotice({ kind: "error", text: body.error ?? "Couldn't discard the draft" });
     addChanged(body.changed);
     setSavedJson(docJson); // nothing left to save; the reload brings the published version
+    window.location.reload();
+  }
+
+  async function restore(rev: RevisionSummary) {
+    const when = new Date(rev.updatedAt).toLocaleString();
+    if (!window.confirm(`Make the version from ${when} the draft? What's in the builder now stays in the history.`)) return;
+    if (dirty && !(await save())) return setNotice({ kind: "error", text: "Couldn't save the current draft first, so nothing was restored." });
+    const r = await fetch(`/api/admin/oneshots/${slug}/restore`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ revision: rev.id }),
+    });
+    const body = await r.json().catch(() => ({}));
+    if (!r.ok) return setNotice({ kind: "error", text: body.error ?? "Couldn't restore that version" });
+    setSavedJson(docJson); // the reload brings the restored draft
     window.location.reload();
   }
 
@@ -577,6 +608,7 @@ export function Builder({ slug, initial, status: initialStatus, hasPublished, sp
         <ThemeProvider theme={parchmentTheme}>
           <aside className={s.previewCol} aria-label="Problems and preview">
             <IssueSummary issues={shownIssues} fromServer={Boolean(serverIssues?.length)} where={where} onJump={jump} readOnly={readOnly} />
+            {hasHistory && <HistoryPanel slug={slug} readOnly={readOnly} reloadKey={writes} onRestore={restore} />}
             <Preview slug={slug} selected={view.kind === "character" ? view.index : null} level={mechLevel} />
           </aside>
         </ThemeProvider>

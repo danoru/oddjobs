@@ -90,7 +90,7 @@ export function checkParsed(
     for (const name of spellNames(levels))
       if (!spells[name])
         out.push({
-          message: `spell "${name}" isn't in content/rules/spells.json (the cards need its text)`,
+          message: `spell "${name}" isn't in the spell book (the cards need its text)`,
           path: whereIsSpell(name, base, variants),
         });
   }

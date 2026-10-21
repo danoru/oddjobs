@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { GetServerSideProps } from "next";
 import { Alert, Box, Button, Container, Typography } from "@mui/material";
 import { requestRole } from "@/lib/auth";
-import { loadOneShot } from "@/lib/content";
+import { requireOneShot } from "@/lib/source";
 import type { OneShotWithCast } from "@/lib/schema";
 import { useClaims, useLevel } from "@/lib/storage";
 import { posterTag } from "@/systems/registry";
@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
   if (!/^[a-z0-9-]+$/.test(slug)) return { notFound: true };
   let os: OneShotWithCast;
   try {
-    os = loadOneShot(slug);
+    os = await requireOneShot(slug);
   } catch {
     return { notFound: true };
   }

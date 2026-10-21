@@ -3,22 +3,18 @@ import { useEffect, useState } from "react";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import { Alert, Box, Button, Container, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
-import { loadOneShot, publishedSlugs } from "@/lib/content";
 import { toPublic, type PublicAnyOneShot } from "@/lib/public";
-import { onlyIfOnDisk } from "@/lib/onDisk";
+import { publishedPaths, withPublished } from "@/lib/published";
 import { useTableCode } from "@/lib/storage";
 import type { Panel } from "@/lib/tapestry";
 import { noEdits, type TapestryEdits } from "@/lib/epilogueSchema";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Frieze, type Layout } from "@/components/tapestry/Tapestry";
 
-export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: publishedSlugs().map((oneshot) => ({ params: { oneshot } })),
-  fallback: false,
-});
+export const getStaticPaths: GetStaticPaths = publishedPaths();
 
-export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = onlyIfOnDisk(async ({ params }) => ({
-  props: { os: toPublic(loadOneShot(String(params!.oneshot))) },
+export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = withPublished((os) => ({
+  props: { os: toPublic(os) },
 }));
 
 type Reply = { panels?: (Panel & { dropped: boolean })[]; edits?: TapestryEdits; gm?: boolean; error?: string };

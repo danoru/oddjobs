@@ -33,19 +33,22 @@ const DRAFT_FILE = "draft.json";
 
 /** When the builder may write content files. */
 export function contentWriteGate(env: Partial<Record<string, string>> = process.env): WriteGate {
+  const kind = "files" as const;
   if (env.VERCEL)
     return {
       writable: false,
+      kind,
       reason:
-        "This is the deployed site: its one-shots are files baked into the build, and its disk is read-only. Edit them on your own machine (pnpm dev), commit the files and push.",
+        "This is the deployed site, and its one-shots are files baked into the build (its disk is read-only). To edit here, move the content into the database: set TEAROFF_STORE=db in Vercel and run the import (see the README). Or edit on your own machine (pnpm dev), commit the files and push.",
     };
-  if (env.TEAROFF_CONTENT_WRITE === "1") return { writable: true };
-  if (env.TEAROFF_CONTENT_WRITE === "0") return { writable: false, reason: "TEAROFF_CONTENT_WRITE=0 turns writing off." };
-  if (env.NODE_ENV === "development") return { writable: true };
+  if (env.TEAROFF_CONTENT_WRITE === "1") return { writable: true, kind };
+  if (env.TEAROFF_CONTENT_WRITE === "0") return { writable: false, kind, reason: "TEAROFF_CONTENT_WRITE=0 turns writing off." };
+  if (env.NODE_ENV === "development") return { writable: true, kind };
   return {
     writable: false,
+    kind,
     reason:
-      "This is a production build, so the builder is read-only: one-shots are files in git (content/). Run the builder locally with pnpm dev (or set TEAROFF_CONTENT_WRITE=1 for a local production build), then commit and push the files.",
+      "This is a production build, so the builder is read-only: one-shots are files in git (content/). Run the builder locally with pnpm dev (or set TEAROFF_CONTENT_WRITE=1 for a local production build), then commit and push the files. With TEAROFF_STORE=db they live in the database instead, and the builder can write anywhere.",
   };
 }
 

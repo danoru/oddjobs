@@ -4,7 +4,7 @@ import type { GetServerSideProps } from "next";
 import { Button, Container } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import { requestRole } from "@/lib/auth";
-import { loadOneShot, spellBookFor } from "@/lib/content";
+import { requireOneShot, spellBookFor } from "@/lib/source";
 import type { OneShotWithCast } from "@/lib/schema";
 import { toPublic, type PublicAnyOneShot } from "@/lib/public";
 import type { SpellInfo } from "@/systems/dnd5e/schema";
@@ -46,12 +46,12 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
   if (!/^[a-z0-9-]+$/.test(slug)) return { notFound: true };
   let os: OneShotWithCast;
   try {
-    os = loadOneShot(slug);
+    os = await requireOneShot(slug);
   } catch {
     return { notFound: true };
   }
   res.setHeader("Cache-Control", "private, no-store");
-  const book = os.system === "dnd5e" ? spellBookFor(os) : {};
+  const book = os.system === "dnd5e" ? await spellBookFor(os) : {};
   return { props: JSON.parse(JSON.stringify({ os, pub: toPublic(os), book })) as Props };
 };
 

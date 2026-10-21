@@ -2,15 +2,15 @@ import Head from "next/head";
 import type { GetServerSideProps } from "next";
 import { Container } from "@mui/material";
 import { requestRole } from "@/lib/auth";
-import { loadSpellBook } from "@/lib/content";
+import { spellBook } from "@/lib/source";
 import { getStore } from "@/lib/store";
 import { isSafeId } from "@/lib/store/doc";
 import { Builder, type BuilderProps } from "@/components/admin/Builder";
 
 /**
  * Editing one one-shot. GM only, rendered per request: drafts and GM-only
- * fields never get a static page. On a deployed build the store can't
- * write, so the builder opens read-only and says why.
+ * fields never get a static page. On a deployed build the FileStore can't
+ * write, so the builder opens read-only and says why; the DbStore can.
  */
 export const getServerSideProps: GetServerSideProps<BuilderProps> = async ({ req, res, params, resolvedUrl }) => {
   if ((await requestRole(req)) !== "gm") {
@@ -28,8 +28,9 @@ export const getServerSideProps: GetServerSideProps<BuilderProps> = async ({ req
       initial: (got.draft ?? got.published)!,
       status: got.status,
       hasPublished: Boolean(got.published),
-      spells: loadSpellBook(),
+      spells: await spellBook(),
       gate: JSON.parse(JSON.stringify(store.gate())),
+      hasHistory: Boolean(store.history),
     },
   };
 };

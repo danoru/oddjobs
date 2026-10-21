@@ -6,7 +6,6 @@ import QRCode from "qrcode";
 import { Box, Button, Typography } from "@mui/material";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import { loadOneShot, publishedSlugs } from "@/lib/content";
 import { toPublic, type PublicAnyOneShot, type PublicDhOneShot, type PublicOneShot, type PublicPaOneShot } from "@/lib/public";
 import { SYSTEMS } from "@/systems/registry";
 import { CandlesTv } from "@/systems/tencandles/components/CandlesTv";
@@ -15,7 +14,7 @@ import { playRip } from "@/lib/rip";
 import { PosterIcon } from "@/components/PosterIcon";
 import { tiltFor } from "@/components/board/Poster";
 import s from "@/components/tv/Tv.module.css";
-import { onlyIfOnDisk } from "@/lib/onDisk";
+import { publishedPaths, withPublished } from "@/lib/published";
 import { TvLive } from "@/components/tv/TvLive";
 import { useLive } from "@/lib/useLive";
 import type { Character as DhCharacter } from "@/systems/daggerheart/schema";
@@ -25,13 +24,10 @@ import { PaPosterRecord, PaTvOverlay } from "@/systems/paranoia/components/Tv";
 import { marksFor, useRecords } from "@/systems/paranoia/components/Table";
 import type { Character as PaCharacter, HouseRules } from "@/systems/paranoia/schema";
 
-export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: publishedSlugs().map((oneshot) => ({ params: { oneshot } })),
-  fallback: false,
-});
+export const getStaticPaths: GetStaticPaths = publishedPaths();
 
-export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = onlyIfOnDisk(async ({ params }) => ({
-  props: { os: toPublic(loadOneShot(String(params!.oneshot))) },
+export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = withPublished((os) => ({
+  props: { os: toPublic(os) },
 }));
 
 /**

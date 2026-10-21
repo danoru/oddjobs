@@ -8,6 +8,7 @@ import { FileStore } from "./store";
 import { handler as listRoute } from "@/pages/api/admin/oneshots";
 import { handler as oneRoute } from "@/pages/api/admin/oneshots/[slug]";
 import { handler as actionRoute } from "@/pages/api/admin/oneshots/[slug]/[action]";
+import { handler as survivorRoute, type SurvivorWriter } from "@/pages/api/admin/survivors";
 
 beforeAll(() => {
   process.env.AUTH_SECRET = "test-secret";
@@ -70,6 +71,8 @@ const endpoints = [
   ["unpublish", actionRoute, { method: "POST", query: { slug: SLUG, action: "unpublish" } }],
   ["duplicate", actionRoute, { method: "POST", query: { slug: SLUG, action: "duplicate" }, body: { to: "copy" } }],
   ["export", actionRoute, { method: "GET", query: { slug: SLUG, action: "export" } }],
+  ["history", actionRoute, { method: "GET", query: { slug: SLUG, action: "history" } }],
+  ["restore", actionRoute, { method: "POST", query: { slug: SLUG, action: "restore" }, body: { revision: "x" } }],
 ] as const;
 
 describe("admin API auth", () => {
@@ -130,5 +133,51 @@ describe("admin API auth", () => {
     const store = tempStore(true);
     const res = await call(oneRoute, store, { role: "gm", method: "GET", query: { slug: "../oneshots" } });
     expect(res.statusCode).toBe(400);
+  });
+});
+
+describe("the history with files", () => {
+  it("isn't there: git is the history", async () => {
+    const store = tempStore(true);
+    const res = await call(actionRoute, store, { role: "gm", method: "GET", query: { slug: SLUG, action: "history" } });
+    expect(res.statusCode).toBe(404);
+    expect(JSON.stringify(res.body)).toMatch(/git is the history/);
+  });
+});
+
+describe("saving to the shared world", () => {
+  const writer = (writable: boolean) => {
+    const saved: unknown[] = [];
+    const w: SurvivorWriter = {
+      gate: () => (writable ? { writable: true } : { writable: false, reason: "files: download them" }),
+      save: async (records) => {
+        saved.push(records);
+        return { saved: ["x"], skipped: [] };
+      },
+      remove: async (ids) => {
+        saved.push(ids);
+        return ids;
+      },
+    };
+    return { w, saved };
+  };
+  const post = (role: "gm" | "table" | null, w: SurvivorWriter) =>
+    call(survivorRoute as never, w as never, { role, method: "POST", body: { records: [] } });
+
+  it("is GM-only", async () => {
+    const { w, saved } = writer(true);
+    for (const role of ["table", null] as const) {
+      expect((await post(role, w)).statusCode).toBe(403);
+      expect((await call(survivorRoute as never, w as never, { role, method: "DELETE", body: { ids: ["x"] } })).statusCode).toBe(403);
+    }
+    expect(saved).toEqual([]);
+    expect((await post("gm", w)).statusCode).toBe(200);
+    expect(saved).toHaveLength(1);
+  });
+
+  it("refuses when the shared world is files", async () => {
+    const { w, saved } = writer(false);
+    expect((await post("gm", w)).body).toMatchObject({ error: "files: download them", readOnly: true });
+    expect(saved).toEqual([]);
   });
 });

@@ -584,7 +584,9 @@ try {
   await gm.goto(`${BASE}/${TC}/epilogue`, { waitUntil: "networkidle" });
   await gm.getByLabel("Headline").fill("THE LAST LAMP AT MARROWBY");
   await until("TC epilogue saved", async () => (await text(gm)).includes("Saved with the table."));
-  await tcPhones[0].goto(`${BASE}/${TC}/tapestry`, { waitUntil: "networkidle" });
+  // "load", not "networkidle": with the database store the pages are ISR, and Next quietly re-fetches
+  // stale page data in the background, which never counts as idle. The panels are waited for below.
+  await tcPhones[0].goto(`${BASE}/${TC}/tapestry`, { waitUntil: "load" });
   await until("TC tapestry", async () => (await tcPhones[0].locator('[data-testid="tapestry-panel"]').count()) > 2);
   const tcTapestry = await tcPhones[0].locator('[data-testid="tapestry"]').innerText();
   check((tcTapestry.match(/A candle goes dark/g) ?? []).length >= 3, "the Ten Candles tapestry weaves the candles going dark");

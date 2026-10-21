@@ -19,6 +19,11 @@
  * Then it duplicates one, edits and publishes the copy, unpublishes it,
  * checks players can't reach /admin or its API, and deletes every test
  * one-shot so content/ is as it was. Exits 1 on the first failure.
+ *
+ * Works with either store: against a server with TEAROFF_STORE=db it checks
+ * the database (through the admin API) instead of the files, and on a
+ * production server (`next start`) that proves publishing reaches the board
+ * with no rebuild.
  */
 import { chromium, type Page } from "playwright";
 import fs from "node:fs";
@@ -54,21 +59,33 @@ async function shot(page: Page, name: string) {
   await page.screenshot({ path: path.join(SHOTS, `${name}.png`) });
 }
 
-for (const slug of TEST_SLUGS)
-  for (const dir of ["oneshots", "drafts"])
-    if (fs.existsSync(path.join(ROOT, "content", dir, slug)))
-      throw new Error(`content/${dir}/${slug} already exists; remove it first (a previous run with KEEP=1?)`);
-
 const browser = await chromium.launch();
 const gmCtx = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
 {
   const r = await gmCtx.request.post(`${BASE}/api/login`, { data: { password: env("GM_PASSWORD") } });
   if (!r.ok()) throw new Error(`Login failed (${r.status()}) — is the dev server running at ${BASE}?`);
 }
+/** Whether the server keeps one-shots in the database (TEAROFF_STORE=db) rather than content/. */
+const IN_DB = ((await (await gmCtx.request.get(`${BASE}/api/admin/oneshots`)).json()) as { gate?: { kind?: string } }).gate?.kind === "db";
+console.log(`(the server's store: ${IN_DB ? "the database" : "files in content/"})`);
+type Stored = { status: string; draft: { oneshot: Record<string, unknown> } | null; published: { oneshot: Record<string, unknown> } | null };
+/** The one-shot as the store has it, through the admin API, or null. */
+async function stored(slug: string): Promise<Stored | null> {
+  const r = await gmCtx.request.get(`${BASE}/api/admin/oneshots/${slug}`);
+  return r.status() === 404 ? null : ((await r.json()) as Stored);
+}
+async function exists(slug: string): Promise<string[]> {
+  if (IN_DB) return (await stored(slug)) ? [`the database's ${slug}`] : [];
+  return ["oneshots", "drafts"].filter((d) => fs.existsSync(path.join(ROOT, "content", d, slug))).map((d) => `content/${d}/${slug}`);
+}
+for (const slug of TEST_SLUGS) {
+  const there = await exists(slug);
+  if (there.length) throw new Error(`${there.join(", ")} already exists; remove it first (a previous run with KEEP=1?)`);
+}
 const page = await gmCtx.newPage();
 const pageErrors: string[] = [];
 // The unsaved-changes guard cancels a navigation by throwing, which is how Next has you do it.
-page.on("pageerror", (e) => void (/Route change aborted/.test(String(e)) || pageErrors.push(String(e))));
+page.on("pageerror", (e) => void (/Route change aborted/.test(String(e)) || pageErrors.push(`${new URL(page.url()).pathname}: ${String(e).slice(0, 300)}`)));
 // Confirms are accepted unless a step says otherwise.
 let onDialog: (msg: string) => boolean = () => true;
 page.on("dialog", (d) => void (onDialog(d.message()) ? d.accept() : d.dismiss()));
@@ -113,6 +130,12 @@ async function addCharacter(name: string) {
 async function publish(slug: string) {
   await page.getByRole("button", { name: "Publish", exact: true }).click();
   await page.getByText("Published. It's on the board").waitFor({ timeout: 30000 });
+  if (IN_DB) {
+    const got = await stored(slug);
+    check(got?.status === "published" && got.published !== null, `${slug} is published in the database`);
+    check(got?.draft === null, `${slug}'s draft is gone after publishing`);
+    return;
+  }
   check(fs.existsSync(path.join(ROOT, "content", "oneshots", slug, "oneshot.json")), `${slug} is published to content/oneshots`);
   check(!fs.existsSync(path.join(ROOT, "content", "drafts", slug)), `${slug}'s draft is gone after publishing`);
 }
@@ -146,10 +169,11 @@ async function newOneShot(system: string, title: string, slug: string) {
 const HOOK = "Wanted for a job that nobody else in the lower city would dare to take on, tonight.";
 const TOO_LONG = `${HOOK} No questions.`;
 
+let left: string[] = [];
 try {
   // ======================= A 5e one-shot from scratch =======================
   await newOneShot("dnd5e", "Builder Test Heist", HEIST);
-  check(fs.existsSync(path.join(ROOT, "content", "drafts", HEIST, "draft.json")), "creating it saves a draft (not on the board)");
+  check(IN_DB ? (await stored(HEIST))?.status === "draft" : fs.existsSync(path.join(ROOT, "content", "drafts", HEIST, "draft.json")), "creating it saves a draft (not on the board)");
   check((await issues()) > 0, "a blank one-shot shows what's missing");
   check(await issueAt("oneshot.pitch"), "…including the pitch, pointed at its field");
 
@@ -365,7 +389,15 @@ try {
   await publish(HEIST);
   await shot(page, "03-heist-published");
   {
-    const written = JSON.parse(fs.readFileSync(path.join(ROOT, "content", "oneshots", HEIST, "oneshot.json"), "utf8"));
+    const written = (IN_DB
+      ? (await stored(HEIST))!.published!.oneshot
+      : JSON.parse(fs.readFileSync(path.join(ROOT, "content", "oneshots", HEIST, "oneshot.json"), "utf8"))) as {
+      acts?: { id: string; title: string }[];
+      letters?: { act?: string }[];
+      rumors?: { truth: string }[];
+      notices?: { title: string }[];
+      coins?: { tossesPerAct?: number };
+    };
     check(written.acts?.[0]?.title === "The Vault Door" && written.letters?.[0]?.act === written.acts[0].id, "the act card and the letter's act are published");
     check(written.rumors?.length === 2 && written.rumors[1].truth === "false", "the rumors are published with their truths");
     check(written.notices?.[0]?.title === "AUDITORS EXPECTED AT DUSK" && written.coins?.tossesPerAct === 2, "the notice and the coin settings are published");
@@ -644,7 +676,10 @@ try {
   check(r.status() === 307 || r.status() === 403, "someone not signed in can't reach the admin API");
   await playerCtx.close();
   await stranger.close();
-  check(fs.existsSync(path.join(ROOT, "content", "oneshots", HEIST, "oneshot.json")), "nothing the player tried changed the content");
+  check(
+    IN_DB ? (await stored(HEIST))?.status === "published" : fs.existsSync(path.join(ROOT, "content", "oneshots", HEIST, "oneshot.json")),
+    "nothing the player tried changed the content",
+  );
 
   check(pageErrors.length === 0, `no page errors${pageErrors.length ? `: ${pageErrors.join(" | ")}` : ""}`);
 } finally {
@@ -662,13 +697,11 @@ try {
     }
     // Only the "remember to commit" list of this browser mentions them; clear it.
     await page.evaluate(() => localStorage.removeItem("tearoff:admin:changed")).catch(() => {});
+    left = (await Promise.all(TEST_SLUGS.map(exists))).flat();
   }
   await browser.close();
 }
 if (!KEEP) {
-  const left = TEST_SLUGS.flatMap((slug) =>
-    ["oneshots", "drafts"].filter((d) => fs.existsSync(path.join(ROOT, "content", d, slug))).map((d) => `content/${d}/${slug}`),
-  );
   check(left.length === 0, `the test one-shots are deleted${left.length ? ` (left: ${left.join(", ")})` : ""}`);
 }
 console.log("\nThe builder works end to end.");

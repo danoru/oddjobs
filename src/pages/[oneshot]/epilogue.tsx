@@ -12,30 +12,33 @@ import {
 } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import { loadOneShot, publishedSlugs } from "@/lib/content";
+import PublicIcon from "@mui/icons-material/Public";
+import { useState } from "react";
 import { toPublic, type PublicAnyOneShot } from "@/lib/public";
 import { FATE_LABEL, FATES, type Fate } from "@/lib/legacy";
 import { emptyEpilogue, survivorsFrom, useSharedEpilogue } from "@/lib/epilogue";
 import { usePlayer, useTableCode } from "@/lib/storage";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Gazette, type EpilogueEntry } from "@/components/gazette/Gazette";
-import { onlyIfOnDisk } from "@/lib/onDisk";
+import { publishedPaths, withPublished } from "@/lib/published";
+import { storeKind, type StoreKind } from "@/lib/store/kind";
 
-export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: publishedSlugs().map((oneshot) => ({ params: { oneshot } })),
-  fallback: false,
-});
+export const getStaticPaths: GetStaticPaths = publishedPaths();
 
-export const getStaticProps: GetStaticProps<{ os: PublicAnyOneShot }> = onlyIfOnDisk(async ({ params }) => ({
-  props: { os: toPublic(loadOneShot(String(params!.oneshot))) },
+type Props = { os: PublicAnyOneShot; sharedWorld: StoreKind };
+
+export const getStaticProps: GetStaticProps<Props> = withPublished((os) => ({
+  props: { os: toPublic(os), sharedWorld: storeKind() },
 }));
 
 /**
  * After the session: each character gets a fate and one line for the paper.
  * That prints as a broadsheet keepsake, and the record joins the shared world
- * so survivors can turn up in later one-shots.
+ * so survivors can turn up in later one-shots: saved straight to the database
+ * (GM only) when the content lives there, or downloaded as a file for
+ * content/legacy/ when it's in git.
  */
-export default function EpiloguePage({ os }: { os: PublicAnyOneShot }) {
+export default function EpiloguePage({ os, sharedWorld }: Props) {
   const code = useTableCode(os.slug);
   const player = usePlayer();
   const { ep, setEp, canEdit, shared, saved } = useSharedEpilogue(os.slug, code, player?.id ?? null);
@@ -44,6 +47,30 @@ export default function EpiloguePage({ os }: { os: PublicAnyOneShot }) {
   const setEntry = (id: string, patch: Partial<EpilogueEntry>) =>
     setEp({ ...ep, entries: { ...ep.entries, [id]: { ...ep.entries[id], ...patch } } });
   const records = survivorsFrom(os, ep);
+  const [world, setWorld] = useState<{ kind: "success" | "error" | "info"; text: string } | null>(null);
+
+  async function saveToWorld() {
+    setWorld({ kind: "info", text: "Saving…" });
+    try {
+      const r = await fetch("/api/admin/survivors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ records }),
+      });
+      const body = (await r.json().catch(() => ({}))) as { error?: string; saved?: string[]; skipped?: string[] };
+      if (r.status === 403 && !body.error?.includes("content/legacy")) return setWorld({ kind: "error", text: "Only the GM can save to the shared world." });
+      if (!r.ok) return setWorld({ kind: "error", text: body.error ?? `Saving failed (${r.status})` });
+      const n = body.saved?.length ?? 0;
+      setWorld({
+        kind: "success",
+        text: n
+          ? `Saved ${n} record${n === 1 ? "" : "s"} to the shared world. Survivors are on the board and turn up as cameos on other one-shots.`
+          : "The shared world already had these records.",
+      });
+    } catch (e) {
+      setWorld({ kind: "error", text: (e as Error).message });
+    }
+  }
 
   function download() {
     const json = JSON.stringify(records, null, 2) + "\n";
@@ -146,17 +173,39 @@ export default function EpiloguePage({ os }: { os: PublicAnyOneShot }) {
                 <Button variant="contained" startIcon={<PrintIcon />} onClick={() => window.print()}>
                   Print the paper
                 </Button>
-                <Button variant="outlined" startIcon={<FileDownloadIcon />} onClick={download} disabled={records.length === 0}>
-                  Save to the shared world
-                </Button>
+                {sharedWorld === "db" ? (
+                  <>
+                    <Button variant="outlined" startIcon={<PublicIcon />} onClick={() => void saveToWorld()} disabled={records.length === 0 || world?.text === "Saving…"}>
+                      Save to the shared world
+                    </Button>
+                    <Button startIcon={<FileDownloadIcon />} onClick={download} disabled={records.length === 0} sx={{ color: "text.secondary" }}>
+                      Download
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="outlined" startIcon={<FileDownloadIcon />} onClick={download} disabled={records.length === 0}>
+                    Save to the shared world
+                  </Button>
+                )}
                 <Button onClick={() => setEp(emptyEpilogue())} disabled={!all} sx={{ color: "text.secondary" }}>
                   Clear
                 </Button>
               </Stack>
-              <Alert severity="info">
-                &ldquo;Save to the shared world&rdquo; downloads {records.length} record{records.length === 1 ? "" : "s"}. Add the file to{" "}
-                <code>content/legacy/</code> and survivors start turning up as cameos on other one-shots.
-              </Alert>
+              {world ? (
+                <Alert severity={world.kind} role="status" onClose={() => setWorld(null)}>
+                  {world.text}
+                </Alert>
+              ) : sharedWorld === "db" ? (
+                <Alert severity="info">
+                  &ldquo;Save to the shared world&rdquo; (GM only) adds {records.length} record{records.length === 1 ? "" : "s"} to the shared
+                  world, and survivors start turning up on the board and as cameos on other one-shots.
+                </Alert>
+              ) : (
+                <Alert severity="info">
+                  &ldquo;Save to the shared world&rdquo; downloads {records.length} record{records.length === 1 ? "" : "s"}. Add the file to{" "}
+                  <code>content/legacy/</code> and survivors start turning up as cameos on other one-shots.
+                </Alert>
+              )}
             </Stack>
           </Box>
           <Gazette os={os} ep={ep} />

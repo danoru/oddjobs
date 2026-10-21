@@ -12,7 +12,7 @@ One-shots come in more than one game system:
 - **Paranoia** is a play aid for tables that own the 2023 Core Book. It gives Troubleshooters whose naughty sides never reach a player page, NODE dice with the Computer die, six-packs of clones, treason Flags, treason reports and Friend Computer on every screen.
 
 
-Next 16 (Pages Router) · React 19 · MUI 9 · CSS Modules · Zod · Vitest · Prisma 6 + Postgres · pnpm · Vercel. Content is JSON in git, validated at build time, and written through the **builder** at `/admin` (see [The builder](#the-builder)); the database only holds table sessions (who tore which poster).
+Next 16 (Pages Router) · React 19 · MUI 9 · CSS Modules · Zod · Vitest · Prisma 6 + Postgres · pnpm · Vercel. Content is written through the **builder** at `/admin` (see [The builder](#the-builder)) and kept either as JSON in git, validated at build time (the default), or in Postgres with `TEAROFF_STORE=db`, so the GM can write and publish everything on the deployed site (see [Content in the database](#content-in-the-database)). The database always holds the table sessions (who tore which poster).
 
 ## Run it
 
@@ -38,12 +38,14 @@ Without a database the site still works: claims just stay in each browser, as in
 | Script | What it does |
 |---|---|
 | `pnpm validate [slug]` | Parse and cross-check content; prints each character's key numbers (Daggerheart: Evasion, HP, Stress, Armor, thresholds, traits and domain cards) |
-| `pnpm test` | Rules math (HP, slots, pact magic), level variants, cards, tokens, reading modes, customization, exporters, auth roles, table codes, `gmNotes` stays off player pages; the event log's rules and privacy (notes, hidden rolls, rumor truths, ticks, targeted bells, no browser ids), the tapestry, the Ten Candles mirror and its act cards, shake detection, and the builder's new fields. Daggerheart: the derived numbers, every check, the SRD tables and errata, duality dice, Hope/Fear/slot tallies and who may move them, its privacy rules, and its checks pointing at their builder fields |
+| `pnpm test` | The database store (DbStore, the spell book and survivors in Postgres, history and restore, revalidation from the admin API, import idempotence, GM-only access) against the local database in a schema of its own, `tearoff_test`; skipped, with a warning, when no local database is running. Rules math (HP, slots, pact magic), level variants, cards, tokens, reading modes, customization, exporters, auth roles, table codes, `gmNotes` stays off player pages; the event log's rules and privacy (notes, hidden rolls, rumor truths, ticks, targeted bells, no browser ids), the tapestry, the Ten Candles mirror and its act cards, shake detection, and the builder's new fields. Daggerheart: the derived numbers, every check, the SRD tables and errata, duality dice, Hope/Fear/slot tallies and who may move them, its privacy rules, and its checks pointing at their builder fields |
 | `pnpm build` | `prisma generate`, validate, then `next build` (fails on any broken one-shot) |
 | `pnpm db:dev` | Start a local Postgres server in the background (`prisma dev --name tearoff --detach`); stop it with `pnpm exec prisma dev stop tearoff` |
 | `pnpm db:migrate` | `prisma migrate dev`: make a new migration after editing `prisma/schema.prisma` |
 | `pnpm db:deploy` | Apply migrations to the database in `.env` (the hosted one on Vercel) |
 | `pnpm db:status:remote` / `pnpm db:deploy:remote` | Check / migrate the hosted Supabase database from your machine |
+| `pnpm db:import [--overwrite]` | Copy the git content (spell book, `content/legacy` survivors, one-shots) into the database in `.env`. Skips what's already there unless `--overwrite`; running it twice changes nothing. `scripts/import-oneshots.ts`, `import-spells.ts` and `import-survivors.ts` do one each |
+| `pnpm db:import:remote` | The same into the hosted Supabase database. **Writes to the live site's database** |
 | `pnpm pdf [slug] [--a4]` | **Local only.** Render `public/pdf/<slug>-sheets`, `-cards`, `-tents` and `-flyer` PDFs (and `<slug>-l<N>-…` for each level variant; `<slug>-kit` and `-flyer` for Ten Candles) from a running server with Playwright. Never runs on Vercel. |
 | `pnpm a11y-check [route…]` | **Local only.** Run axe-core over the main pages (signed in as GM) and Tab through each, checking every focus stop shows a ring. Exits 1 on any problem. |
 | `pnpm parity snap <dir>` / `pnpm parity diff <a> <b>` | **Local only.** Snapshot every 5e page's visible text, every printable's PDF page count and a few screenshots, then compare two snapshots. Run it before and after a refactor: phase 4 used it to prove moving 5e into `src/systems/dnd5e/` changed nothing. |
@@ -52,6 +54,7 @@ Without a database the site still works: claims just stay in each browser, as in
 | `pnpm e2e:toys` | **Local only.** Phase 6's table toys end to end in headless Chromium against a running server with a database: a GM, two phones and the TV on a 5e table (The Drowned Bell) and a Ten Candles one (Lights Out at Marrowby). Dice and the tray, notes, the bell, act cards, the spotlight (with a fast-forwarded clock), rumors, the town board, coins, the epilogue per table, the tapestry and the chronicle; it page-checks the printed box on Letter and A4, the tapestry and the chronicle, and checks over HTTP and on screen that players never see GM-only data, other players' notes, hidden rolls or rumor truths. `SHOTS=dir` saves screenshots. |
 | `pnpm e2e:daggerheart` | **Local only.** A Daggerheart night (A Vow Before Dawn) in headless Chromium, against a running server with a database: a GM, two phones and the TV. It covers the opening Fear, duality rolls from the sheet until both Hope and Fear have come up (checked against the server's fold and on the TV), an Experience and advantage, damage dice, slots and the damage helper, the GM correcting a mark and spending Fear, adversary attacks behind the screen, and phase 6's toys at a Daggerheart table. It also checks the box's page count on Letter and A4, the tapestry and the chronicle, axe on the new screens, and over HTTP that players never see the adversaries, GM notes, letters, hidden rolls or browser ids. `SHOTS=dir` saves screenshots. |
 | `pnpm e2e:paranoia` | **Local only.** A Paranoia mission in headless Chromium against a running server with a database: a GM, two phones and the TV. It checks first that no player page, print view, cards or tents page carries a naughty side, and that the secrets API hands each phone only its own. Then it plays NODE dice from the sheet (checked against the sheet, wounds and Flags on the server), gear dice, wounds and Moxie on the phone, a clone's death and the next one decanted, a treason report the accused and the TV can't read, Flags and XP from the GM, Friend Computer on every screen, and phase 6's toys. It also checks the box (both sides) on Letter and A4, the tapestry and the chronicle, and runs axe. `SHOTS=dir` saves screenshots. |
+| `pnpm e2e:db` | **Local only.** The database store in headless Chromium, against a server started with `TEAROFF_STORE=db` after `pnpm db:import` (best a production one, `pnpm build && pnpm start -p 3004`, to prove no rebuild is needed): the imported one-shots on the board, a Ten Candles module published from the builder and on the board at once, a revision published and the first version restored from the history panel, unpublished (its pages 404) and deleted; a spell edited and seen on the cards; a survivor saved from the epilogue and seen on the home board; players kept out of the builder, its history and the shared world's API. It puts everything back. `pnpm e2e:builder` works against the same server too (it checks the database instead of the files). `SHOTS=dir` saves screenshots. |
 | `pnpm print-check [slug]` | **Local only.** Render every printable at every level, on Letter and A4, in each reading mode, count the PDF pages and look for card text that overflows. Exits 1 if anything doesn't fit. |
 
 ## Pages
@@ -142,7 +145,7 @@ A play aid for Mongoose's 2023 PARANOIA Core Book; you need the book. There's no
 - **Sealed letters.** One-shots declare `letters`, each addressed to one character and timed to an act. The GM delivers them from the GM page. They arrive on that player's sheet as a sealed envelope, and the player breaks the seal to read it. Story beats inherited from absent characters can be sent the same way. Text is resolved from content on the server and only ever sent to the holder of the recipient character (`/api/tables/<code>/letters`, `Delivery` in Prisma).
 - **Session zero.** Each character has a `flashback` question. After claiming, the player answers it on their sheet, and the GM page collects the answers as a "previously on…" recap (`/api/tables/<code>/flashbacks`, `Flashback` in Prisma).
 - **Woodcut portraits.** In Customize, upload any photo and it's turned into an ink-on-parchment engraving in the browser (`src/lib/woodcut.ts`). It's stored with the tweaks on that device and isn't included in share links.
-- **The shared world.** The epilogue page downloads survivor records. Put the file in `content/legacy/` and survivors appear on the home board and as "also seen in town" cameos on other one-shots (`src/lib/legacy.ts`).
+- **The shared world.** The epilogue page saves survivor records, and survivors appear on the home board and as "also seen in town" cameos on other one-shots (`src/lib/legacy.ts`). With the database store, "Save to the shared world" writes them straight to the database (GM only; `/api/admin/survivors`). With files, it downloads them: put the file in `content/legacy/`.
 
 ## Table toys (phase 6)
 
@@ -180,13 +183,13 @@ The GM opens a **table** on the GM page and gets a five-character code (no 0/O/1
 - Client: `useClaims` in `src/lib/storage.ts`. It polls when the browser has a table code for this one-shot. Without a code it uses localStorage only.
 - Tables are never deleted yet; they're tiny.
 
-`gmNotes` never reaches a player. Player pages are static and built from `toPublic()`, which strips it. The GM page uses `getServerSideProps`, which checks the role before reading content, so there's no static page or `_next/data` file for it. Because that page reads `content/` at request time, `next.config.mjs` adds the content to its file tracing (`outputFileTracingIncludes`).
+`gmNotes` never reaches a player. Player pages are static (with the database store, regenerated on demand: see [Content in the database](#content-in-the-database)) and built from `toPublic()`, which strips it. The GM page uses `getServerSideProps`, which checks the role before reading content, so there's no static page or `_next/data` file for it. Because that page reads `content/` at request time, `next.config.mjs` adds the content to its file tracing (`outputFileTracingIncludes`).
 
 Customizations are stored per browser (localStorage) and can be shared with a `#t=` link.
 
 ## The builder
 
-`/admin` (GM password) is where one-shots are written now; nobody needs to hand-write JSON. It runs on your own machine and writes the same files the build reads, which you then commit.
+`/admin` (GM password) is where one-shots are written now; nobody needs to hand-write JSON. With files (the default) it runs on your own machine and writes the same files the build reads, which you then commit. With `TEAROFF_STORE=db` it writes to the database, on the deployed site too, and publishing puts a one-shot on the board at once.
 
 - **The list.** Every one-shot with its system and whether it's on the board, a draft, or published with unpublished changes. **New one-shot** (pick the system, give a title), **Duplicate as template**, **Edit**, **Unpublish** (back to a draft), **Delete** (type the slug to confirm), **Import JSON** and **Export**.
 - **The editor.** The one-shot's sections and the cast on the left (reorder with the arrows, add by name), the form in the middle, problems and a live preview on the right.
@@ -196,15 +199,49 @@ Customizations are stored per browser (localStorage) and can be shared with a `#
 - **Checks as you type.** Every change runs the build's own checks (Zod plus `crossCheck`, the rules math, level variants and the spell book; `src/lib/oneShotCheck.ts`) and shows each problem on its field and in a list with jump links. Drafts may be invalid; **Publish** (the wax seal) needs zero problems, and the server checks again by loading the files exactly as `next build` does.
 - **Preview.** The real poster, yarn-board and sheet components, as you type. "Job page preview", "Full page" and "Print view" open the real pages from the saved draft.
 - **Autosave.** Drafts save a moment after you stop typing; leaving with unsaved changes asks first.
+- **History** (database store only). Every save, publish, unpublish and discarded draft, newest first (autosaves within a minute share an entry; the newest 50 are kept). **Restore** makes that version the draft again; publish it to put it back on the board.
 - **The spell book** (`/admin/spells`). Every entry in `content/rules/spells.json`: add, edit or delete one at a time, with the schema's checks as you type (a 20–300 character paraphrase, a counter on it) and an optional block for what differs under 2014 (or 2024), including "no upcasting". A spell the builder's picker doesn't know shows "Not in the spell book yet. Add it", which opens this page prefilled; reload the one-shot's page afterwards to pick it. A spell a one-shot still uses can't be deleted. The file is rewritten in name order with the builder's JSON layout.
 
-**Where it writes.** Drafts are `content/drafts/<slug>/draft.json` (the whole one-shot in one file). Publishing writes `content/oneshots/<slug>/…` and removes the draft; only files whose JSON changed are rewritten, so a git diff shows just your edits. Every write goes to a temp file and is renamed into place, and slugs and ids are checked before they touch a path. A note lists the files changed since you last committed: **commit them yourself**; the builder never runs git.
+**Where it writes (files).** Drafts are `content/drafts/<slug>/draft.json` (the whole one-shot in one file). Publishing writes `content/oneshots/<slug>/…` and removes the draft; only files whose JSON changed are rewritten, so a git diff shows just your edits. Every write goes to a temp file and is renamed into place, and slugs and ids are checked before they touch a path. A note lists the files changed since you last committed: **commit them yourself**; the builder never runs git.
 
-**When it can write.** Only when the app runs on your machine: `pnpm dev` (`NODE_ENV=development`), or `TEAROFF_CONTENT_WRITE=1` for a local production build (`TEAROFF_CONTENT_WRITE=0` turns it off). On Vercel, or any production build without the flag, the builder is read-only and says why; the API refuses writes the same way.
+**When it can write (files).** Only when the app runs on your machine: `pnpm dev` (`NODE_ENV=development`), or `TEAROFF_CONTENT_WRITE=1` for a local production build (`TEAROFF_CONTENT_WRITE=0` turns it off). On Vercel, or any production build without the flag, the builder is read-only and says why; the API refuses writes the same way.
 
 A dev server keeps each page's list of paths for a moment, so right after publishing the builder knocks on the new job page once before it says so; another page of a brand-new one-shot can still 404 on the very first visit (reload). A production build has the new one-shot only after you commit, push and deploy.
 
-The store behind it is an interface (`src/lib/store/`), so a database store can replace the files later without touching the builder.
+The store behind it is an interface (`src/lib/store/`): the FileStore, or the DbStore with `TEAROFF_STORE=db`. With the database the builder is writable anywhere it can reach the database; the GM password is the only gate. Nothing needs committing.
+
+## Content in the database
+
+`TEAROFF_STORE=db` moves everything the GM authors into Postgres (the `tearoff` schema, like the tables), so it can all be written and published from the deployed site with no redeploy and no files. Unset (the default), content stays as files in git, exactly as before.
+
+- **One-shots.** `OneShot` keeps one row per slug with the builder's whole document as JSON: `draft` (being edited, may be invalid) and `published` (what players see). `OneShotRevision` is the history. The DbStore (`src/lib/store/dbStore.ts`) implements the same `OneShotStore` as the FileStore, and publishing runs the same checks (Zod, `crossCheck`, the rules, level variants and the spell book, here the database's) and writes nothing unless they all pass. Documents are `json`, not `jsonb`, so key order survives and an export reads like the files.
+- **The spell book.** One `Spell` row per entry; `/admin/spells` edits it on the deployed site too (`DbSpellStore`). A spell a one-shot uses (published or draft) still can't be deleted.
+- **The shared world.** One `Survivor` row per record; the epilogue saves them directly, and `DELETE /api/admin/survivors { ids }` takes one out again.
+- **Player pages read the published rows** (`src/lib/source.ts`, through `checkDoc`, so a bad row is a 404, never a broken page). They're ISR: built from the published one-shots at build time, any other path renders on its first visit (`fallback: "blocking"`), and `revalidate: 60` is the safety net. A draft, an unpublished or a deleted one-shot is a 404.
+- **On-demand revalidation** (`src/lib/revalidate.ts`). Publishing, unpublishing and deleting rebuild `/` and every page the one-shot had before and has after (job page, sheets, print, cards, tents, flyer, TV, sounds, epilogue, tapestry, play) with `res.revalidate()`, so the board changes at once. A spell edit rebuilds the cards of every published one-shot that uses it, and saving survivors rebuilds the board and every job page. (`next dev` renders every request fresh, so it skips this.)
+- **GM pages and table APIs** (`/gm`, `/kit`, `/box`, the chronicle, `/api/tables/*`, Foundry) read the same published rows per request; the polled table APIs keep a parsed copy for ten seconds per server instance.
+- **git stays the seed and the backup.** `content/` keeps working as files, `pnpm validate` and the build still check it, and **Export** in the builder gives the same JSON as a file.
+
+### Try it locally
+
+```bash
+pnpm db:dev && pnpm db:deploy       # the local database, migrated
+pnpm db:import                      # copy content/ into it (safe to repeat)
+TEAROFF_STORE=db pnpm dev           # or: TEAROFF_STORE=db pnpm build && TEAROFF_STORE=db pnpm start -p 3004
+```
+
+Set `TEAROFF_STORE=db` in the shell rather than in `.env`, so switching back is just leaving it out. `pnpm build` with `TEAROFF_STORE=db` reads the database to prebuild the pages, so the database must be running (if it can't be reached, the pages are built on their first visit instead).
+
+### Switch the deployed site to the database
+
+Do it in this order, or the board is empty for a moment:
+
+1. **Deploy this code** (push to `main`). `vercel-build` runs `prisma migrate deploy`, which adds the `OneShot`, `OneShotRevision`, `Spell` and `Survivor` tables to Supabase. The site still reads files.
+2. **Import the content into Supabase** from your machine: `pnpm db:status:remote` to check the migration landed, then `pnpm db:import:remote`. It prints the host it's writing to; run it again any time, it skips what's there.
+3. **Set `TEAROFF_STORE=db`** in the Vercel project's environment variables (Production, and Preview if you want it there too).
+4. **Redeploy** (Deployments → Redeploy, or push again). From then on `/admin` and `/admin/spells` are writable on the site, publishing goes live at once, and the epilogue saves survivors to the shared world.
+
+To go back to files, remove `TEAROFF_STORE` and redeploy; whatever was written in the database since stays there (export anything you want to keep in git first).
 
 ## Writing a one-shot
 
@@ -278,7 +315,8 @@ GitHub → Vercel. Set these in the Vercel project:
 
 - `APP_PASSWORD`, `GM_PASSWORD` and `AUTH_SECRET`.
 - Optional: `FOUNDRY_TOKEN` (Foundry table sync).
-- Don't set `TEAROFF_CONTENT_WRITE` there: the deployed builder is read-only (Vercel's disk is too, and the store refuses to write whenever `VERCEL` is set).
+- Optional: `TEAROFF_STORE=db` keeps the content in the database, so the builder, the spell book and the shared world can be written on the site. See [Switch the deployed site to the database](#switch-the-deployed-site-to-the-database) for the order to do it in.
+- Don't set `TEAROFF_CONTENT_WRITE` there: with files, the deployed builder is read-only (Vercel's disk is too, and the FileStore refuses to write whenever `VERCEL` is set).
 - **Database:** connect Supabase from the Vercel project's Storage tab. Don't set `DATABASE_URL`/`DIRECT_URL` in Vercel: the app derives them from the integration's `POSTGRES_PRISMA_URL` (pooled, for the app) and `POSTGRES_URL_NON_POOLING` (direct, for migrations), adding `schema=tearoff` and serverless settings (`src/lib/dbUrl.ts`). Everything stays in the `tearoff` schema because Supabase exposes `public` through its REST API with the public anon key, and these tables have no row-level security.
 
 `vercel-build` runs `prisma migrate deploy` (through `scripts/db-env.mts`), then `prisma generate`, then validation, then `next build`.
