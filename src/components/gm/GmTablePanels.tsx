@@ -21,8 +21,8 @@ const small = { fontFamily: "var(--font-label)", fontSize: 13, color: "var(--ink
  * letters to hand out, and the session-zero answers to read before play.
  */
 export function GmTablePanels({ os, table, present }: { os: OneShotWithCast; table: string | null; present: string[] }) {
-  const { letters: sent, deliver, takeBack, error: letterError } = useLetters(table, null);
-  const { flashbacks } = useFlashbacks(table, null);
+  const { letters: sent, deliver, takeBack, error: letterError } = useLetters(table);
+  const { flashbacks } = useFlashbacks(table);
   const nameOf = (id: string) => os.cast.find((c) => c.id === id)?.name ?? id;
   const offer = availableLetters(os, present);
 
@@ -114,7 +114,7 @@ export function GmTablePanels({ os, table, present }: { os: OneShotWithCast; tab
         <Button component={Link} href={`/${os.slug}/tapestry`} variant="contained" startIcon={<ViewTimelineIcon />}>
           The night&apos;s tapestry
         </Button>
-        <Button component={Link} href={`/${os.slug}/box`} variant="contained" startIcon={<PrintIcon />}>
+        <Button component={Link} href={`/${os.slug}/box${table ? `?game=${table}` : ""}`} variant="contained" startIcon={<PrintIcon />}>
           Print the whole box
         </Button>
         <Button component={Link} href="/chronicle" variant="contained" startIcon={<AutoStoriesIcon />}>

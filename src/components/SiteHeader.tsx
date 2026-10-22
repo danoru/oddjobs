@@ -4,12 +4,14 @@ import { signOut } from "next-auth/react";
 import { Box, Button, Typography } from "@mui/material";
 import { ReadingMenu } from "@/components/reading/ReadingMenu";
 import { useWhoami } from "@/lib/useWhoami";
+import { fullLoad } from "@/lib/fullLoad";
 
 /** The hanging tavern sign. `reading` adds the reading-modes menu, on pages that show sheets. */
 export function SiteHeader({ back, reading = false }: { back?: { href: string; label: string }; reading?: boolean }) {
   const router = useRouter();
   const who = useWhoami(router.pathname);
   const user = who?.user;
+  const guest = who?.guest ?? null;
   return (
     <>
       {/* The skip link is the app's first element (src/pages/_app.tsx), ahead of the GM bar. */}
@@ -61,13 +63,38 @@ export function SiteHeader({ back, reading = false }: { back?: { href: string; l
             </Button>
           )}
           {user && (
+            <Button component={Link} href="/games" prefetch={false} size="small" sx={{ color: "text.secondary" }}>
+              Your games
+            </Button>
+          )}
+          {user && (
             <Button component={Link} href="/settings" prefetch={false} size="small" sx={{ color: "text.secondary" }} title="Your settings">
               {user.displayName}
             </Button>
           )}
-          <Button size="small" sx={{ color: "text.secondary" }} onClick={() => void signOut({ redirectTo: "/" })}>
-            Leave the tavern
-          </Button>
+          {user ? (
+            <Button size="small" sx={{ color: "text.secondary" }} onClick={() => void signOut({ redirectTo: "/" })}>
+              Leave the tavern
+            </Button>
+          ) : (
+            guest && (
+              <>
+                <Typography component="span" sx={{ color: "text.secondary", fontSize: 14 }}>
+                  {guest.name}, a guest at table {guest.code}
+                </Typography>
+                <Button component={Link} href={`/login?next=${encodeURIComponent(router.asPath)}`} size="small" sx={{ color: "text.secondary" }}>
+                  Sign in
+                </Button>
+                <Button
+                  size="small"
+                  sx={{ color: "text.secondary" }}
+                  onClick={() => void fetch("/api/guest", { method: "DELETE" }).finally(() => fullLoad("/"))}
+                >
+                  Stand up
+                </Button>
+              </>
+            )
+          )}
         </Box>
       </Box>
     </>

@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { checkFoundryToken, shapeFoundryTable } from "@/systems/dnd5e/foundry-sync";
-import { tableOneShot } from "@/lib/source";
+import { gameOneShot } from "@/lib/games.server";
+import { db } from "@/lib/prisma";
 import { normalizeCode } from "@/lib/tables";
-import { tableState } from "@/lib/tables.server";
+import { CLAIMS_IN_ORDER, stateOf } from "@/lib/tables.server";
 
 /**
  * GET /api/foundry/tables/<code> — read-only table board for the Foundry
@@ -33,11 +34,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (auth === "unauthorized") return res.status(401).json({ error: "Bad or missing bearer token" });
 
   const code = normalizeCode(req.query.code);
-  const state = code ? await tableState(code, null) : null;
-  if (!state) return res.status(404).json({ error: "No table with that code" });
+  const game = code ? await db().game.findUnique({ where: { code }, include: CLAIMS_IN_ORDER }) : null;
+  if (!game) return res.status(404).json({ error: "No table with that code" });
+  const state = stateOf(game, null);
 
   try {
-    const os = await tableOneShot(state.oneshot);
+    const os = await gameOneShot(game);
     if (os.system !== "dnd5e") return res.status(404).json({ error: "Foundry sync is for 5e one-shots" });
     return res.status(200).json(shapeFoundryTable(os, state));
   } catch (e) {

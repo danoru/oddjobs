@@ -3,9 +3,9 @@ import { decodeTweaks, emptyTweaks, tweaksSchema, type Tweaks } from "@/systems/
 import { parseReading, type Reading, type ReadingMode } from "./reading";
 import { levelsOf, pickLevel, withVariant, type HasLevels } from "@/systems/dnd5e/variants";
 import type { Character } from "@/systems/dnd5e/schema";
+import type { GameSummary, JobRecord } from "./games";
 import {
   normalizeCode,
-  PLAYER_HEADER,
   playerIdSchema,
   playerNameSchema,
   POLL_MS,
@@ -93,7 +93,11 @@ function useLocalClaims(slug: string) {
 
 type Player = { id: string; name: string };
 
-/** Who this browser is at the table: a made-up id plus the name they gave. */
+/**
+ * This browser has sat down at a table, under this name. The server knows
+ * who's asking from the session or the guest pass, never from this id; it
+ * only tells the pages that the browser has joined.
+ */
 export function usePlayer(): Player | null {
   const raw = useStored(PLAYER_KEY);
   return useMemo(() => {
@@ -118,14 +122,28 @@ export type ClaimInfo = { name: string | null; mine: boolean };
 
 type Reply = { ok: boolean; status: number; json: { error?: string; state?: TableState } & Partial<TableState> };
 
+/** Sit this browser down at a game under a name: the guest door, once the server has handed it a pass. */
+export function sitDown(slug: string, code: string, name: string) {
+  const known = playerIdSchema.safeParse((parseJson(readRaw(PLAYER_KEY)) as Partial<Player> | null)?.id);
+  write(PLAYER_KEY, { id: known.success ? known.data : newPlayerId(), name });
+  write(tableKey(slug), code);
+}
+
+/** Remember a game's code as this browser's table for its one-shot (the GM's own pages, the TV and the phone follow it). */
+export function rememberTable(slug: string, code: string) {
+  write(tableKey(slug), code);
+}
+
 /**
- * Who has torn which poster. With a table code this polls the table every few
+ * Who has torn which poster. With a table code this polls the game every few
  * seconds and tearing locks the poster for everyone there; without one it's
- * this browser's localStorage, as in v1.
+ * this browser's localStorage, as in v1. `fixed` is a game the page is for
+ * (the GM's view of one game), over whatever this browser joined last.
  */
-export function useClaims(slug: string) {
+export function useClaims(slug: string, fixed?: string | null) {
   const local = useLocalClaims(slug);
-  const code = useTableCode(slug);
+  const stored = useTableCode(slug);
+  const code = fixed ?? stored;
   const player = usePlayer();
   const playerId = player?.id ?? null;
   const [state, setState] = useState<TableState | null>(null);
@@ -133,6 +151,9 @@ export function useClaims(slug: string) {
   // Responses can land out of order; only the newest request may set state.
   const sent = useRef(0);
   const applied = useRef(0);
+  // The spoiler guard: whether the asker has run this one-shot (asked once, on the first tear), and has been told.
+  const knows = useRef<boolean | null>(null);
+  const warned = useRef(false);
 
   const request = useCallback(
     async (method: string, path: string, body?: unknown): Promise<Reply & { seq: number }> => {
@@ -140,15 +161,14 @@ export function useClaims(slug: string) {
       const res = await fetch(path, {
         method,
         cache: "no-store",
-        headers: {
-          ...(playerId ? { [PLAYER_HEADER]: playerId } : {}),
-          ...(body ? { "Content-Type": "application/json" } : {}),
-        },
+        headers: body ? { "Content-Type": "application/json" } : undefined,
         body: body ? JSON.stringify(body) : undefined,
       });
       const json = await res.json().catch(() => ({}));
       return { ok: res.ok, status: res.status, json, seq };
     },
+    // Sitting down (a new player) changes who's asking.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [playerId],
   );
 
@@ -204,13 +224,13 @@ export function useClaims(slug: string) {
       setError(null);
       if (live) {
         const others = live.claims.filter((c) => c.characterId !== id);
-        const optimistic: TableClaim = { characterId: id, name: player?.name ?? "you", mine: true, claimedAt: "" };
+        const optimistic: TableClaim = { characterId: id, name: player?.name ?? "you", mine: true, guest: false, claimedAt: "" };
         setState({ ...live, claims: tear ? [...others, optimistic] : others });
         applied.current = sent.current; // polls already in flight are older than this
       }
       try {
         const r = tear
-          ? await request("POST", `/api/tables/${code}/claims`, { characterId: id, name: player?.name ?? "" })
+          ? await request("POST", `/api/tables/${code}/claims`, { characterId: id })
           : await request("DELETE", `/api/tables/${code}/claims?characterId=${encodeURIComponent(id)}`);
         apply(r.seq, r.ok ? (r.json as TableState) : r.json.state);
         if (!r.ok) setError(r.json.error ?? "That didn't work — try again.");
@@ -221,15 +241,29 @@ export function useClaims(slug: string) {
     [code, live, player, request, apply],
   );
 
-  /** Tear an open poster, or pin your own back up. Someone else's stays put. */
+  /**
+   * Tear an open poster, or pin your own back up. Someone else's stays put.
+   * Someone who has run this one-shot is told so, gently, before their first
+   * tear: they know its secrets. Tearing again goes ahead.
+   */
   const toggle = useCallback(
-    (id: string) => {
+    async (id: string) => {
       if (!code) return local.toggle(id);
       const held = claimedBy[id];
       if (held && !held.mine) return setError(`${held.name ?? "Someone"} already tore that one down.`);
+      if (!held && !warned.current) {
+        if (knows.current === null) {
+          const r = await fetch(`/api/games?oneshot=${encodeURIComponent(slug)}`, { cache: "no-store" }).catch(() => null);
+          knows.current = r?.ok ? ((await r.json()) as JobRecord).youKnow : false;
+        }
+        if (knows.current) {
+          warned.current = true;
+          return setError("You've run this job, so you know its secrets. Tear it again to take the part anyway, and keep them to yourself.");
+        }
+      }
       void change(id, !held);
     },
-    [code, local, claimedBy, change],
+    [code, slug, local, claimedBy, change],
   );
 
   /** Pin any poster back up — the server only allows this for its tearer or the GM. */
@@ -242,9 +276,21 @@ export function useClaims(slug: string) {
       if (!c) return { error: "Table codes are five letters and numbers." };
       const name = playerNameSchema.safeParse(rawName);
       if (!name.success) return { error: "Tell the table your name (up to 40 letters)." };
-      const res = await fetch(`/api/tables/${c}`, { cache: "no-store" }).catch(() => null);
+      let res = await fetch(`/api/tables/${c}`, { cache: "no-store" }).catch(() => null);
+      if (res?.status === 401) {
+        // No account here: sit down as a guest at that game.
+        const sat = await fetch("/api/guest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: c, name: name.data }),
+        }).catch(() => null);
+        if (sat?.status === 404) return { error: `There's no table ${c}.` };
+        if (!sat?.ok) return { error: (await sat?.json().catch(() => null))?.error ?? "Couldn't reach the tavern — try again." };
+        res = await fetch(`/api/tables/${c}`, { cache: "no-store" }).catch(() => null);
+      }
       if (!res) return { error: "Couldn't reach the tavern — try again." };
       if (res.status === 404) return { error: `There's no table ${c}.` };
+      if (!res.ok) return { error: "Couldn't reach the tavern — try again." };
       const table = (await res.json()) as TableState;
       if (table.oneshot !== slug) return { error: `Table ${c} is playing a different one-shot.`, oneshot: table.oneshot };
       write(PLAYER_KEY, { id: playerId ?? newPlayerId(), name: name.data });
@@ -254,16 +300,17 @@ export function useClaims(slug: string) {
     [slug, playerId],
   );
 
-  /** GM: open a fresh table for this one-shot and switch to it. */
-  const openTable = useCallback(async (): Promise<string | null> => {
-    const res = await fetch("/api/tables", {
+  /** Run this job: a new game of this one-shot with you as its GM. The new game's code, or an error. */
+  const runJob = useCallback(async (): Promise<{ code: string } | { error: string }> => {
+    const res = await fetch("/api/games", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ oneshot: slug }),
     }).catch(() => null);
-    if (!res?.ok) return (await res?.json().catch(() => null))?.error ?? "Couldn't open a table — try again.";
-    write(tableKey(slug), ((await res.json()) as TableState).code);
-    return null;
+    if (!res?.ok) return { error: (await res?.json().catch(() => null))?.error ?? "Couldn't start a game — try again." };
+    const game = (await res.json()) as GameSummary;
+    write(tableKey(slug), game.code);
+    return { code: game.code };
   }, [slug]);
 
   /** Back to claims on this device only. */
@@ -272,6 +319,8 @@ export function useClaims(slug: string) {
   return {
     /** The table code, or null for this-device-only claims. */
     table: code,
+    /** The game's status, once the table has answered. */
+    status: live?.status ?? null,
     /** True until the first answer from the table arrives. */
     loading: Boolean(code && !live),
     claims: Object.keys(claimedBy),
@@ -283,7 +332,7 @@ export function useClaims(slug: string) {
     release,
     join,
     leave,
-    openTable,
+    runJob,
   };
 }
 

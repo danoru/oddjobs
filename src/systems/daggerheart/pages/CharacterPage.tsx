@@ -39,7 +39,7 @@ export function CharacterPage({ os, id }: { os: PublicDhOneShot; id: string }) {
   const needsName = Boolean(table && !player);
   const names = Object.fromEntries(os.cast.map((x) => [x.id, x.name]));
   const seated = Boolean(table && player && claim?.mine);
-  const live = useLive(seated ? table : null, "player", player?.id ?? null);
+  const live = useLive(seated ? table : null, "player");
   const tallies = useTallies(live.events, os.cast as Character[]);
   const marks = tallies.marks[id] ?? noMarks;
   const [armed, setArmed] = useState<DhRoll | null>(null);
@@ -116,7 +116,7 @@ export function CharacterPage({ os, id }: { os: PublicDhOneShot; id: string }) {
           <main id="main" tabIndex={-1} className={sheet.sheet} {...readingAttrs(reading)}>
             {seated && table && player && (
               <div style={{ marginBottom: 24 }}>
-                <PlayerExtras code={table} playerId={player.id} characterId={id} flashback={c.flashback} />
+                <PlayerExtras code={table} characterId={id} flashback={c.flashback} />
                 {live.you && <DamageCard live={live} c={c} marks={marks} fear={tallies.fear} />}
                 <TableToys live={live} coin={null} rumors={os.hasRumors} />
               </div>

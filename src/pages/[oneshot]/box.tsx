@@ -3,8 +3,8 @@ import { Fragment } from "react";
 import type { GetServerSideProps } from "next";
 import { Button, Container } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
-import { pageViewer } from "@/lib/auth";
-import { requireOneShot, spellBookFor } from "@/lib/source";
+import { gmPage } from "@/lib/games.server";
+import { spellBookFor } from "@/lib/source";
 import type { OneShotWithCast } from "@/lib/schema";
 import { toPublic, type PublicAnyOneShot } from "@/lib/public";
 import type { SpellInfo } from "@/systems/dnd5e/schema";
@@ -35,21 +35,16 @@ type Props = { os: OneShotWithCast; pub: PublicAnyOneShot; book: Record<string, 
 
 /**
  * Print the whole box: every printable for a table without phones, in the
- * order the night uses them. GM only, because the sealed letters are printed
- * with their text: rendered per request after the role check, like the GM page.
+ * order the night uses them, for one game (`?game=<code>`). Its GM's only,
+ * because the sealed letters are printed with their text: rendered per
+ * request after the same check as the GM page.
  */
-export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, params, resolvedUrl }) => {
-  // The GM pages are the admins' until games arrive (phase 11).
-  const gate = await pageViewer({ req, resolvedUrl }, "admin");
-  if (gate.redirect) return { redirect: gate.redirect };
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, params, resolvedUrl, query }) => {
   const slug = String(params?.oneshot ?? "");
   if (!/^[a-z0-9-]+$/.test(slug)) return { notFound: true };
-  let os: OneShotWithCast;
-  try {
-    os = await requireOneShot(slug);
-  } catch {
-    return { notFound: true };
-  }
+  const page = await gmPage({ req, resolvedUrl, query }, slug);
+  if (!("game" in page)) return page;
+  const os: OneShotWithCast = page.os;
   res.setHeader("Cache-Control", "private, no-store");
   const book = os.system === "dnd5e" ? await spellBookFor(os) : {};
   return { props: JSON.parse(JSON.stringify({ os, pub: toPublic(os), book })) as Props };

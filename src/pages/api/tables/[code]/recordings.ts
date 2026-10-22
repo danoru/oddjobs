@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { requestRole } from "@/lib/auth";
-import { seatOf, type Viewer } from "@/lib/game";
+import { seatOf } from "@/lib/game";
+import { asStatus, isOver } from "@/lib/games";
+import { findGame, gameAccess, viewerOf } from "@/lib/games.server";
 import { db } from "@/lib/prisma";
 import { normalizeCode } from "@/lib/tables";
-import { playerIdOf } from "@/lib/tables.server";
 import { audible, initialState, type TcState } from "@/systems/tencandles/game";
 import { MAX_AUDIO_BYTES, uploadBody, type RecordingInfo } from "@/systems/tencandles/recording";
 
@@ -25,21 +25,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   res.setHeader("Cache-Control", "private, no-store");
   const code = normalizeCode(req.query.code);
-  const table = code ? await db().table.findUnique({ where: { code }, include: { game: true } }) : null;
+  const table = code ? await findGame(code, { state: true }) : null;
   if (!table) return res.status(404).json({ error: "No table with that code" });
-  const state = (table.game?.system === "tencandles" ? table.game.state : initialState()) as unknown as TcState;
+  const state = (table.state?.system === "tencandles" ? table.state.state : initialState()) as unknown as TcState;
 
-  const isGm = (await requestRole(req)) === "gm";
-  const playerId = playerIdOf(req);
+  const access = await gameAccess(req, table);
   const as = req.query.as;
-  const viewer: Viewer =
-    as === "table" ? { role: "table" } : isGm && as !== "player" ? { role: "gm" } : playerId ? { role: "player", playerId } : { role: "table" };
+  const viewer = viewerOf(access, as);
   const you = viewer.role === "player" ? seatOf(state.players, viewer.playerId) : -1;
   const hear = new Set(audible(state, viewer, you >= 0 ? you : null));
   const seatFor = (pid: string) => seatOf(state.players, pid);
 
   if (req.method === "GET") {
-    const rows = await db().recording.findMany({ where: { tableId: table.id } });
+    const rows = await db().recording.findMany({ where: { gameId: table.id } });
     const wanted = typeof req.query.seat === "string" ? Number(req.query.seat) : null;
     if (wanted !== null) {
       const row = rows.find((r) => seatFor(r.playerId) === wanted);
@@ -57,17 +55,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === "DELETE") {
-    const seat = isGm && as !== "player" && typeof req.query.seat === "string" ? Number(req.query.seat) : you;
+    const seat = access.act && as !== "player" && typeof req.query.seat === "string" ? Number(req.query.seat) : you;
     const pid = state.players[seat]?.playerId;
     if (!pid) return res.status(400).json({ error: "Whose recording?" });
-    await db().recording.deleteMany({ where: { tableId: table.id, playerId: pid } });
+    await db().recording.deleteMany({ where: { gameId: table.id, playerId: pid } });
     return res.status(200).json({ ok: true });
   }
 
   // POST: keep your own final words.
   if (viewer.role !== "player" || you < 0) return res.status(403).json({ error: "Take a seat first" });
   if (!state.settings.keepRecordings) return res.status(403).json({ error: "This table keeps recordings on each phone only" });
-  if (state.phase === "ended") return res.status(409).json({ error: "It's over" });
+  if (state.phase === "ended" || isOver(asStatus(table.status))) return res.status(409).json({ error: "It's over" });
   const body = uploadBody.safeParse(req.body);
   if (!body.success) return res.status(400).json({ error: "That recording is too long or in a format we can't keep" });
   const audio = body.data.kind === "audio" ? Buffer.from(body.data.data, "base64") : null;
@@ -80,8 +78,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     size: audio ? audio.length : body.data.kind === "text" ? body.data.text.length : 0,
   };
   await db().recording.upsert({
-    where: { tableId_playerId: { tableId: table.id, playerId: viewer.playerId } },
-    create: { tableId: table.id, playerId: viewer.playerId, ...data },
+    where: { gameId_playerId: { gameId: table.id, playerId: viewer.playerId } },
+    create: { gameId: table.id, playerId: viewer.playerId, ...data },
     update: data,
   });
   return res.status(201).json({ ok: true });

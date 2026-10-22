@@ -9,20 +9,18 @@ import s from "./Table.module.css";
  */
 export function PlayerExtras({
   code,
-  playerId,
   characterId,
   flashback,
 }: {
   code: string;
-  playerId: string;
   characterId: string;
   flashback?: string;
 }) {
-  const { letters, open } = useLetters(code, playerId);
+  const { letters, open } = useLetters(code);
   const mine = letters.filter((l) => l.to === characterId);
   return (
     <div className="no-print">
-      {flashback && <FlashbackCard code={code} playerId={playerId} characterId={characterId} prompt={flashback} />}
+      {flashback && <FlashbackCard code={code} characterId={characterId} prompt={flashback} />}
       {mine.map((l) => (
         <div key={l.id} className={s.card}>
           <p className={s.title}>{l.openedAt ? "A LETTER, OPENED" : "A SEALED LETTER FOR YOU"}</p>
@@ -49,16 +47,14 @@ export function PlayerExtras({
 
 function FlashbackCard({
   code,
-  playerId,
   characterId,
   prompt,
 }: {
   code: string;
-  playerId: string;
   characterId: string;
   prompt: string;
 }) {
-  const { flashbacks, answer, error } = useFlashbacks(code, playerId);
+  const { flashbacks, answer, error } = useFlashbacks(code);
   const saved = flashbacks.find((f) => f.characterId === characterId && f.mine)?.answer;
   const [draft, setDraft] = useState("");
   const [editing, setEditing] = useState(false);

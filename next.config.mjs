@@ -29,6 +29,11 @@ const nextConfig = {
     "/api/tables/*/tapestry": ["./content/**/*.json"],
     "/*/box": ["./content/**/*.json"],
     "/chronicle": ["./content/**/*.json"],
+    // Running a job checks it's published; game lists show one-shot titles.
+    "/api/games": ["./content/**/*.json"],
+    "/api/games/*": ["./content/**/*.json"],
+    "/games": ["./content/**/*.json"],
+    "/t/*": ["./content/**/*.json"],
     // The builder reads (and, locally, writes) content per request; deployed it's read-only.
     "/admin": ["./content/**/*.json"],
     "/admin/**/*": ["./content/**/*.json"],

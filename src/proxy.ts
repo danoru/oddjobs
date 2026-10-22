@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+import { guestMayVisit, readGuestPass } from "@/lib/guestPass";
 import { readClaims } from "@/lib/session";
 
 /**
  * The front door. Everything needs a signed-in account except the public
  * pages: the landing page (`/`), the door itself (`/login`, `/join/<code>`,
- * `/reset/<token>`), their APIs, Auth.js's own routes and the link-preview
- * images. Static assets skip the proxy entirely (see the matcher), and so
+ * `/reset/<token>`, and `/t/<code>` to sit down at a game as a guest), their
+ * APIs, Auth.js's own routes and the link-preview images. A guest pass
+ * (src/lib/guestPass.ts) also opens its one game: that one-shot's player
+ * pages and that game's table APIs. Static assets skip the proxy entirely (see the matcher), and so
  * does `/api/foundry/`: Foundry calls it cross-origin with a bearer token (no
  * cookie), and the route checks the token itself.
  *
@@ -16,7 +19,7 @@ import { readClaims } from "@/lib/session";
  * the same rule as the page.
  */
 
-const PUBLIC = /^\/(?:login|join\/[^/]+|reset\/[^/]+|api\/(?:auth\/.*|og(?:\/.*)?|join|reset|whoami))\/?$/;
+const PUBLIC = /^\/(?:login|join\/[^/]+|reset\/[^/]+|t\/[^/]+|api\/(?:auth\/.*|og(?:\/.*)?|join|reset|whoami|guest))\/?$/;
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -30,6 +33,8 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(board);
   }
   if (claims || PUBLIC.test(pathname)) return NextResponse.next();
+  const pass = await readGuestPass(req.headers.get("cookie"));
+  if (pass && guestMayVisit(pass, pathname)) return NextResponse.next();
 
   if (pathname.startsWith("/api/")) {
     return NextResponse.json({ error: "Sign in first" }, { status: 401, headers: { "Cache-Control": "private, no-store" } });

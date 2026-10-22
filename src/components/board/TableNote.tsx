@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Alert, Box, Button, TextField, Typography } from "@mui/material";
 import type { useClaims } from "@/lib/storage";
+import { useWhoami } from "@/lib/useWhoami";
 import s from "./Board.module.css";
 
 const field = {
@@ -14,7 +15,8 @@ const field = {
 
 /**
  * Join the GM's table so everyone sees who tore what, or show which table
- * you're at. `initialCode` comes from a `?table=` link.
+ * you're at. `initialCode` comes from a `?table=` link. An account sits
+ * down as itself; someone without one sits down as a guest, under a name.
  */
 export function TableNote({
   claims,
@@ -24,12 +26,13 @@ export function TableNote({
   initialCode?: string;
 }) {
   const { table, player, error, join, leave } = claims;
+  const account = useWhoami()?.user ?? null;
   // null until typed in, so a link's code and a remembered name show up once
   // the router and storage are read, without wiping what's been typed.
   const [typedCode, setCode] = useState<string | null>(null);
   const [typedName, setName] = useState<string | null>(null);
   const code = typedCode ?? initialCode?.toUpperCase() ?? "";
-  const name = typedName ?? player?.name ?? "";
+  const name = account?.displayName ?? typedName ?? player?.name ?? "";
   const [problem, setProblem] = useState<{ error: string; oneshot?: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -51,7 +54,7 @@ export function TableNote({
             Table {table}
           </p>
           <Typography sx={{ fontFamily: "var(--font-print)", fontSize: 17 }}>
-            You&apos;re {player.name}. Tear a poster and it&apos;s gone for everyone at this table.
+            You&apos;re {account?.displayName ?? player.name}. Tear a poster and it&apos;s gone for everyone at this table.
           </Typography>
           <Button size="small" onClick={leave} sx={{ color: "var(--ink-soft)", ml: "auto" }}>
             Leave table
@@ -62,7 +65,9 @@ export function TableNote({
           <p className={s.noteTitle} data-part="noteTitle">{table ? `Table ${table}` : "Playing at a table?"}</p>
           <Typography sx={{ fontFamily: "var(--font-print)", fontSize: 16, mb: 1.5 }}>
             {table
-              ? "Give the table your name before you tear a poster."
+              ? account
+                ? "Sit down at this table before you tear a poster."
+                : "Give the table your name before you tear a poster."
               : "Join with the GM's table code and everyone sees who's torn what. Without one, claims stay on this device."}
           </Typography>
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
@@ -76,14 +81,14 @@ export function TableNote({
                 sx={{ ...field, width: 130 }}
               />
             )}
-            <TextField
+            {!account && <TextField
               size="small"
               label="Your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               slotProps={{ htmlInput: { maxLength: 40 } }}
               sx={{ ...field, width: 200 }}
-            />
+            />}
             <Button type="submit" variant="contained" color="secondary" disabled={busy}>
               {table ? "Sit down" : "Join table"}
             </Button>

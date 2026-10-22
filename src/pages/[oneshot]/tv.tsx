@@ -45,7 +45,7 @@ function PosterTv({ os }: { os: PublicOneShot | PublicDhOneShot | PublicPaOneSho
   // Friend Computer. Both from the same poll as the dice.
   const dh = os.system === "daggerheart";
   const pa = os.system === "paranoia";
-  const live = useLive(dh || pa ? table : null, "table", null);
+  const live = useLive(dh || pa ? table : null, "table");
   const tallies = useTallies(live.events, dh ? (os.cast as DhCharacter[]) : NO_CAST);
   const records = useRecords(live.events, pa ? (os.cast as unknown as PaCharacter[]) : NO_PA, pa ? os.houseRules : NO_RULES);
   const { level } = useLevel(os);

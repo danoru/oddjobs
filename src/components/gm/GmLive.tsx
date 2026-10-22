@@ -33,7 +33,7 @@ export function GmLive({
   letters: LetterView[];
   deliver: (id: string) => Promise<boolean>;
 }) {
-  const live = useLive(table, "gm", null);
+  const live = useLive(table, "gm");
   const { fold, people, act, error } = live;
   const coin = coinFor(os);
   const meta = SYSTEMS[os.system];

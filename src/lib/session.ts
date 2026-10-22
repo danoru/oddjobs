@@ -22,6 +22,8 @@ export interface Claims {
   /** The user's id. */
   sub: string;
   username: string;
+  /** The display name, as of the last check. */
+  name?: string;
   role: SiteRole;
   author: boolean;
   /** The user's tokenVersion when the session started; a bump ends it. */

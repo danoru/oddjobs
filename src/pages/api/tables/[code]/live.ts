@@ -1,17 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { requestRole } from "@/lib/auth";
-import { tableOneShot } from "@/lib/source";
-import { cryptoRng, type Viewer } from "@/lib/game";
-import { applyLive, liveAction, redactedFor, toPublicPerson, viewEvents, type LiveActor, type LiveRow } from "@/lib/live";
+import { cryptoRng } from "@/lib/game";
+import { asStatus, userKey } from "@/lib/games";
+import { actorOf, CO_GMS, gameAccess, gameOneShot, viewerOf } from "@/lib/games.server";
+import { applyLive, liveAction, redactedFor, toPublicPerson, viewEvents, type LiveRow } from "@/lib/live";
 import { db } from "@/lib/prisma";
 import { normalizeCode } from "@/lib/tables";
-import { appendEvents, peopleAt, playerIdOf, toLiveRow } from "@/lib/tables.server";
+import { appendEvents, peopleAt, toLiveRow } from "@/lib/tables.server";
+import { readGuestPass } from "@/lib/guestPass";
+import { cookieHeaderOf, readClaims } from "@/lib/session";
 import { coinFor, SYSTEMS } from "@/systems/registry";
 import { sheetLimits } from "@/systems/daggerheart/derive";
 import { sheetLimits as paranoiaSheets } from "@/systems/paranoia/derive";
 
 /**
- * The table's event log (src/lib/live.ts): dice, notes, the bell, act cards,
+ * The game's event log (src/lib/live.ts): dice, notes, the bell, act cards,
  * the spotlight, rumors, the town board and coins (and Daggerheart's duality
  * dice, Hope, Fear and slots; Paranoia's NODE dice, records, treason reports
  * and Friend Computer).
@@ -29,6 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   res.setHeader("Cache-Control", "no-store");
   const code = normalizeCode(req.query.code);
   const after = Math.max(0, Number(req.query.after) || 0);
+  // Who's asking decides which of their own rows the poll needs; who they are at this game is checked below.
+  const asker = await askerKey(req);
   // A poll only needs the rows after its cursor, plus whatever decides which rolls are hidden; acting needs the whole log.
   const events =
     req.method === "GET" && after > 0
@@ -39,26 +43,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               { kind: "hide" },
               { hidden: true },
               // The asker's own rolls, so a roll the GM hid stays visible to whoever made it.
-              ...(playerIdOf(req) ? [{ kind: "roll", byPlayer: playerIdOf(req) }] : []),
+              ...(asker ? [{ kind: "roll", byPlayer: asker }] : []),
             ],
           },
           orderBy: { id: "asc" as const },
         }
       : { orderBy: { id: "asc" as const } };
-  const table = code ? await db().table.findUnique({ where: { code }, include: { claims: true, game: true, events } }) : null;
+  const table = code ? await db().game.findUnique({ where: { code }, omit: { content: true }, include: { ...CO_GMS, claims: true, state: true, events } }) : null;
   if (!table) return res.status(404).json({ error: "No table with that code" });
   let os;
   try {
-    os = await tableOneShot(table.oneshot);
+    os = await gameOneShot(table);
   } catch {
     return res.status(404).json({ error: "That one-shot is gone" });
   }
 
-  const isGm = (await requestRole(req)) === "gm";
-  const playerId = playerIdOf(req);
+  const access = await gameAccess(req, table);
   const as = req.query.as;
-  const viewer: Viewer =
-    as === "table" ? { role: "table" } : isGm && as !== "player" ? { role: "gm" } : playerId ? { role: "player", playerId } : { role: "table" };
+  const viewer = viewerOf(access, as);
   const people = peopleAt(table, os);
 
   const reply = (rows: LiveRow[], status = 200, error?: string) => {
@@ -76,13 +78,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const rows = table.events.map(toLiveRow);
   if (req.method === "GET") return reply(rows);
 
-  if (as === "table") return res.status(403).json({ error: "The TV only watches" });
+  const who = actorOf(access, as, asStatus(table.status));
+  if ("error" in who) return res.status(who.status).json({ error: who.error });
   const parsed = liveAction.safeParse(req.body?.action);
   if (!parsed.success) return res.status(400).json({ error: "That's not something you can do here" });
-  const actor: LiveActor | null = isGm && as !== "player" ? { role: "gm" } : playerId ? { role: "player", playerId } : null;
-  if (!actor) return res.status(400).json({ error: "Join the table with your name first" });
 
-  const result = applyLive(parsed.data, actor, {
+  const result = applyLive(parsed.data, who.actor, {
     people,
     rows,
     acts: os.acts,
@@ -97,4 +98,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!result.ok) return reply(rows, 409, result.error);
   const added = await appendEvents(table.id, result.rows);
   return reply([...rows, ...added], 201);
+}
+
+/** The asker's key, as their session or guest pass says, before the game is known (only to narrow the poll). */
+async function askerKey(req: NextApiRequest): Promise<string | null> {
+  const cookie = cookieHeaderOf(req);
+  const claims = await readClaims(cookie);
+  if (claims) return userKey(claims.sub);
+  return (await readGuestPass(cookie))?.key ?? null;
 }

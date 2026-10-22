@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { deleteBlob, getBlob, putBlob } from "@/lib/localBlobs";
-import { PLAYER_HEADER } from "@/lib/tables";
 import { MAX_AUDIO_BYTES, MAX_SECONDS, MAX_TEXT, type RecordingInfo } from "../recording";
 import { RuleMark, seatName } from "./Bits";
 import type { SeatView } from "../game";
@@ -60,13 +59,11 @@ const extFor = (mime: string) => (mime.includes("mp4") ? "m4a" : mime.includes("
  */
 export function Recorder({
   code,
-  playerId,
   kept,
   recorded,
   onRecorded,
 }: {
   code: string;
-  playerId: string;
   /** The GM keeps recordings on the server at this table. */
   kept: boolean;
   /** What the table has been told we left. */
@@ -150,7 +147,7 @@ export function Recorder({
       if (clip.blob.size > MAX_AUDIO_BYTES) return setProblem("That's too long to keep at the table. Record something shorter.");
       const res = await fetch(`/api/tables/${code}/recordings?as=player`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", [PLAYER_HEADER]: playerId },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ kind: "audio", mime: clip.mime, data: await toBase64(clip.blob) }),
       }).catch(() => null);
       if (!res?.ok) return setProblem((await res?.json().catch(() => null))?.error ?? "Couldn't reach the table — it's still on your phone.");
@@ -167,7 +164,7 @@ export function Recorder({
     if (kept) {
       const res = await fetch(`/api/tables/${code}/recordings?as=player`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", [PLAYER_HEADER]: playerId },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ kind: "text", text: t }),
       }).catch(() => null);
       if (!res?.ok) return setProblem((await res?.json().catch(() => null))?.error ?? "Couldn't reach the table — it's still on your phone.");
@@ -186,7 +183,7 @@ export function Recorder({
     setText("");
     setSaved(null);
     if (kept)
-      await fetch(`/api/tables/${code}/recordings?as=player`, { method: "DELETE", headers: { [PLAYER_HEADER]: playerId } }).catch(
+      await fetch(`/api/tables/${code}/recordings?as=player`, { method: "DELETE" }).catch(
         () => null,
       );
     await onRecorded(null);
@@ -293,13 +290,11 @@ export function Recorder({
  */
 export function FinalWords({
   code,
-  playerId,
   as,
   seats,
   you,
 }: {
   code: string;
-  playerId: string | null;
   as: "player" | "table" | "gm";
   seats: SeatView[];
   you: number | null;
@@ -308,12 +303,11 @@ export function FinalWords({
   const [urls, setUrls] = useState<Record<number, string>>({});
   const [own, setOwn] = useState<{ url: string; mime: string } | null>(null);
   const [ownText] = useState(() => (as === "player" ? readText(code) : ""));
-  const headers = playerId ? { [PLAYER_HEADER]: playerId } : undefined;
   const q = as === "gm" ? "" : `as=${as}`;
 
   useEffect(() => {
     let alive = true;
-    void fetch(`/api/tables/${code}/recordings${q ? `?${q}` : ""}`, { headers, cache: "no-store" })
+    void fetch(`/api/tables/${code}/recordings${q ? `?${q}` : ""}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((j: { recordings?: RecordingInfo[] }) => alive && setList(j.recordings ?? []))
       .catch(() => undefined);
@@ -328,11 +322,10 @@ export function FinalWords({
       alive = false;
       if (url) URL.revokeObjectURL(url);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code, q, as]);
 
   async function load(seat: number) {
-    const res = await fetch(`/api/tables/${code}/recordings?seat=${seat}${q ? `&${q}` : ""}`, { headers }).catch(() => null);
+    const res = await fetch(`/api/tables/${code}/recordings?seat=${seat}${q ? `&${q}` : ""}`).catch(() => null);
     if (!res?.ok) return;
     const url = URL.createObjectURL(await res.blob());
     setUrls((u) => ({ ...u, [seat]: url }));

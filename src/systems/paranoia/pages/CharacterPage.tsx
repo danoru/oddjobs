@@ -37,7 +37,7 @@ export function CharacterPage({ os, id }: { os: PublicPaOneShot; id: string }) {
   const claim = claimedBy[id];
   const needsName = Boolean(table && !player);
   const seated = Boolean(table && player && claim?.mine);
-  const live = useLive(seated ? table : null, "player", player?.id ?? null);
+  const live = useLive(seated ? table : null, "player");
   const records = useRecords(live.events, os.cast, os.houseRules);
   const marks = marksFor(records, c);
   const { secret, error: secretError } = useSecret(table, player?.id ?? null, id, seated);
@@ -108,7 +108,7 @@ export function CharacterPage({ os, id }: { os: PublicPaOneShot; id: string }) {
             {seated && table && player && (
               <div style={{ marginBottom: 24 }} className="no-print">
                 <ComputerFeed events={live.events} />
-                <PlayerExtras code={table} playerId={player.id} characterId={id} flashback={c.flashback} />
+                <PlayerExtras code={table} characterId={id} flashback={c.flashback} />
                 {live.you && <RecordCard live={live} c={c} marks={marks} h={os.houseRules} />}
                 <TableToys live={live} coin={null} rumors={os.hasRumors} />
               </div>

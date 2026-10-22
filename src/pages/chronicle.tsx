@@ -3,7 +3,8 @@ import type { GetServerSideProps } from "next";
 import { Alert, Button, Container } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import { pageViewer } from "@/lib/auth";
-import { requireOneShot, survivors } from "@/lib/source";
+import { survivors } from "@/lib/source";
+import { gameOneShot } from "@/lib/games.server";
 import { db } from "@/lib/prisma";
 import { toPublic, type PublicAnyOneShot } from "@/lib/public";
 import { hasContent } from "@/lib/epilogueSchema";
@@ -24,7 +25,7 @@ type Props = { nights: Night[]; error: string | null };
  * into one printable book. A title page, then a chapter per night in date
  * order: its broadsheet, its tapestry and who survived (the shared world's
  * records in content/legacy, or the night's own fates). Read per request from
- * the tables' saved epilogues.
+ * the games' saved epilogues.
  */
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, resolvedUrl }) => {
   const gate = await pageViewer({ req, resolvedUrl }, "member");
@@ -32,7 +33,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
   res.setHeader("Cache-Control", "private, no-store");
   let tables;
   try {
-    tables = await db().table.findMany({ where: { epilogue: { isNot: null } }, include: NIGHT_INCLUDE });
+    tables = await db().game.findMany({ where: { epilogue: { isNot: null } }, include: NIGHT_INCLUDE });
   } catch {
     return { props: { nights: [], error: "The chronicle needs the table database, and it can't be reached." } };
   }
@@ -41,7 +42,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, 
   for (const t of tables) {
     let os;
     try {
-      os = await requireOneShot(t.oneshot);
+      os = await gameOneShot(t);
     } catch {
       continue;
     }

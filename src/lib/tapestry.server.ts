@@ -1,4 +1,4 @@
-import type { Claim, Delivery, Epilogue as EpilogueRow, Table, TableEvent } from "@prisma/client";
+import type { Claim, Delivery, Epilogue as EpilogueRow, Game, TableEvent } from "@prisma/client";
 import type { OneShotWithCast } from "./schema";
 import { viewEvents } from "./live";
 import { peopleAt, toLiveRow } from "./tables.server";
@@ -6,18 +6,18 @@ import { buildTapestry, stripNoteText, type Panel } from "./tapestry";
 import { epilogueSchema, noEdits, tapestryEditsSchema, type TapestryEdits } from "./epilogueSchema";
 import type { Epilogue } from "@/components/gazette/Gazette";
 
-export type TableWithNight = Table & { claims: Claim[]; deliveries: Delivery[]; events: TableEvent[]; epilogue: EpilogueRow | null; game?: { state: unknown } | null };
+export type TableWithNight = Omit<Game, "content"> & { claims: Claim[]; deliveries: Delivery[]; events: TableEvent[]; epilogue: EpilogueRow | null; state?: { state: unknown } | null };
 
-/** Include this in a Prisma table query to get everything a night's tapestry needs. */
+/** Include this in a Prisma game query to get everything a night's tapestry needs. */
 export const NIGHT_INCLUDE = {
   claims: true,
   deliveries: true,
   events: { orderBy: { id: "asc" } },
   epilogue: true,
-  game: true,
+  state: true,
 } as const;
 
-/** A table's epilogue and tapestry: panels from what the table saw (the TV's view), and the GM's edits. */
+/** A game's epilogue and tapestry: panels from what the table saw (the TV's view), and the GM's edits. */
 export function nightOf(table: TableWithNight, os: OneShotWithCast): { panels: Panel[]; edits: TapestryEdits; epilogue: Epilogue | null } {
   const people = peopleAt(table, os);
   const events = stripNoteText(viewEvents(table.events.map(toLiveRow), { role: "table" }, { people, rumors: [] }));

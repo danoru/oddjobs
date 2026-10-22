@@ -9,8 +9,7 @@ import { SESSION_COOKIE } from "./session";
  * people, and a user source that knows them. `installTestUsers()` once in a
  * test file, then `sessionCookies("gm")` for the request's cookies.
  *
- * "gm" is an admin (the GM pages are the admins' until games arrive);
- * "table" a plain member.
+ * "gm" is an admin; "table" a plain member. Who runs a game is per game.
  */
 export const TEST_USERS = {
   gm: { id: "u-admin", username: "barkeep", displayName: "The Barkeep", pronouns: null, role: "admin", author: false, canInvite: true },

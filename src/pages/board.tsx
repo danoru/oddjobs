@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Head from "next/head";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { GetStaticProps } from "next";
 import { Box, Container, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { publishedOneShots, revalidateSeconds, survivors } from "@/lib/source";
@@ -49,15 +49,29 @@ export default function BoardPage({ jobs, survivors }: { jobs: Summary[]; surviv
   const [system, setSystem] = useState<"all" | SystemId>("all");
   const [ruleset, setRuleset] = useState<"all" | "2014" | "2024">("all");
   const [party, setParty] = useState<number | "any">("any");
+  // "Fresh to me": the jobs you haven't run or played, so their secrets are still secret.
+  const [fresh, setFresh] = useState<"all" | "fresh">("all");
+  const [known, setKnown] = useState<Set<string> | null>(null);
+  useEffect(() => {
+    let alive = true;
+    void fetch("/api/games?known=1", { cache: "no-store" })
+      .then((r) => (r.ok ? (r.json() as Promise<{ known: string[] }>) : null))
+      .then((j) => alive && j && setKnown(new Set(j.known)))
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, []);
   const shown = useMemo(
     () =>
       jobs.filter(
         (j) =>
           (system === "all" || j.system === system) &&
           (ruleset === "all" || j.ruleset === ruleset) &&
-          (party === "any" || (j.players.min <= party && party <= j.players.max)),
+          (party === "any" || (j.players.min <= party && party <= j.players.max)) &&
+          (fresh === "all" || !known?.has(j.slug)),
       ),
-    [jobs, system, ruleset, party],
+    [jobs, system, ruleset, party, fresh, known],
   );
 
   return (
@@ -122,6 +136,12 @@ export default function BoardPage({ jobs, survivors }: { jobs: Summary[]; surviv
                   </ToggleButton>
                 ))}
               </ToggleButtonGroup>
+              <ToggleButtonGroup size="small" exclusive value={fresh} onChange={(_, v) => v && setFresh(v)} aria-label="Jobs you know">
+                <ToggleButton value="all">Every job</ToggleButton>
+                <ToggleButton value="fresh" disabled={!known}>
+                  Fresh to me
+                </ToggleButton>
+              </ToggleButtonGroup>
             </Box>
           </Box>
 
@@ -130,7 +150,7 @@ export default function BoardPage({ jobs, survivors }: { jobs: Summary[]; surviv
               <div className={s.note} style={{ maxWidth: 420, margin: "0 auto" }}>
                 <span className={s.pin} aria-hidden="true" />
                 <p className={s.noteTitle}>Nothing pinned for that</p>
-                <p className={s.postingPitch}>Try another game, ruleset or table size.</p>
+                <p className={s.postingPitch}>{fresh === "fresh" ? "You know every job like that. Try another game, ruleset or table size, or every job." : "Try another game, ruleset or table size."}</p>
               </div>
             ) : (
               <div className={s.wideGrid}>

@@ -3,8 +3,8 @@ import { z } from "zod";
 /**
  * Accounts (phase 10): who may do what on the site, and what a username,
  * password, display name and pronouns may be. Pure, so the browser forms and
- * the server share one set of rules. Per-game roles (GM, player, spectator)
- * come with games in phase 11; until then the GM pages are the admins'.
+ * the server share one set of rules. Per-game roles (GM, co-GM, player)
+ * live on each game (./games.ts).
  */
 
 export const SITE_ROLES = ["admin", "member"] as const;

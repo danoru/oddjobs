@@ -32,7 +32,7 @@ const STEP_LINE: Record<(typeof STEPS)[number], string> = {
  */
 export function CandlesTv({ os }: { os: PublicTcOneShot }) {
   const { table } = useClaims(os.slug);
-  const { game, extras, error } = useGame<TcView, { intro: string | null }>(table, "table", null);
+  const { game, extras, error } = useGame<TcView, { intro: string | null }>(table, "table");
   const now = useNow();
   const [qr, setQr] = useState("");
   const [sound, setSound] = useState(false);
@@ -181,7 +181,7 @@ export function CandlesTv({ os }: { os: PublicTcOneShot }) {
                 {OPENING_LINE}
               </p>
               <div style={{ width: "min(90vw, 760px)", textAlign: "left" }}>
-                <FinalWords code={table} playerId={null} as="table" seats={game.seats} you={null} />
+                <FinalWords code={table} as="table" seats={game.seats} you={null} />
               </div>
             </>
           )}

@@ -360,3 +360,34 @@
   color: #b9a888;
   border-top: 1px solid rgba(210, 168, 90, 0.2);
 }
+
+/* A table code: sit down as a guest. */
+.codeForm {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.codeRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.codeInput {
+  width: 9ch;
+  padding: 10px 12px;
+  font: 22px/1 var(--font-poster);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--parchment);
+  border: 2px solid #6e4f17;
+}
+
+.codeInput:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: 2px;
+}

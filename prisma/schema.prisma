@@ -8,74 +8,128 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-/// One game night of one one-shot. The GM opens it and reads out `code`;
-/// players join with the code and tear posters at this table.
-model Table {
-  id        String   @id @default(cuid())
-  code      String   @unique
-  oneshot   String
-  claims     Claim[]
-  deliveries Delivery[]
-  flashbacks Flashback[]
-  game       Game?
-  recordings Recording[]
-  events     TableEvent[]
-  epilogue   Epilogue?
-  createdAt  DateTime   @default(now())
+/// One running of one one-shot (phase 11): a GM account runs it, players
+/// hold its seats, and the five-letter `code` is read out across the table
+/// for in-person play. It plays the one-shot as it was published when the
+/// game was made (`content`), so builder edits don't change a game mid-run.
+model Game {
+  id          String      @id @default(cuid())
+  code        String      @unique
+  oneshot     String
+  /// Who runs it. Null = a table from before accounts: admins only.
+  gmId        String?
+  gm          User?       @relation("GameGm", fields: [gmId], references: [id], onDelete: SetNull)
+  /// "planned" | "open" | "live" | "finished" | "epilogued" (src/lib/games.ts).
+  status      String      @default("open")
+  scheduledAt DateTime?
+  /// How many seats the GM offers; null = one per poster.
+  seats       Int?
+  /// The published OneShotDoc this game plays, pinned when it was made (or
+  /// updated to the latest before it went live). Null = whatever is
+  /// published now: the files store, and tables from before games.
+  content     Json?       @db.Json
+  /// SHA-256 of `content`, to tell whether a newer version has been published.
+  contentHash String?
+  pinnedAt    DateTime?
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  coGms       GameCoGm[]
+  claims      Claim[]
+  deliveries  Delivery[]
+  flashbacks  Flashback[]
+  state       GameState?
+  recordings  Recording[]
+  events      TableEvent[]
+  epilogue    Epilogue?
+  invites     Invite[]
+  createdAt   DateTime    @default(now())
+
+  @@index([gmId])
+  @@index([oneshot])
 }
 
-/// A torn-down poster. The unique (tableId, characterId) pair is the lock:
-/// once someone holds a character, nobody else at the table can tear it.
+/// Someone the GM brought in to run the game with them: they see and do
+/// everything the GM does, except handing the game on or choosing co-GMs.
+model GameCoGm {
+  gameId  String
+  game    Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addedAt DateTime @default(now())
+
+  @@id([gameId, userId])
+  @@index([userId])
+}
+
+/// The spoiler guard: this person has run (or co-run) this one-shot, so they
+/// know its secrets. Kept after a game is handed on: what's read can't be unread.
+model Spoiler {
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  oneshot String
+  at      DateTime @default(now())
+
+  @@id([userId, oneshot])
+}
+
+/// A seat: a torn-down poster. The unique (gameId, characterId) pair is the
+/// lock: once someone holds a character, nobody else at the game can tear it.
+/// An account's seat has `userId`; a guest's has none (a name and the code),
+/// until the guest turns it into an account through an invite.
 model Claim {
   id          String   @id @default(cuid())
-  tableId     String
-  table       Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  gameId      String
+  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
   characterId String
-  /// Random id the player's browser made up; never sent to other players.
+  /// The holder's key at this game: `u-<userId>` for an account, the guest
+  /// pass's random key for a guest. Never sent to other players.
   playerId    String
   playerName  String
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   claimedAt   DateTime @default(now())
 
-  @@unique([tableId, characterId])
+  @@unique([gameId, characterId])
+  @@index([userId])
 }
 
-/// A sealed letter the GM has handed to one character at this table. The
+/// A sealed letter the GM has handed to one character at this game. The
 /// text stays in content; this records that it was sent and when it was opened.
 /// `letterId` is a content letter id, or `beat:<from>:<n>` for a story beat
 /// inherited from a character nobody is playing tonight.
 model Delivery {
   id          String    @id @default(cuid())
-  tableId     String
-  table       Table     @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  gameId      String
+  game        Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
   letterId    String
   characterId String
   deliveredAt DateTime  @default(now())
   openedAt    DateTime?
 
-  @@unique([tableId, letterId])
+  @@unique([gameId, letterId])
 }
 
 /// A player's one-sentence answer to their character's session-zero question.
 model Flashback {
   id          String   @id @default(cuid())
-  tableId     String
-  table       Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  gameId      String
+  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
   characterId String
   playerId    String
   answer      String
   updatedAt   DateTime @updatedAt
 
-  @@unique([tableId, characterId])
+  @@unique([gameId, characterId])
 }
 
 /// Live table play for systems that have it (Ten Candles): the whole game as
 /// one JSON state, changed only through the system's reducer
 /// (src/systems/<id>/game.ts). `version` guards against two phones acting at
 /// once: a write only lands if nobody else wrote since it was read.
-model Game {
+model GameState {
   id        String   @id @default(cuid())
-  tableId   String   @unique
-  table     Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  gameId    String   @unique
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
   system    String
   state     Json
   version   Int      @default(0)
@@ -83,13 +137,13 @@ model Game {
 }
 
 /// A player's final words (Ten Candles), kept only when the GM chooses to
-/// keep recordings at this table. Small and capped: a short voice clip, or a
+/// keep recordings at this game. Small and capped: a short voice clip, or a
 /// written message for players without a microphone.
 model Recording {
   id        String   @id @default(cuid())
-  tableId   String
-  table     Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
-  /// The recording player's made-up browser id; never sent to anyone.
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  /// The recording player's key at this game (as Claim.playerId); never sent to anyone.
   playerId  String
   mime      String
   audio     Bytes?
@@ -97,22 +151,23 @@ model Recording {
   size      Int
   createdAt DateTime @default(now())
 
-  @@unique([tableId, playerId])
+  @@unique([gameId, playerId])
 }
 
-/// Everything that happens at a table outside a system's own game state:
+/// Everything that happens at a game outside a system's own game state:
 /// dice rolls, notes passed under the table, the GM's bell, act cards,
 /// spotlight ticks, rumors drawn, notices pinned to the town board,
-/// inspiration coins. One append-only log per table, polled with a cursor
+/// inspiration coins. One append-only log per game, polled with a cursor
 /// (`id`); what each viewer may see is decided by `viewEvent` in
 /// src/lib/live.ts, never by the client.
 model TableEvent {
   id        Int      @id @default(autoincrement())
-  tableId   String
-  table     Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
   /// roll | note | bell | act | tick | rumor | notice | unpin | coin | spend | hide | death | candle
   kind      String
-  /// The acting player's made-up browser id; null for the GM. Never sent to anyone.
+  /// The acting player's key (as Claim.playerId: `u-<userId>` for an
+  /// account); null for the GM. Never sent to anyone.
   byPlayer  String?
   /// The player a note, bell, coin or rumor draw is for; null for the GM or everyone.
   toPlayer  String?
@@ -121,16 +176,16 @@ model TableEvent {
   data      Json
   createdAt DateTime @default(now())
 
-  @@index([tableId, id])
+  @@index([gameId, id])
 }
 
-/// The morning after, kept per table so the chronicle can bind every night
+/// The morning after, kept per game so the chronicle can bind every night
 /// into one book: the broadsheet (headline, lines, fates) and the GM's edits
 /// to the night's tapestry (panels dropped or renamed).
 model Epilogue {
   id        String   @id @default(cuid())
-  tableId   String   @unique
-  table     Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  gameId    String   @unique
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
   data      Json
   tapestry  Json
   updatedAt DateTime @updatedAt
@@ -225,7 +280,7 @@ model User {
   pronouns      String?
   /// argon2id.
   passwordHash  String
-  /// "admin" | "member". Per-game roles (GM, player) come with games, in phase 11.
+  /// "admin" | "member". Per-game roles (GM, co-GM, player) live on each game.
   role          String          @default("member")
   /// The author badge: may write one-shots in the builder (only their own).
   author        Boolean         @default(false)
@@ -246,12 +301,17 @@ model User {
   resetsMade    PasswordReset[] @relation("ResetMaker")
   oneShots      OneShot[]
   fileOneShots  OneShotOwner[]
+  gamesRun      Game[]          @relation("GameGm")
+  coGmOf        GameCoGm[]
+  seats         Claim[]
+  spoilers      Spoiler[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 }
 
 /// An invite link, `/join/<code>`: single- or multi-use, with an expiry, and
-/// optionally the author badge for whoever joins with it.
+/// optionally the author badge for whoever joins with it. A GM can make one
+/// for a guest seat: whoever joins with it takes that seat (and its history).
 model Invite {
   id           String    @id @default(cuid())
   code         String    @unique
@@ -265,6 +325,10 @@ model Invite {
   createdById  String?
   createdBy    User?     @relation("InviteMaker", fields: [createdById], references: [id], onDelete: SetNull)
   joined       User[]    @relation("JoinedWith")
+  /// A guest seat to hand over: the game, and the guest key it was played under.
+  guestGameId  String?
+  guestGame    Game?     @relation(fields: [guestGameId], references: [id], onDelete: SetNull)
+  guestKey     String?
   createdAt    DateTime  @default(now())
 }
 

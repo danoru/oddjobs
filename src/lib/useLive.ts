@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { PLAYER_HEADER } from "./tables";
 import { foldLive, type LiveAction, type LiveEvent, type PublicPerson } from "./live";
 
 /** The log is chattier than claims (dice, bells): poll as fast as live play does. */
@@ -34,7 +33,7 @@ const empty = (code: string | null): State => ({ code, events: [], people: [], y
  * page as whoever the cookie says. A roll the GM hides after it arrived is
  * blanked here too; one un-hidden makes the hook fetch the log afresh.
  */
-export function useLive(code: string | null, as: "player" | "table" | "gm", playerId: string | null) {
+export function useLive(code: string | null, as: "player" | "table" | "gm") {
   const [state, setState] = useState<State>(() => empty(code));
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -72,14 +71,13 @@ export function useLive(code: string | null, as: "player" | "table" | "gm", play
         method,
         cache: "no-store",
         headers: {
-          ...(playerId ? { [PLAYER_HEADER]: playerId } : {}),
           ...(body ? { "Content-Type": "application/json" } : {}),
         },
         body: body ? JSON.stringify(body) : undefined,
       });
       return { ok: res.ok, json: (await res.json().catch(() => ({}))) as Reply };
     },
-    [url, query, playerId],
+    [url, query],
   );
 
   const call = useCallback(

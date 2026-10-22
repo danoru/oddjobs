@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { PLAYER_HEADER } from "./tables";
 import { FATES, survivorSchema, type Survivor } from "./legacy";
 import type { Epilogue } from "@/components/gazette/Gazette";
 import type { PublicAnyOneShot } from "./public";
@@ -105,13 +104,15 @@ type Shared = { epilogue: Epilogue | null; canEdit: "all" | string[] };
  * table the GM writes the whole front page and each player only their own
  * character's line; edits save a moment after typing stops.
  */
+const JSON_HEADERS = { "Content-Type": "application/json" };
+
 export function useSharedEpilogue(slug: string, code: string | null, playerId: string | null) {
   const local = useEpilogue(slug);
   const [shared, setShared] = useState<Shared | null>(null);
   const [draft, setDraft] = useState<Epilogue | null>(null);
   const [saved, setSaved] = useState<"saved" | "saving" | "error" | null>(null);
   const lastEdit = useRef(0);
-  const headers = useMemo(() => ({ "Content-Type": "application/json", ...(playerId ? { [PLAYER_HEADER]: playerId } : {}) }), [playerId]);
+  const headers = JSON_HEADERS;
 
   useEffect(() => {
     if (!code) return;
@@ -130,7 +131,8 @@ export function useSharedEpilogue(slug: string, code: string | null, playerId: s
       alive = false;
       window.clearInterval(t);
     };
-  }, [code, headers]);
+    // Who is asking is the session or guest pass: sitting down (a new player) asks again.
+  }, [code, headers, playerId]);
 
   const ep = draft ?? shared?.epilogue ?? emptyEpilogue();
   const canEdit = useMemo(() => shared?.canEdit ?? [], [shared]);

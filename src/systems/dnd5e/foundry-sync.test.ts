@@ -54,8 +54,8 @@ describe("shapeFoundryTable", () => {
     code: "ABC23",
     oneshot: "the-drowned-bell",
     claims: [
-      { characterId: "rook", name: "Maya", mine: false, claimedAt: "2026-01-01T00:00:00.000Z" },
-      { characterId: "rook", name: "Late", mine: false, claimedAt: "2026-01-01T00:00:01.000Z" },
+      { characterId: "rook", name: "Maya", mine: false, guest: true, claimedAt: "2026-01-01T00:00:00.000Z" },
+      { characterId: "rook", name: "Late", mine: false, guest: false, claimedAt: "2026-01-01T00:00:01.000Z" },
     ],
   };
 

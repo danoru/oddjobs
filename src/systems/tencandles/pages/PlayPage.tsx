@@ -26,7 +26,7 @@ export function PlayPage({ os }: { os: PublicTcOneShot }) {
   const mine = Object.entries(claimedBy).find(([, c]) => c.mine)?.[0] ?? null;
   const premade = os.cast.find((c) => c.id === mine);
   // The bell, notes and rumors (Ten Candles has no inspiration coins; its dice are the game's own).
-  const live = useLive(table && player ? table : null, "player", player?.id ?? null);
+  const live = useLive(table && player ? table : null, "player");
 
   return (
     <>
@@ -51,7 +51,7 @@ export function PlayPage({ os }: { os: PublicTcOneShot }) {
           {table && player && <TableToys live={live} coin={null} rumors={os.hasRumors} />}
 
           {table && player && premade?.flashback && mine && (
-            <PlayerExtras code={table} playerId={player.id} characterId={mine} flashback={premade.flashback} />
+            <PlayerExtras code={table} characterId={mine} flashback={premade.flashback} />
           )}
 
           {table && player && os.cast.length > 0 && (

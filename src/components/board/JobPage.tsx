@@ -18,6 +18,7 @@ import { skinFrom, SKIN_WORDS } from "@/lib/skins";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Poster } from "@/components/board/Poster";
 import { TableNote } from "@/components/board/TableNote";
+import { RunJob } from "@/components/board/RunJob";
 import { YarnBoard } from "@/components/board/YarnBoard";
 import { TownBoard } from "@/components/board/TownBoard";
 import { LevelPicker } from "@/components/board/LevelPicker";
@@ -160,6 +161,7 @@ export function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Su
             )}
           </div>
 
+          {!router.pathname.startsWith("/admin") && <RunJob slug={os.slug} runJob={table.runJob} />}
           <TableNote claims={table} initialCode={linkCode} />
           <TownBoard code={table.table} playerId={table.player?.id ?? null} />
 

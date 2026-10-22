@@ -10,7 +10,7 @@ const KIND: Record<string, string> = { poster: "NEW POSTER", reward: "REWARD CHA
  * until they're pinned.
  */
 export function TownBoard({ code, playerId }: { code: string | null; playerId: string | null }) {
-  const { fold } = useLive(code, playerId ? "player" : "table", playerId);
+  const { fold } = useLive(code, playerId ? "player" : "table");
   if (!code || fold.notices.length === 0) return null;
   return (
     <section aria-labelledby="town-board" style={{ marginBottom: 32 }} data-testid="job-notices">

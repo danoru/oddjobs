@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { PLAYER_HEADER } from "@/lib/tables";
 import type { Naughty } from "./schema";
 
 /**
@@ -14,7 +13,7 @@ export function useSecret(code: string | null, playerId: string | null, characte
   useEffect(() => {
     if (!code || !playerId || !held) return;
     let alive = true;
-    fetch(`/api/tables/${code}/secrets?as=player`, { cache: "no-store", headers: { [PLAYER_HEADER]: playerId } })
+    fetch(`/api/tables/${code}/secrets?as=player`, { cache: "no-store" })
       .then((r) => r.json())
       .then((j: { secrets?: Record<string, Naughty>; error?: string }) => {
         if (!alive) return;

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { PLAYER_HEADER, POLL_MS } from "./tables";
+import { POLL_MS } from "./tables";
 import type { FlashbackView, LetterView } from "./letters";
 
 /**
@@ -8,7 +8,7 @@ import type { FlashbackView, LetterView } from "./letters";
  * addressed to characters they hold), so the hooks are the same for both.
  */
 
-function usePolled<T>(url: string | null, playerId: string | null, pick: (json: unknown) => T, empty: T) {
+function usePolled<T>(url: string | null, pick: (json: unknown) => T, empty: T) {
   const [data, setData] = useState<T>(empty);
   const [error, setError] = useState<string | null>(null);
   const pickRef = useRef(pick);
@@ -24,7 +24,6 @@ function usePolled<T>(url: string | null, playerId: string | null, pick: (json: 
           method,
           cache: "no-store",
           headers: {
-            ...(playerId ? { [PLAYER_HEADER]: playerId } : {}),
             ...(body ? { "Content-Type": "application/json" } : {}),
           },
           body: body ? JSON.stringify(body) : undefined,
@@ -42,7 +41,7 @@ function usePolled<T>(url: string | null, playerId: string | null, pick: (json: 
         return false;
       }
     },
-    [url, playerId],
+    [url],
   );
 
   useEffect(() => {
@@ -58,10 +57,9 @@ function usePolled<T>(url: string | null, playerId: string | null, pick: (json: 
   return { data, error, call };
 }
 
-export function useLetters(code: string | null, playerId: string | null) {
+export function useLetters(code: string | null) {
   const { data, error, call } = usePolled<LetterView[]>(
     code ? `/api/tables/${code}/letters` : null,
-    playerId,
     (j) => (j as { letters?: LetterView[] }).letters ?? [],
     [],
   );
@@ -74,10 +72,9 @@ export function useLetters(code: string | null, playerId: string | null) {
   };
 }
 
-export function useFlashbacks(code: string | null, playerId: string | null) {
+export function useFlashbacks(code: string | null) {
   const { data, error, call } = usePolled<FlashbackView[]>(
     code ? `/api/tables/${code}/flashbacks` : null,
-    playerId,
     (j) => (j as { flashbacks?: FlashbackView[] }).flashbacks ?? [],
     [],
   );

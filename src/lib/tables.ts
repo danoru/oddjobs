@@ -1,9 +1,10 @@
 import { z } from "zod";
+import type { GameStatus } from "./games";
 
 /**
- * Table sessions: a GM opens a table for one one-shot and reads out its short
- * code; players join with the code and their torn posters are shared with
- * everyone at that table. Shared by the API routes and the browser.
+ * The table at a game (./games.ts): its short code is read out across the
+ * table; players join with it and their torn posters are shared with
+ * everyone at that game. Shared by the API routes and the browser.
  */
 
 /** No 0/O or 1/I, so a code read across a table can't be misheard. */
@@ -27,25 +28,24 @@ export function normalizeCode(raw: unknown): string | null {
   return code.length === CODE_LENGTH && [...code].every((ch) => CODE_ALPHABET.includes(ch)) ? code : null;
 }
 
-/** Header carrying the browser's made-up player id. */
-export const PLAYER_HEADER = "x-tearoff-player";
-
 const kebab = z.string().regex(/^[a-z0-9-]+$/).max(80);
 export const playerIdSchema = z.string().regex(/^[A-Za-z0-9-]{8,64}$/);
 export const playerNameSchema = z.string().trim().min(1).max(40);
 
-export const openTableBody = z.object({ oneshot: kebab });
-export const claimBody = z.object({ characterId: kebab, name: playerNameSchema });
+/** The name comes from the account or the guest pass; a browser can't sit down as someone else. */
+export const claimBody = z.object({ characterId: kebab });
 
 export type TableClaim = {
   characterId: string;
   name: string;
-  /** Torn by the browser asking. Other players' ids are never sent. */
+  /** Torn by whoever is asking. Other players' keys are never sent. */
   mine: boolean;
+  /** Held by a guest (no account), who could keep it through an invite. */
+  guest: boolean;
   claimedAt: string;
 };
 
-export type TableState = { code: string; oneshot: string; claims: TableClaim[] };
+export type TableState = { code: string; oneshot: string; status: GameStatus; seats: number | null; claims: TableClaim[] };
 
 /** Poll interval for shared claims. */
 export const POLL_MS = 3000;

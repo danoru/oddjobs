@@ -20,6 +20,23 @@ import { Accounts, AccountError, toViewer } from "@/lib/users.server";
 import { RateLimiter } from "@/lib/rateLimit.server";
 import { handler as actionRoute } from "@/pages/api/admin/oneshots/[slug]/[action]";
 import { handler as survivorRoute } from "@/pages/api/admin/survivors";
+import type { Viewer } from "@/lib/accounts";
+import { createGame, gameOneShot, gmPage } from "@/lib/games.server";
+import { GUEST_COOKIE, signGuestPass, type GuestPass } from "@/lib/guestPass";
+import tableRoute from "@/pages/api/tables/[code]/index";
+import claimsRoute from "@/pages/api/tables/[code]/claims";
+import lettersRoute from "@/pages/api/tables/[code]/letters";
+import liveRoute from "@/pages/api/tables/[code]/live";
+import secretsRoute from "@/pages/api/tables/[code]/secrets";
+import flashbacksRoute from "@/pages/api/tables/[code]/flashbacks";
+import epilogueRoute from "@/pages/api/tables/[code]/epilogue";
+import tapestryRoute from "@/pages/api/tables/[code]/tapestry";
+import stateRoute from "@/pages/api/tables/[code]/game";
+import recordingsRoute from "@/pages/api/tables/[code]/recordings";
+import gamesRoute from "@/pages/api/games/index";
+import gameRoute from "@/pages/api/games/[code]";
+import guestRoute from "@/pages/api/guest";
+import { handler as joinRoute } from "@/pages/api/join";
 
 /**
  * The database store, against the local Postgres in .env (`pnpm db:dev`) in a
@@ -88,6 +105,7 @@ beforeEach(async () => {
   vi.unstubAllEnvs();
   if (!up) return;
   const c = db();
+  await c.game.deleteMany();
   await c.oneShot.deleteMany();
   await c.spell.deleteMany();
   await c.survivor.deleteMany();
@@ -591,5 +609,447 @@ describe.skipIf(!up)("ownership in the database", () => {
     expect((await book.all()).get("some-night")).toBe(quill.id);
     await book.set("some-night", null);
     expect(await book.get("some-night")).toBeNull();
+  });
+});
+
+/**
+ * The phase 11 migration (tables become games) on a scratch schema of its
+ * own: every migration before it, then rows in the old shape, then the real
+ * SQL file, and what the rows became. Run once with an admin and once without.
+ */
+describe.skipIf(!up)("the games migration", () => {
+  const MIGRATIONS = path.join(ROOT, "prisma", "migrations");
+  const GAMES = "20261023000000_games";
+  const statements = (file: string) =>
+    fs
+      .readFileSync(path.join(MIGRATIONS, file, "migration.sql"), "utf8")
+      .split("\n")
+      .filter((l) => !l.trim().startsWith("--"))
+      .join("\n")
+      .split(/;\s*(?:\n|$)/)
+      .map((s) => s.trim())
+      // One connection, one implicit transaction per statement: BEGIN/COMMIT are for migrate deploy.
+      .filter((s) => s && s !== "BEGIN" && s !== "COMMIT");
+
+  async function migrated(withAdmin: boolean) {
+    const { PrismaClient } = await import("@prisma/client");
+    await db().$disconnect(); // prisma dev takes one connection at a time
+    const u = new URL(urls.url!);
+    u.searchParams.set("schema", "tearoff_migtest");
+    const c = new PrismaClient({ datasourceUrl: u.toString() });
+    try {
+      await c.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "tearoff_migtest" CASCADE`);
+      await c.$executeRawUnsafe(`CREATE SCHEMA "tearoff_migtest"`);
+      const before = fs.readdirSync(MIGRATIONS).filter((d) => /^\d/.test(d) && d < GAMES).sort();
+      for (const m of before) for (const s of statements(m)) await c.$executeRawUnsafe(s);
+
+      const run = (sql: string) => c.$executeRawUnsafe(sql);
+      await run(`INSERT INTO "User" ("id","username","usernameLower","displayName","passwordHash","role","updatedAt","createdAt") VALUES
+        ('m1','sam','sam','Sam','x','member',now(),'2026-01-01'),
+        ${withAdmin ? `('a2','late','late','Late Admin','x','admin',now(),'2026-03-01'), ('a1','rook','rook','Rook','x','admin',now(),'2026-02-01'),` : ""}
+        ('m2','ash','ash','Ash','x','member',now(),'2026-01-02')`);
+      await run(`INSERT INTO "Table" ("id","code","oneshot","createdAt") VALUES
+        ('t1','ABCDE','lot-thirteen','2026-05-01T19:00:00Z'), ('t2','FGHJK','the-drowned-bell','2026-06-01T19:00:00Z'), ('t3','LMNPQ','lot-thirteen','2026-07-01T19:00:00Z')`);
+      await run(`INSERT INTO "Claim" ("id","tableId","characterId","playerId","playerName","claimedAt") VALUES
+        ('c1','t1','rook','0123456789abcdef0123456789abcdef','Sam','2026-05-01T19:05:00Z'), ('c2','t2','tide','fedcba9876543210fedcba9876543210','Ash','2026-06-01T19:05:00Z')`);
+      await run(`INSERT INTO "Game" ("id","tableId","system","state","version","updatedAt") VALUES ('g1','t2','tencandles','{"players":[{"playerId":"fedcba9876543210fedcba9876543210","name":"Ash"}]}',3,now())`);
+      await run(`INSERT INTO "TableEvent" ("tableId","kind","byPlayer","toPlayer","hidden","data","createdAt") VALUES
+        ('t1','roll','0123456789abcdef0123456789abcdef',NULL,false,'{"total":20}','2026-05-01T22:30:00Z'), ('t1','note',NULL,'0123456789abcdef0123456789abcdef',false,'{"text":"psst"}','2026-05-01T21:00:00Z')`);
+      await run(`INSERT INTO "Delivery" ("id","tableId","letterId","characterId") VALUES ('d1','t1','rook-1','rook')`);
+      await run(`INSERT INTO "Flashback" ("id","tableId","characterId","playerId","answer","updatedAt") VALUES ('f1','t1','rook','0123456789abcdef0123456789abcdef','The sea.',now())`);
+      await run(`INSERT INTO "Recording" ("id","tableId","playerId","mime","text","size") VALUES ('r1','t2','fedcba9876543210fedcba9876543210','text/plain','bye',3)`);
+      await run(`INSERT INTO "Epilogue" ("id","tableId","data","tapestry","updatedAt") VALUES ('e1','t3','{}','{}','2026-07-02T09:00:00Z')`);
+
+      for (const s of statements(GAMES)) await c.$executeRawUnsafe(s);
+      const games = await c.game.findMany({ orderBy: { code: "asc" }, include: { claims: true, deliveries: true, flashbacks: true, recordings: true, events: { orderBy: { id: "asc" } }, epilogue: true, state: true } });
+      const spoilers = await c.spoiler.findMany({ orderBy: { oneshot: "asc" } });
+      const drift = await c.$queryRawUnsafe<{ n: bigint }[]>(`SELECT count(*) AS n FROM pg_tables WHERE schemaname = 'tearoff_migtest' AND tablename = 'Table'`);
+      return { games, spoilers, tableLeft: Number(drift[0].n) };
+    } finally {
+      await c.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "tearoff_migtest" CASCADE`).catch(() => {});
+      await c.$disconnect();
+    }
+  }
+
+  it("makes every table a finished game run by the first admin, and every claim a guest seat", async () => {
+    const { games, spoilers, tableLeft } = await migrated(true);
+    expect(tableLeft).toBe(0);
+    expect(games.map((g) => [g.code, g.oneshot, g.gmId, g.status])).toEqual([
+      ["ABCDE", "lot-thirteen", "a1", "finished"],
+      ["FGHJK", "the-drowned-bell", "a1", "finished"],
+      ["LMNPQ", "lot-thirteen", "a1", "epilogued"],
+    ]);
+    const [t1, t2, t3] = games;
+    // Finished when the last thing happened at it.
+    expect(t1.startedAt?.toISOString()).toBe("2026-05-01T19:00:00.000Z");
+    expect(t1.finishedAt?.toISOString()).toBe("2026-05-01T22:30:00.000Z");
+    expect(t3.finishedAt?.toISOString()).toBe("2026-07-02T09:00:00.000Z");
+    // Unpinned: they play whatever is published.
+    expect(games.every((g) => g.content === null && g.pinnedAt === null)).toBe(true);
+    // Guest seats under the same browser key, so their history can still be claimed.
+    expect(t1.claims).toMatchObject([{ characterId: "rook", playerId: "0123456789abcdef0123456789abcdef", playerName: "Sam", userId: null }]);
+    expect(t1.events.map((e) => [e.kind, e.byPlayer, e.toPlayer])).toEqual([
+      ["roll", "0123456789abcdef0123456789abcdef", null],
+      ["note", null, "0123456789abcdef0123456789abcdef"],
+    ]);
+    expect(t1.deliveries).toMatchObject([{ letterId: "rook-1", characterId: "rook" }]);
+    expect(t1.flashbacks).toMatchObject([{ answer: "The sea." }]);
+    expect(t2.state).toMatchObject({ system: "tencandles", version: 3 });
+    expect(t2.recordings).toMatchObject([{ text: "bye" }]);
+    expect(t3.epilogue).not.toBeNull();
+    // The admin who ran them knows their secrets, once per one-shot.
+    expect(spoilers.map((s) => [s.userId, s.oneshot])).toEqual([
+      ["a1", "lot-thirteen"],
+      ["a1", "the-drowned-bell"],
+    ]);
+  }, 120_000);
+
+  it("leaves them to the admins when there's no admin yet", async () => {
+    const { games, spoilers } = await migrated(false);
+    expect(games.map((g) => [g.gmId, g.status])).toEqual([
+      [null, "finished"],
+      [null, "finished"],
+      [null, "epilogued"],
+    ]);
+    expect(spoilers).toEqual([]);
+  }, 120_000);
+});
+
+// ---- Games (phase 11) ----
+
+/** A request's caller at a game: an account, a guest pass, or nobody. */
+type Who = Viewer | { guest: GuestPass } | null;
+type Hit = { statusCode: number; body: unknown; cookies: string[] };
+
+async function hit(route: (req: NextApiRequest, res: NextApiResponse) => unknown, who: Who, opts: { method: string; query?: Record<string, string>; body?: unknown }): Promise<Hit> {
+  const cookies: Record<string, string> =
+    who && "guest" in who ? { [GUEST_COOKIE]: encodeURIComponent(await signGuestPass(who.guest, process.env.AUTH_SECRET!)) } : await sessionCookies(who);
+  const out: Hit = { statusCode: 200, body: undefined, cookies: [] };
+  const res = {
+    status(code: number) {
+      out.statusCode = code;
+      return res;
+    },
+    json(body: unknown) {
+      out.body = body;
+      return res;
+    },
+    send(body: unknown) {
+      out.body = body;
+      return res;
+    },
+    setHeader(k: string, v: string) {
+      if (k.toLowerCase() === "set-cookie") out.cookies.push(v);
+      return res;
+    },
+  };
+  const header = Object.entries(cookies).map(([k, v]) => `${k}=${v}`).join("; ");
+  const req = { method: opts.method, query: opts.query ?? {}, body: opts.body, cookies, headers: header ? { cookie: header } : {} };
+  await route(req as unknown as NextApiRequest, res as unknown as NextApiResponse);
+  return out;
+}
+
+describe.skipIf(!up)("games", () => {
+  const PARANOIA = "open-in-case-of-future";
+  const CANDLES = "lights-out-at-marrowby";
+  let gm: Viewer, co: Viewer, other: Viewer, admin: Viewer, stranger: Viewer;
+  const sam = (code: string, key = "0123456789abcdef0123456789abcdef"): { guest: GuestPass } => ({
+    guest: { code, oneshot: PARANOIA, key, name: "Sam", exp: Math.floor(Date.now() / 1000) + 3600 },
+  });
+
+  async function publish(slug: string, change?: (d: OneShotDoc) => void) {
+    const store = new DbStore();
+    const d = await gitDoc(slug);
+    change?.(d);
+    if (await store.get(slug)) await store.saveDraft(slug, d);
+    else await store.import(slug, d);
+    await store.publish(slug);
+  }
+
+  async function newGame(slug = PARANOIA) {
+    const g = await createGame(gm, slug);
+    return g!.code;
+  }
+
+  beforeEach(async () => {
+    vi.stubEnv("TEAROFF_STORE", "db");
+    gm = toViewer(await person("Mags"));
+    co = toViewer(await person("Cobb"));
+    other = toViewer(await person("Ollie"));
+    stranger = toViewer(await person("Stray"));
+    admin = toViewer(await person("Boss", { role: "admin", canInvite: true }));
+    installTestUsers([gm, co, other, stranger, admin]);
+    await publish(PARANOIA);
+  });
+
+  it("runs any published job with you as GM, pinned to what's published, and you know its secrets", async () => {
+    const r = await hit(gamesRoute, other, { method: "POST", body: { oneshot: PARANOIA } });
+    expect(r.statusCode).toBe(201);
+    const code = (r.body as { code: string }).code;
+    const row = await db().game.findUniqueOrThrow({ where: { code } });
+    expect([row.gmId, row.status]).toEqual([other.id, "open"]);
+    expect(row.content).not.toBeNull();
+    expect(row.pinnedAt).not.toBeNull();
+    expect(await db().spoiler.findMany({ where: { userId: other.id } })).toMatchObject([{ oneshot: PARANOIA }]);
+    // A date makes it planned; the seats open when the GM says.
+    const later = await hit(gamesRoute, other, { method: "POST", body: { oneshot: PARANOIA, scheduledAt: "2026-11-01T19:00:00.000Z", seats: 4 } });
+    expect(later.body).toMatchObject({ status: "planned", seats: 4, scheduledAt: "2026-11-01T19:00:00.000Z" });
+    expect((await hit(gamesRoute, other, { method: "POST", body: { oneshot: "no-such-job" } })).statusCode).toBe(404);
+    expect((await hit(gamesRoute, null, { method: "POST", body: { oneshot: PARANOIA } })).statusCode).toBe(401);
+  });
+
+  it("gives the GM's side of every table API to the game's GM and co-GMs, a look to admins, and nothing to anyone else", async () => {
+    const code = await newGame();
+    const q = { code };
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "addCoGm", username: "Cobb" } })).statusCode).toBe(200);
+    // Seats: Ollie holds Gloria, a guest holds Penny.
+    expect((await hit(claimsRoute, other, { method: "POST", query: q, body: { characterId: "gloria-pop" } })).statusCode).toBe(201);
+    expect((await hit(claimsRoute, sam(code), { method: "POST", query: q, body: { characterId: "penny-buy" } })).statusCode).toBe(201);
+
+    const status = async (route: Parameters<typeof hit>[0], who: Who, opts: Parameters<typeof hit>[2]) => (await hit(route, who, opts)).statusCode;
+    const ok = (n: number) => n >= 200 && n < 300;
+    const everyone: [string, Who][] = [["gm", gm], ["co-GM", co], ["admin", admin], ["member", stranger], ["player", other], ["guest", sam(code)], ["nobody", null]];
+    const runs = new Set(["gm", "co-GM"]);
+    for (const [name, who] of everyone) {
+      const acts = runs.has(name);
+      // Sealed letters: only those who run it hand them out (and take them back).
+      expect(ok(await status(lettersRoute, who, { method: "POST", query: q, body: { letterId: "the-sprinkles-crate" } })), `${name} delivers`).toBe(acts);
+      // The live log's GM-only moves: Friend Computer speaks, the act card goes up.
+      expect(ok(await status(liveRoute, who, { method: "POST", query: q, body: { action: { type: "computer", text: "Hello, citizen." } } })), `${name} as the Computer`).toBe(acts);
+      expect(ok(await status(liveRoute, who, { method: "POST", query: q, body: { action: { type: "act", index: 0 } } })), `${name} raises the curtain`).toBe(acts);
+      // The broadsheet and the tapestry's edits.
+      expect(ok(await status(epilogueRoute, who, { method: "PUT", query: q, body: { epilogue: { date: "2026-10-21", headline: "", subhead: "", lead: "", entries: {} } } })), `${name} sets the front page`).toBe(acts);
+      expect(ok(await status(epilogueRoute, who, { method: "PATCH", query: q, body: { tapestry: { dropped: [], titles: {} } } })), `${name} edits the tapestry`).toBe(acts);
+      // The game's own controls.
+      expect(ok(await status(gameRoute, who, { method: "PATCH", query: q, body: { op: "schedule", scheduledAt: null, seats: null } })), `${name} reschedules`).toBe(acts);
+      // Reading the GM's side: every secret, every flashback, the tapestry's edits, the game's controls.
+      const looks = acts || name === "admin";
+      const secrets = (await hit(secretsRoute, who, { method: "GET", query: q })).body as { secrets?: Record<string, unknown> };
+      expect(Object.keys(secrets.secrets ?? {}).length === 5, `${name} sees every secret`).toBe(looks);
+      const tapestry = (await hit(tapestryRoute, who, { method: "GET", query: q })).body as { gm?: boolean };
+      expect(tapestry.gm ?? false, `${name} sees the tapestry's edits`).toBe(looks);
+      const detail = (await hit(gameRoute, who, { method: "GET", query: q })).body as { members?: unknown };
+      expect("members" in (detail ?? {}), `${name} sees the controls`).toBe(looks);
+    }
+    // Pinning someone else's poster back up is the GM's.
+    expect(await status(claimsRoute, stranger, { method: "DELETE", query: { ...q, characterId: "gloria-pop" } })).toBe(403);
+    expect(await status(claimsRoute, admin, { method: "DELETE", query: { ...q, characterId: "gloria-pop" } })).toBe(403);
+    expect(await status(claimsRoute, co, { method: "DELETE", query: { ...q, characterId: "gloria-pop" } })).toBe(200);
+    // Handing it on and choosing co-GMs are the GM's alone.
+    expect(await status(gameRoute, co, { method: "PATCH", query: q, body: { op: "transfer", to: "Ollie" } })).toBe(403);
+    expect(await status(gameRoute, co, { method: "PATCH", query: q, body: { op: "addCoGm", username: "Ollie" } })).toBe(403);
+  });
+
+  it("scopes the GM's pages (GM view, kit, box) to the game", async () => {
+    const code = await newGame();
+    const ctx = async (who: Viewer | null, query: Record<string, string>) => {
+      const cookies = await sessionCookies(who);
+      return { req: { cookies, headers: {} } as never, resolvedUrl: `/${PARANOIA}/gm?${new URLSearchParams(query)}`, query };
+    };
+    const mine = await gmPage(await ctx(gm, { game: code }), PARANOIA);
+    expect("game" in mine && mine.os.slug).toBe(PARANOIA);
+    expect("game" in (await gmPage(await ctx(admin, { game: code }), PARANOIA))).toBe(true);
+    // A member who doesn't run it is sent to the player's side.
+    expect(await gmPage(await ctx(stranger, { game: code }), PARANOIA)).toEqual({ redirect: { destination: `/${PARANOIA}?table=${code}`, permanent: false } });
+    // No game named: your newest of it, or the job page to run one.
+    expect(await gmPage(await ctx(gm, {}), PARANOIA)).toEqual({ redirect: { destination: `/${PARANOIA}/gm?game=${code}`, permanent: false } });
+    expect(await gmPage(await ctx(stranger, {}), PARANOIA)).toEqual({ redirect: { destination: `/${PARANOIA}?run=1`, permanent: false } });
+    expect(await gmPage(await ctx(gm, { game: code }), "lot-thirteen")).toEqual({ notFound: true });
+    expect((await gmPage(await ctx(null, { game: code }), PARANOIA)) as { redirect: { destination: string } }).toMatchObject({ redirect: { destination: expect.stringMatching(/^\/login/) } });
+  });
+
+  it("hands the reins on, keeps a co-GM, and the new GM knows the secrets", async () => {
+    const code = await newGame();
+    const q = { code };
+    const r = await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "transfer", to: "ollie", stay: true } });
+    expect(r.statusCode).toBe(200);
+    expect(r.body).toMatchObject({ gm: { username: "Ollie" }, coGms: [{ username: "Mags" }] });
+    expect(await db().spoiler.findUnique({ where: { userId_oneshot: { userId: other.id, oneshot: PARANOIA } } })).not.toBeNull();
+    // Mags is a co-GM now: still on the GM's side, but no longer hands it on.
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "transfer", to: "Cobb" } })).statusCode).toBe(403);
+    expect((await hit(lettersRoute, gm, { method: "GET", query: q })).statusCode).toBe(200);
+    const off = await hit(gameRoute, other, { method: "PATCH", query: q, body: { op: "removeCoGm", username: "Mags" } });
+    expect(off.body).toMatchObject({ coGms: [] });
+    // Mags still knows what's in the envelopes.
+    expect(((await hit(gamesRoute, gm, { method: "GET", query: { oneshot: PARANOIA } })).body as { youKnow: boolean }).youKnow).toBe(true);
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "transfer", to: "nobody-here" } })).statusCode).toBe(403);
+  });
+
+  it("seats a guest by code and name, then hands the seat and its history to the account they make", async () => {
+    const code = await newGame();
+    const q = { code };
+    // Sitting down: a pass for that one game, and the same browser keeps its key.
+    const sat = await hit(guestRoute, null, { method: "POST", body: { code: code.toLowerCase(), name: "Sam" } });
+    expect(sat.statusCode).toBe(200);
+    expect(sat.cookies[0]).toMatch(new RegExp(`^${GUEST_COOKIE}=.+HttpOnly`));
+    expect((await hit(guestRoute, null, { method: "POST", body: { code: "ZZZZZ", name: "Sam" } })).statusCode).toBe(404);
+    expect((await hit(guestRoute, other, { method: "POST", body: { code, name: "Sam" } })).statusCode).toBe(409);
+
+    const guest = sam(code);
+    expect((await hit(claimsRoute, guest, { method: "POST", query: q, body: { characterId: "penny-buy" } })).statusCode).toBe(201);
+    const seen = (await hit(tableRoute, guest, { method: "GET", query: q })).body as { claims: { characterId: string; name: string; mine: boolean; guest: boolean }[] };
+    expect(seen.claims).toEqual([expect.objectContaining({ characterId: "penny-buy", name: "Sam", mine: true, guest: true })]);
+    // A pass for another game is nobody here.
+    expect((await hit(claimsRoute, sam("FGHJK"), { method: "POST", query: q, body: { characterId: "gloria-pop" } })).statusCode).toBe(400);
+    // Things happen: a roll, a flashback, a note from the GM.
+    expect((await hit(liveRoute, guest, { method: "POST", query: q, body: { action: { type: "roll", label: "Moxie", count: 1, sides: 6, mod: 0 } } })).statusCode).toBe(201);
+    const people = ((await hit(liveRoute, gm, { method: "GET", query: q })).body as { people: { handle: string; name: string }[] }).people;
+    expect((await hit(liveRoute, gm, { method: "POST", query: q, body: { action: { type: "note", to: people[0].handle, text: "Psst, Sam." } } })).statusCode).toBe(201);
+    expect((await hit(flashbacksRoute, guest, { method: "POST", query: q, body: { characterId: "penny-buy", answer: "The vat." } })).statusCode).toBe(200);
+    const before = await db().claim.findFirstOrThrow({ where: { characterId: "penny-buy" } });
+    expect([before.userId, before.playerId]).toEqual([null, guest.guest.key]);
+
+    // The GM invites Sam to keep it. Mags can't make invites; an admin looking in can't act; a co-GM who may invite can.
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "inviteGuest", characterId: "penny-buy" } })).statusCode).toBe(403);
+    expect((await hit(gameRoute, admin, { method: "PATCH", query: q, body: { op: "inviteGuest", characterId: "penny-buy" } })).statusCode).toBe(403);
+    await db().user.update({ where: { id: gm.id }, data: { canInvite: true } });
+    gm = { ...gm, canInvite: true };
+    installTestUsers([gm, co, other, stranger, admin]);
+    const inv = await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "inviteGuest", characterId: "penny-buy" } });
+    expect(inv.statusCode).toBe(201);
+    const invite = (inv.body as { invite: { code: string } }).invite.code;
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "inviteGuest", characterId: "gloria-pop" } })).statusCode).toBe(404);
+
+    // Sam joins on another device (no pass there): the invite carries the seat.
+    const joined = await hit((req, res) => joinRoute(req, res), null, { method: "POST", body: { code: invite, username: "sam", displayName: "Sam Ash", password: PW } });
+    expect(joined.statusCode).toBe(201);
+    expect(joined.body).toMatchObject({ seats: 1 });
+    const user = await db().user.findUniqueOrThrow({ where: { usernameLower: "sam" } });
+    const key = `u-${user.id}`;
+    const after = await db().claim.findFirstOrThrow({ where: { characterId: "penny-buy" } });
+    expect([after.userId, after.playerId, after.playerName]).toEqual([user.id, key, "Sam Ash"]);
+    const events = await db().tableEvent.findMany({ where: { game: { code } }, orderBy: { id: "asc" } });
+    expect(events.filter((e) => e.kind === "roll").map((e) => e.byPlayer)).toEqual([key]);
+    expect(events.filter((e) => e.kind === "note").map((e) => e.toPlayer)).toEqual([key]);
+    expect(JSON.stringify(events)).not.toContain(guest.guest.key);
+    expect(await db().flashback.findFirst({ where: { playerId: key } })).not.toBeNull();
+    // As Sam the account, it's still their seat, their note and their flashback.
+    const samV = toViewer(user);
+    installTestUsers([gm, co, other, stranger, admin, samV]);
+    const mine = (await hit(tableRoute, samV, { method: "GET", query: q })).body as { claims: { mine: boolean; guest: boolean }[] };
+    expect(mine.claims).toEqual([expect.objectContaining({ mine: true, guest: false })]);
+    const log = (await hit(liveRoute, samV, { method: "GET", query: { ...q, as: "player" } })).body as { events: { kind: string; data: unknown }[] };
+    expect(JSON.stringify(log.events)).toContain("Psst, Sam.");
+    expect(((await hit(flashbacksRoute, samV, { method: "GET", query: q })).body as { flashbacks: { mine: boolean }[] }).flashbacks).toEqual([expect.objectContaining({ mine: true })]);
+  });
+
+  it("keeps the seat count, and a finished game's seats and log as they were", async () => {
+    const code = await newGame();
+    const q = { code };
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "schedule", scheduledAt: null, seats: 1 } })).statusCode).toBe(200);
+    expect((await hit(claimsRoute, other, { method: "POST", query: q, body: { characterId: "gloria-pop" } })).statusCode).toBe(201);
+    expect((await hit(claimsRoute, stranger, { method: "POST", query: q, body: { characterId: "penny-buy" } })).body).toMatchObject({ error: "All 1 seats are taken" });
+
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "status", status: "live" } })).body).toMatchObject({ status: "live" });
+    // A front page drafted mid-game is just a draft: the game plays on.
+    const draft = await hit(epilogueRoute, gm, { method: "PUT", query: q, body: { epilogue: { date: "2026-10-21", headline: "Early edition", subhead: "", lead: "", entries: {} } } });
+    expect(draft.body).toMatchObject({ status: "live" });
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "status", status: "open" } })).statusCode).toBe(409);
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "status", status: "finished" } })).body).toMatchObject({ status: "finished" });
+    const row = await db().game.findUniqueOrThrow({ where: { code } });
+    expect(row.startedAt).not.toBeNull();
+    expect(row.finishedAt).not.toBeNull();
+    // Over: no tearing, no pinning back, no rolling, no letters.
+    expect((await hit(claimsRoute, other, { method: "DELETE", query: { ...q, characterId: "gloria-pop" } })).statusCode).toBe(409);
+    expect((await hit(claimsRoute, stranger, { method: "POST", query: q, body: { characterId: "clem-grs" } })).statusCode).toBe(409);
+    expect((await hit(liveRoute, other, { method: "POST", query: q, body: { action: { type: "roll", label: "x", count: 1, sides: 6, mod: 0 } } })).statusCode).toBe(409);
+    expect((await hit(lettersRoute, gm, { method: "POST", query: q, body: { letterId: "the-sprinkles-crate" } })).statusCode).toBe(409);
+    // The morning after still takes the paper, and puts the game in it.
+    const ep = await hit(epilogueRoute, gm, { method: "PUT", query: q, body: { epilogue: { date: "2026-10-21", headline: "Sprinkles everywhere", subhead: "", lead: "", entries: {} } } });
+    expect(ep.body).toMatchObject({ status: "epilogued" });
+    expect(((await hit(epilogueRoute, other, { method: "PATCH", query: q, body: { characterId: "gloria-pop", entry: { line: "Never again." } } })).statusCode)).toBe(200);
+    // Who has played it, for the next GM to pick a fresh table.
+    const record = (await hit(gamesRoute, co, { method: "GET", query: { oneshot: PARANOIA } })).body as { youKnow: boolean; played: unknown[] };
+    expect(record).toMatchObject({ youKnow: false, played: [{ displayName: "Mags", as: "gm" }, { displayName: "Ollie", as: "player" }] });
+    expect(((await hit(gamesRoute, other, { method: "GET", query: { known: "1" } })).body as { known: string[] }).known).toEqual([PARANOIA]);
+    expect(((await hit(gamesRoute, co, { method: "GET", query: { known: "1" } })).body as { known: string[] }).known).toEqual([]);
+  });
+
+  it("plays the version it was pinned to, and offers the latest only before it goes live", async () => {
+    const code = await newGame();
+    const q = { code };
+    await hit(claimsRoute, other, { method: "POST", query: q, body: { characterId: "gloria-pop" } });
+    await hit(lettersRoute, gm, { method: "POST", query: q, body: { letterId: "the-sprinkles-crate" } });
+    // The author retitles the letter and the job, and publishes.
+    await publish(PARANOIA, (d) => {
+      d.oneshot.title = "Open In Case Of Future, Revised";
+      (d.oneshot.letters as { id: string; title: string }[])[0].title = "A new title";
+    });
+    const game = await db().game.findUniqueOrThrow({ where: { code } });
+    expect((await gameOneShot(game)).title).not.toMatch(/Revised/);
+    const letters = (await hit(lettersRoute, other, { method: "GET", query: q })).body as { letters: { title: string }[] };
+    expect(letters.letters.map((l) => l.title)).toEqual(["Under the sprinkles"]);
+    expect((await hit(gameRoute, gm, { method: "GET", query: q })).body).toMatchObject({ newer: true });
+    // Before it starts, the GM can move it on.
+    const moved = await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "repin" } });
+    expect(moved.body).toMatchObject({ newer: false });
+    const again = (await hit(lettersRoute, other, { method: "GET", query: q })).body as { letters: { title: string }[] };
+    expect(again.letters.map((l) => l.title)).toEqual(["A new title"]);
+    // Once it's live, it keeps what it started with.
+    await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "status", status: "live" } });
+    await publish(PARANOIA, (d) => {
+      d.oneshot.title = "Third time";
+    });
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "repin" } })).statusCode).toBe(409);
+    const live = await db().game.findUniqueOrThrow({ where: { code } });
+    expect((await gameOneShot(live)).title).toBe("Open In Case Of Future, Revised");
+  });
+
+  it("never hands a player anyone else's secrets, keys or account ids", async () => {
+    const code = await newGame();
+    const q = { code };
+    const guest = sam(code);
+    await hit(claimsRoute, other, { method: "POST", query: q, body: { characterId: "gloria-pop" } });
+    await hit(claimsRoute, guest, { method: "POST", query: q, body: { characterId: "penny-buy" } });
+    await hit(lettersRoute, gm, { method: "POST", query: q, body: { letterId: "the-sprinkles-crate" } });
+    await hit(lettersRoute, gm, { method: "POST", query: q, body: { letterId: "the-buyer-writes" } });
+    await hit(flashbacksRoute, guest, { method: "POST", query: q, body: { characterId: "penny-buy", answer: "Sam's own past." } });
+    const people = ((await hit(liveRoute, gm, { method: "GET", query: q })).body as { people: { handle: string; character: string }[] }).people;
+    const penny = people.find((p) => p.character?.startsWith("Penny"))!;
+    await hit(liveRoute, gm, { method: "POST", query: q, body: { action: { type: "note", to: penny.handle, text: "Only for Penny." } } });
+    await hit(liveRoute, gm, { method: "POST", query: q, body: { action: { type: "roll", label: "Behind the screen", count: 1, sides: 20, mod: 0, hidden: true } } });
+
+    const os = await gameOneShot(await db().game.findUniqueOrThrow({ where: { code } }));
+    const pennysSecret = JSON.stringify((os.cast.find((c) => c.id === "penny-buy") as { naughty: unknown }).naughty);
+    const forbidden = [guest.guest.key, gm.id, co.id, admin.id, "Only for Penny.", "Sam's own past.", pennysSecret, "Behind the screen"];
+    const routes: [string, Parameters<typeof hit>[0], Record<string, string>][] = [
+      ["table", tableRoute, q],
+      ["live", liveRoute, { ...q, as: "player" }],
+      ["letters", lettersRoute, q],
+      ["secrets", secretsRoute, { ...q, as: "player" }],
+      ["flashbacks", flashbacksRoute, q],
+      ["tapestry", tapestryRoute, q],
+      ["epilogue", epilogueRoute, q],
+      ["recordings", recordingsRoute, { ...q, as: "player" }],
+    ];
+    for (const [name, route, query] of routes) {
+      const seen = JSON.stringify((await hit(route, other, { method: "GET", query })).body);
+      for (const f of forbidden) expect(seen.includes(f), `${name} shows Ollie ${f.slice(0, 30)}`).toBe(false);
+      // Not even their own account id: keys stay on the server.
+      expect(seen.includes(other.id), `${name} shows Ollie a key`).toBe(false);
+    }
+    // Their own secret, letter and nothing else.
+    const mine = (await hit(secretsRoute, other, { method: "GET", query: { ...q, as: "player" } })).body as { secrets: Record<string, unknown> };
+    expect(Object.keys(mine.secrets)).toEqual(["gloria-pop"]);
+    const letters = (await hit(lettersRoute, other, { method: "GET", query: q })).body as { letters: { to: string; text?: string }[] };
+    expect(letters.letters.map((l) => [l.to, !!l.text])).toEqual([["gloria-pop", true]]);
+    // The TV sees the table, not the people at it.
+    const tv = JSON.stringify((await hit(liveRoute, gm, { method: "GET", query: { ...q, as: "table" } })).body);
+    for (const f of forbidden) expect(tv.includes(f)).toBe(false);
+  });
+
+  it("runs Ten Candles' own state per game: the GM's moves are the GM's", async () => {
+    await publish(CANDLES);
+    const code = await newGame(CANDLES);
+    const q = { code };
+    const sit = await hit(stateRoute, other, { method: "POST", query: { ...q, as: "player" }, body: { action: { type: "sit", name: "Ollie" } } });
+    expect(sit.statusCode).toBe(200);
+    const settings = { action: { type: "settings", patch: { onesToGm: true } } };
+    expect((await hit(stateRoute, admin, { method: "POST", query: q, body: settings })).statusCode).toBe(403);
+    expect((await hit(stateRoute, stranger, { method: "POST", query: q, body: settings })).statusCode).toBe(409);
+    expect((await hit(stateRoute, gm, { method: "POST", query: q, body: settings })).statusCode).toBe(200);
+    const state = await db().gameState.findFirstOrThrow({ where: { game: { code } } });
+    expect(JSON.stringify(state.state)).toContain(`u-${other.id}`);
+    expect(JSON.stringify((await hit(stateRoute, stranger, { method: "GET", query: { ...q, as: "player" } })).body)).not.toContain(other.id);
   });
 });

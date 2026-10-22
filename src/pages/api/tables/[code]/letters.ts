@@ -1,13 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { requestRole } from "@/lib/auth";
-import { tableOneShot } from "@/lib/source";
 import { db } from "@/lib/prisma";
+import { asStatus, isOver } from "@/lib/games";
+import { findGame, gameAccess, gameOneShot } from "@/lib/games.server";
 import { normalizeCode } from "@/lib/tables";
-import { playerIdOf } from "@/lib/tables.server";
 import { deliverBody, letterText, resolveLetter, type LetterView } from "@/lib/letters";
 
 /**
- * Sealed letters at a table.
+ * Sealed letters at a game.
  * GET — the GM sees every delivery (no text needed, they have it); a player
  *       sees letters addressed to characters they hold, with the text.
  * POST { letterId } — GM delivers a letter (content letter or inherited beat).
@@ -21,23 +20,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   res.setHeader("Cache-Control", "no-store");
   const code = normalizeCode(req.query.code);
-  const table = code
-    ? await db().table.findUnique({ where: { code }, include: { claims: true, deliveries: true } })
-    : null;
-  if (!table) return res.status(404).json({ error: "No table with that code" });
+  const game = code ? await findGame(code, { claims: true, deliveries: true }) : null;
+  if (!game) return res.status(404).json({ error: "No table with that code" });
 
   let os;
   try {
-    os = await tableOneShot(table.oneshot);
+    os = await gameOneShot(game);
   } catch {
     return res.status(404).json({ error: "That one-shot is gone" });
   }
-  const isGm = (await requestRole(req)) === "gm";
-  const playerId = playerIdOf(req);
-  const present = table.claims.map((c) => c.characterId);
-  const held = new Set(table.claims.filter((c) => playerId && c.playerId === playerId).map((c) => c.characterId));
+  const access = await gameAccess(req, game);
+  const present = game.claims.map((c) => c.characterId);
+  const held = new Set(game.claims.filter((c) => access.key && c.playerId === access.key).map((c) => c.characterId));
 
-  const view = (d: (typeof table.deliveries)[number]): LetterView | null => {
+  const view = (d: (typeof game.deliveries)[number]): LetterView | null => {
     const t = letterText(os, d.letterId);
     if (!t) return null;
     return {
@@ -50,9 +46,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
   };
   const visible = async () => {
-    const deliveries = await db().delivery.findMany({ where: { tableId: table.id }, orderBy: { deliveredAt: "asc" } });
+    const deliveries = await db().delivery.findMany({ where: { gameId: game.id }, orderBy: { deliveredAt: "asc" } });
     return deliveries
-      .filter((d) => isGm || held.has(d.characterId))
+      .filter((d) => access.view || held.has(d.characterId))
       .map(view)
       .filter((v): v is LetterView => v !== null);
   };
@@ -62,13 +58,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "PATCH") {
     const body = deliverBody.safeParse(req.body);
     if (!body.success) return res.status(400).json({ error: "Which letter?" });
-    const d = table.deliveries.find((x) => x.letterId === body.data.letterId);
+    const d = game.deliveries.find((x) => x.letterId === body.data.letterId);
     if (!d || !held.has(d.characterId)) return res.status(403).json({ error: "That letter isn't yours to open" });
     if (!d.openedAt) await db().delivery.update({ where: { id: d.id }, data: { openedAt: new Date() } });
     return res.status(200).json({ letters: await visible() });
   }
 
-  if (!isGm) return res.status(403).json({ error: "Only the GM hands out letters" });
+  if (!access.act) return res.status(403).json({ error: access.view ? "Only this game's GM can do that" : "Only the GM hands out letters" });
+  if (isOver(asStatus(game.status))) return res.status(409).json({ error: "This game is over" });
 
   if (req.method === "POST") {
     const body = deliverBody.safeParse(req.body);
@@ -76,14 +73,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const letter = resolveLetter(os, body.data.letterId, present);
     if (!letter) return res.status(409).json({ error: "Nobody at the table can receive that letter right now" });
     await db().delivery.upsert({
-      where: { tableId_letterId: { tableId: table.id, letterId: letter.id } },
-      create: { tableId: table.id, letterId: letter.id, characterId: letter.to },
+      where: { gameId_letterId: { gameId: game.id, letterId: letter.id } },
+      create: { gameId: game.id, letterId: letter.id, characterId: letter.to },
       update: {},
     });
     return res.status(201).json({ letters: await visible() });
   }
 
   const letterId = typeof req.query.letterId === "string" ? req.query.letterId : "";
-  await db().delivery.deleteMany({ where: { tableId: table.id, letterId } });
+  await db().delivery.deleteMany({ where: { gameId: game.id, letterId } });
   return res.status(200).json({ letters: await visible() });
 }

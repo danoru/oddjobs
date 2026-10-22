@@ -45,7 +45,7 @@ export function CharacterPage({ os: base, id }: { os: PublicOneShot; id: string 
   const [panel, setPanel] = useState<null | "customize" | "recipe" | "foundry">(null);
   // At a table with this poster torn: the dice tray, the bell, notes, coins and rumors.
   const seated = Boolean(table && player && claim?.mine);
-  const live = useLive(seated ? table : null, "player", player?.id ?? null);
+  const live = useLive(seated ? table : null, "player");
   const [armed, setArmed] = useState<RollSpec | null>(null);
   const coin = coinFor(os);
 
@@ -138,7 +138,7 @@ export function CharacterPage({ os: base, id }: { os: PublicOneShot; id: string 
           <main id="main" tabIndex={-1} className={sheet.sheet} {...readingAttrs(reading)}>
             {table && player && claim?.mine && (
               <div style={{ marginBottom: 24 }}>
-                <PlayerExtras code={table} playerId={player.id} characterId={id} flashback={stock.flashback} />
+                <PlayerExtras code={table} characterId={id} flashback={stock.flashback} />
                 <TableToys live={live} coin={coin} rumors={os.hasRumors} />
               </div>
             )}

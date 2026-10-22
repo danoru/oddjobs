@@ -11,21 +11,25 @@ import { fullLoad } from "./fullLoad";
 
 export interface Whoami {
   user: { username: string; displayName: string; role: "admin" | "member"; author: boolean; canInvite: boolean } | null;
-  /** The table role: "gm" for an admin until games arrive. */
-  role: "gm" | "table" | null;
+  /** Games the user runs or co-runs that aren't over. */
+  running: { code: string; oneshot: string }[];
+  /** Sitting at a game without an account. */
+  guest: { name: string; code: string; oneshot: string } | null;
   signedOut: boolean;
 }
 
 /** Pages anyone may see: no trip to the door from these. */
-const PUBLIC = /^\/(?:$|login|join\/|reset\/)/;
+const PUBLIC = /^\/(?:$|login|join\/|reset\/|t\/)/;
+
+const NOBODY: Whoami = { user: null, running: [], guest: null, signedOut: false };
 
 let cached: Whoami | undefined;
 let pending: Promise<Whoami> | null = null;
 
 function ask(): Promise<Whoami> {
   pending ??= fetch("/api/whoami", { cache: "no-store" })
-    .then((r) => (r.ok ? (r.json() as Promise<Whoami>) : { user: null, role: null, signedOut: false }))
-    .catch(() => ({ user: null, role: null, signedOut: false }))
+    .then((r) => (r.ok ? (r.json() as Promise<Whoami>) : NOBODY))
+    .catch(() => NOBODY)
     .then((w) => {
       if (w.user) cached = w;
       pending = null;

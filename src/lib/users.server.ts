@@ -191,13 +191,17 @@ export class Accounts {
 
   // ---- Invites ----
 
-  async makeInvite(by: Viewer, input: unknown): Promise<{ code: string; expiresAt: Date }> {
+  /**
+   * `seat`: a guest seat at a game (phase 11) that whoever joins with it
+   * takes over, with its history. Those are always single-use.
+   */
+  async makeInvite(by: Viewer, input: unknown, seat?: { gameId: string; key: string }): Promise<{ code: string; expiresAt: Date }> {
     if (!isAdmin(by) && !by.canInvite) throw new AccountError("Only an admin can make invites", 403);
     const parsed = inviteSchema.safeParse(input ?? {});
     if (!parsed.success) throw new AccountError(parsed.error.issues[0].message);
     const opt = parsed.data;
     // A member who may invite gets single-use links of a week at most, and can't hand out the author badge.
-    const member = !isAdmin(by);
+    const member = !isAdmin(by) || !!seat;
     const days = Math.min(opt.days, member ? MEMBER_INVITE_DAYS : INVITE_MAX_DAYS);
     const expiresAt = new Date(this.now().getTime() + days * 24 * 60 * 60 * 1000);
     const inv = await this.client().invite.create({
@@ -208,6 +212,7 @@ export class Accounts {
         expiresAt,
         grantsAuthor: member ? false : opt.grantsAuthor,
         createdById: by.id,
+        ...(seat ? { guestGameId: seat.gameId, guestKey: seat.key } : {}),
       },
     });
     return { code: inv.code, expiresAt };

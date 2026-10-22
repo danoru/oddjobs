@@ -40,7 +40,7 @@ export function PlayerTable({
   /** A pre-made poster this player tore down, if any. */
   claimedId: string | null;
 }) {
-  const { game, extras, error, busy, act } = useGame<TcView, Extras>(code, "player", player.id);
+  const { game, extras, error, busy, act } = useGame<TcView, Extras>(code, "player");
   const now = useNow();
   const premade = os.cast.find((c) => c.id === claimedId) ?? null;
 
@@ -72,7 +72,7 @@ export function PlayerTable({
         <>
           {game.phase === "lobby" && <Lobby game={game} seat={seat} premade={premade?.name ?? null} onStand={() => act({ type: "stand" })} />}
           {game.phase === "creation" && (
-            <Creation game={game} seat={seat} extras={extras} act={act} busy={busy} premade={premade} code={code} playerId={player.id} />
+            <Creation game={game} seat={seat} extras={extras} act={act} busy={busy} premade={premade} code={code} />
           )}
           {game.phase === "truths" && <Truths game={game} seat={seat} act={act} busy={busy} names={names} />}
           {game.phase === "scene" && <Scene game={game} seat={seat} act={act} busy={busy} names={names} />}
@@ -81,7 +81,7 @@ export function PlayerTable({
               <h2>The dark</h2>
               <p className={s.opening}>{OPENING_LINE}</p>
               <p className={s.prose}>Now the last words.</p>
-              <FinalWords code={code} playerId={player.id} as="player" seats={game.seats} you={seat} />
+              <FinalWords code={code} as="player" seats={game.seats} you={seat} />
             </div>
           )}
           {game.phase !== "lobby" && game.phase !== "creation" && <MyStack game={game} seat={seat} />}
@@ -174,7 +174,6 @@ function Creation({
   busy,
   premade,
   code,
-  playerId,
 }: {
   game: TcView;
   seat: number;
@@ -183,7 +182,6 @@ function Creation({
   busy: boolean;
   premade: PublicTcOneShot["cast"][number] | null;
   code: string;
-  playerId: string;
 }) {
   const step = game.step!;
   const n = game.seats.length;
@@ -263,7 +261,6 @@ function Creation({
       {step === "record" && (
         <Recorder
           code={code}
-          playerId={playerId}
           kept={game.settings.keepRecordings}
           recorded={game.seats[seat].recorded}
           onRecorded={(kind) => act({ type: "recorded", kind })}

@@ -8,8 +8,8 @@ import { accounts } from "./users.server";
  * only checks that a session exists; everything privileged checks the user
  * here, against the database, on every request.
  *
- * Until games arrive (phase 11), "GM" means an admin: the GM pages, opening a
- * table and the GM's side of every table API.
+ * Who runs a game (its GM and co-GMs) is per game: src/lib/games.server.ts
+ * (`gameAccess`) for the table APIs and the GM's pages.
  */
 
 type NodeReq = { headers?: Record<string, string | string[] | undefined>; cookies?: Partial<Record<string, string>> };
@@ -24,22 +24,6 @@ export async function currentUser(req: NodeReq): Promise<Viewer | null> {
   const claims = await readClaims(cookieHeaderOf(req));
   if (!claims) return null;
   return userSource.viewer(claims.sub, claims.tv);
-}
-
-/** At a table: "gm" for an admin, "table" for anyone else signed in. */
-export type Role = "table" | "gm";
-
-/**
- * The table role, for the table APIs the phones poll every couple of
- * seconds: a player's session is taken at its word (no database read per
- * poll), but a session claiming admin is checked against the database.
- */
-export async function requestRole(req: NodeReq): Promise<Role | null> {
-  const claims = await readClaims(cookieHeaderOf(req));
-  if (!claims) return null;
-  if (claims.role !== "admin") return "table";
-  const v = await userSource.viewer(claims.sub, claims.tv);
-  return v ? (isAdmin(v) ? "gm" : "table") : null;
 }
 
 export type Need = "member" | "author" | "admin";

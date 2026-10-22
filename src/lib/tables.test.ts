@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { claimBody, CODE_ALPHABET, CODE_LENGTH, makeTableCode, normalizeCode, playerIdSchema } from "./tables";
+import { claimBody, CODE_ALPHABET, CODE_LENGTH, makeTableCode, normalizeCode, playerIdSchema, playerNameSchema } from "./tables";
 
 describe("table codes", () => {
   it("are five unambiguous characters", () => {
@@ -20,15 +20,13 @@ describe("table codes", () => {
 });
 
 describe("request bodies", () => {
-  it("accept a claim with a name", () => {
-    expect(claimBody.safeParse({ characterId: "sister-vell", name: " Ana " }).data).toEqual({
-      characterId: "sister-vell",
-      name: "Ana",
-    });
+  it("take a claim by character only: the name comes from the account or the guest pass", () => {
+    expect(claimBody.safeParse({ characterId: "sister-vell", name: "Someone Else" }).data).toEqual({ characterId: "sister-vell" });
   });
   it("reject blank names and odd ids", () => {
-    expect(claimBody.safeParse({ characterId: "sister-vell", name: "  " }).success).toBe(false);
-    expect(claimBody.safeParse({ characterId: "../etc", name: "Ana" }).success).toBe(false);
+    expect(playerNameSchema.safeParse("  ").success).toBe(false);
+    expect(playerNameSchema.safeParse(" Ana ").data).toBe("Ana");
+    expect(claimBody.safeParse({ characterId: "../etc" }).success).toBe(false);
     expect(playerIdSchema.safeParse("short").success).toBe(false);
   });
 });

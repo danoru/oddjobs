@@ -33,7 +33,7 @@ export function TvLive({
   /** The page's own poll of the log, when it reads it too (Daggerheart's Fear and marks); otherwise the TV polls here. */
   live?: ReturnType<typeof useLive>;
 }) {
-  const own = useLive(shared ? null : code, "table", null);
+  const own = useLive(shared ? null : code, "table");
   const live = shared ?? own;
   const { fold, events, baseline } = live;
   const fresh = (e: LiveEvent) => baseline !== null && e.id > baseline;

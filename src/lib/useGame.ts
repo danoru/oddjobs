@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { PLAYER_HEADER } from "./tables";
 
 /** Live play changes faster than claims do; poll a little quicker (the actor's own phone updates at once). */
 export const GAME_POLL_MS = 2000;
@@ -15,7 +14,6 @@ type Reply<V> = { error?: string; game?: V } & Record<string, unknown>;
 export function useGame<V, X extends Record<string, unknown> = Record<string, unknown>>(
   code: string | null,
   as: "player" | "table" | "gm",
-  playerId: string | null,
 ) {
   const [game, setGame] = useState<V | null>(null);
   const [extras, setExtras] = useState<Partial<X>>({});
@@ -32,7 +30,6 @@ export function useGame<V, X extends Record<string, unknown> = Record<string, un
         method,
         cache: "no-store",
         headers: {
-          ...(playerId ? { [PLAYER_HEADER]: playerId } : {}),
           ...(body ? { "Content-Type": "application/json" } : {}),
         },
         body: body ? JSON.stringify(body) : undefined,
@@ -46,7 +43,7 @@ export function useGame<V, X extends Record<string, unknown> = Record<string, un
       }
       return { ok: res.ok, json };
     },
-    [url, playerId],
+    [url],
   );
 
   useEffect(() => {

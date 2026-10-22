@@ -24,7 +24,7 @@ type Act = (a: unknown) => Promise<string | null>;
 
 /** The GM's side of a Ten Candles table: seats, rules, candles, every card, the dice and the truths. */
 export function GmTable({ os, code }: { os: OneShotWithCast; code: string | null }) {
-  const { game, error, busy, act } = useGame<TcView>(code, "gm", null);
+  const { game, error, busy, act } = useGame<TcView>(code, "gm");
   // This page keeps the candles on the screen: burning down, and drafts.
   useCandleKeeper(game, act);
   const now = useNow();
@@ -92,7 +92,7 @@ export function GmTable({ os, code }: { os: OneShotWithCast; code: string | null
             <>
               <p className={s.opening}>{OPENING_LINE}</p>
               <p className={s.prose}>Turn the lights off. Play their last words.</p>
-              <FinalWords code={code} playerId={null} as="gm" seats={game.seats} you={null} />
+              <FinalWords code={code} as="gm" seats={game.seats} you={null} />
             </>
           )}
           {game.phase !== "lobby" && game.phase !== "ended" && (
@@ -116,7 +116,7 @@ export function GmTable({ os, code }: { os: OneShotWithCast; code: string | null
               <p className={s.eyebrow} style={{ marginTop: 16 }}>
                 Last words kept at the table
               </p>
-              <FinalWords code={code} playerId={null} as="gm" seats={game.seats} you={null} />
+              <FinalWords code={code} as="gm" seats={game.seats} you={null} />
             </>
           )}
         </div>
@@ -126,7 +126,7 @@ export function GmTable({ os, code }: { os: OneShotWithCast; code: string | null
         <Link className={s.btn} href={`/${os.slug}/tv`}>
           Candles on the TV
         </Link>
-        <Link className={s.btn} href={`/${os.slug}/kit`}>
+        <Link className={s.btn} href={`/${os.slug}/kit${code ? `?game=${code}` : ""}`}>
           Print the table kit
         </Link>
         <Link className={s.btn} href={`/${os.slug}/sounds`}>

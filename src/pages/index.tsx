@@ -1,5 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import type { GetStaticProps } from "next";
 import { publishedOneShots, revalidateSeconds } from "@/lib/source";
 import { toLanding, type LandingJob } from "@/lib/landing";
@@ -32,6 +34,32 @@ const STEPS = [
 
 const isIcon = (i: string): i is (typeof POSTER_ICONS)[number] => (POSTER_ICONS as readonly string[]).includes(i);
 const SYSTEM_LABEL = { dnd5e: "D&D 5e", tencandles: "Ten Candles" } as const;
+
+/** A table code from the GM: sit down at that game as a guest (/t/<code>), no account needed. */
+function TableCode() {
+  const router = useRouter();
+  const [code, setCode] = useState("");
+  return (
+    <form
+      className={l.codeForm}
+      onSubmit={(e) => {
+        e.preventDefault();
+        const c = code.toUpperCase().replace(/[\s-]/g, "");
+        if (c) void router.push(`/t/${encodeURIComponent(c)}`);
+      }}
+    >
+      <label htmlFor="table-code" className={l.sub}>
+        At a table tonight? Join with the code your GM reads out.
+      </label>
+      <span className={l.codeRow}>
+        <input id="table-code" className={l.codeInput} value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={7} autoCapitalize="characters" spellCheck={false} placeholder="ABCDE" />
+        <button type="submit" className={l.button}>
+          Sit down
+        </button>
+      </span>
+    </form>
+  );
+}
 
 export default function Landing({ jobs, origin }: Props) {
   const posters = jobs.flatMap((j) => j.posters.map((p) => ({ ...p, job: j.title, system: j.system })));
@@ -128,6 +156,7 @@ export default function Landing({ jobs, origin }: Props) {
             <Link href="/login" className={l.button}>
               Sign in
             </Link>
+            <TableCode />
           </section>
         </main>
 
