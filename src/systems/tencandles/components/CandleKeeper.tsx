@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { SoundEngine } from "@/lib/sound/synth";
 import { buzz } from "@/lib/shake";
+import { usePrefs } from "@/lib/storage";
 import type { TcSettings } from "../rules";
 import type { TcAction, TcView } from "../game";
 import s from "./Tc.module.css";
@@ -88,6 +89,12 @@ export function useCandleKeeper(game: TcView | null, act: Act) {
  */
 export function DraftPrompt({ game, act, busy }: { game: TcView; act: Act; busy: boolean }) {
   const draft = game.draft;
+  const { sound } = usePrefs().prefs;
+  // Read when a draft blows in, not a reason to sound it again.
+  const soundNow = useRef(sound);
+  useEffect(() => {
+    soundNow.current = sound;
+  });
   const engine = useRef<SoundEngine | null>(null);
   const yes = useRef<HTMLButtonElement | null>(null);
 
@@ -103,13 +110,13 @@ export function DraftPrompt({ game, act, busy }: { game: TcView; act: Act; busy:
     }, 900);
     try {
       if (SoundEngine.isSupported()) {
-        engine.current ??= new SoundEngine({ volume: 0.8 });
+        engine.current ??= new SoundEngine({ volume: soundNow.current.volume });
         engine.current.playStinger("whoosh");
       }
     } catch {
       /* no audio */
     }
-    buzz([120, 60, 120]);
+    if (soundNow.current.buzz) buzz([120, 60, 120]);
     if (document.hidden && typeof Notification !== "undefined" && Notification.permission === "granted") {
       try {
         new Notification("A draft at the table", { body: `Candle ${draft.index + 1} is sputtering. Does it go out?` });

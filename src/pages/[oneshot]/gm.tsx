@@ -12,6 +12,7 @@ import { GmTable } from "@/systems/tencandles/components/GmTable";
 import { Adversaries } from "@/systems/daggerheart/components/GmPanels";
 import { LevelPicker } from "@/components/board/LevelPicker";
 import { SiteHeader } from "@/components/SiteHeader";
+import { ProfileLink } from "@/components/profile/ProfileLink";
 import { GmTablePanels } from "@/components/gm/GmTablePanels";
 import { GameControls } from "@/components/gm/GameControls";
 import s from "@/components/board/Board.module.css";
@@ -120,7 +121,14 @@ export default function GmPage({ os: base, code }: Props) {
                       <li key={c.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <span style={{ flex: 1 }}>
                           <span className={s.yarn}>{c.name}</span>{" "}
-                          {claim ? `— ${claim.name ?? "someone"}` : <i>still on the board (NPC tonight?)</i>}
+                          {claim ? (
+                            <>
+                              —{" "}
+                              {claim.username ? <ProfileLink person={{ username: claim.username, displayName: claim.name ?? claim.username }} /> : (claim.name ?? "someone")}
+                            </>
+                          ) : (
+                            <i>still on the board (NPC tonight?)</i>
+                          )}
                           {os.coreRoles.includes(c.id) && !claim && <b> · needed</b>}
                         </span>
                         {claim && (
@@ -191,7 +199,16 @@ export default function GmPage({ os: base, code }: Props) {
                 <div className={s.meta} style={{ marginBottom: 8 }}>
                   <span>{c.poster.epithet}</span>
                   <span>{posterTag(c)}</span>
-                  {claimedBy[c.id]?.name && <span>played by {claimedBy[c.id].name}</span>}
+                  {claimedBy[c.id]?.name && (
+                    <span>
+                      played by{" "}
+                      {claimedBy[c.id].username ? (
+                        <ProfileLink person={{ username: claimedBy[c.id].username!, displayName: claimedBy[c.id].name! }} />
+                      ) : (
+                        claimedBy[c.id].name
+                      )}
+                    </span>
+                  )}
                 </div>
                 {"naughty" in c ? (
                   <>

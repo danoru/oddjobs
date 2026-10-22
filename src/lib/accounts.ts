@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PORTRAIT_DATA_MAX, PORTRAIT_DATA_RE } from "@/systems/dnd5e/customize";
 
 /**
  * Accounts (phase 10): who may do what on the site, and what a username,
@@ -72,6 +73,13 @@ export const signUpSchema = z.object({
 export type SignUp = z.infer<typeof signUpSchema>;
 
 export const profileSchema = z.object({ displayName: displayNameSchema, pronouns: pronounsSchema });
+
+/** The woodcut on your WANTED poster, engraved in the browser (src/lib/woodcut.ts); null takes it down. */
+export const portraitSchema = z
+  .string()
+  .max(PORTRAIT_DATA_MAX, "That portrait is too detailed to keep. Try a simpler photo.")
+  .regex(PORTRAIT_DATA_RE, "That isn't a woodcut")
+  .nullable();
 
 /** The first problem with each field, for a form. */
 export function fieldErrors(err: z.ZodError): Record<string, string> {

@@ -68,6 +68,11 @@ export function SiteHeader({ back, reading = false }: { back?: { href: string; l
             </Button>
           )}
           {user && (
+            <Button component={Link} href={`/u/${encodeURIComponent(user.username)}`} prefetch={false} size="small" sx={{ color: "text.secondary" }}>
+              Your profile
+            </Button>
+          )}
+          {user && (
             <Button component={Link} href="/settings" prefetch={false} size="small" sx={{ color: "text.secondary" }} title="Your settings">
               {user.displayName}
             </Button>

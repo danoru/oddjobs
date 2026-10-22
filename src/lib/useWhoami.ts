@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fullLoad } from "./fullLoad";
+import type { Prefs } from "./prefs";
 
 /**
  * Who's signed in, for navigation only (the GM bar, the header): asks
@@ -13,6 +14,8 @@ export interface Whoami {
   user: { username: string; displayName: string; role: "admin" | "member"; author: boolean; canInvite: boolean } | null;
   /** Games the user runs or co-runs that aren't over. */
   running: { code: string; oneshot: string }[];
+  /** The account's defaults for reading, dice and sound; null if never saved (or not signed in). */
+  prefs: Prefs | null;
   /** Sitting at a game without an account. */
   guest: { name: string; code: string; oneshot: string } | null;
   signedOut: boolean;
@@ -21,7 +24,7 @@ export interface Whoami {
 /** Pages anyone may see: no trip to the door from these. */
 const PUBLIC = /^\/(?:$|login|join\/|reset\/|t\/)/;
 
-const NOBODY: Whoami = { user: null, running: [], guest: null, signedOut: false };
+const NOBODY: Whoami = { user: null, running: [], prefs: null, guest: null, signedOut: false };
 
 let cached: Whoami | undefined;
 let pending: Promise<Whoami> | null = null;

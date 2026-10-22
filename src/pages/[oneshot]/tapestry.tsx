@@ -5,7 +5,7 @@ import { Alert, Box, Button, Container, ToggleButton, ToggleButtonGroup, Typogra
 import PrintIcon from "@mui/icons-material/Print";
 import { toPublic, type PublicAnyOneShot } from "@/lib/public";
 import { publishedPaths, withPublished } from "@/lib/published";
-import { useTableCode } from "@/lib/storage";
+import { useLinkedTableCode } from "@/lib/storage";
 import type { Panel } from "@/lib/tapestry";
 import { noEdits, type TapestryEdits } from "@/lib/epilogueSchema";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -25,7 +25,7 @@ type Reply = { panels?: (Panel & { dropped: boolean })[]; edits?: TapestryEdits;
  * table can look and print.
  */
 export default function TapestryPage({ os }: { os: PublicAnyOneShot }) {
-  const code = useTableCode(os.slug);
+  const code = useLinkedTableCode(os.slug);
   const [data, setData] = useState<Reply | null>(null);
   const [layout, setLayout] = useState<Layout>("strip");
   const icons = Object.fromEntries(os.cast.map((c) => [c.id, c.poster.icon]));

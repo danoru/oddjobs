@@ -4,8 +4,11 @@ import { accounts } from "@/lib/users.server";
 import { allow, bodyOf, sendAccountError } from "@/lib/accountsApi.server";
 
 /**
- * Your own account (/settings).
+ * Your own account (/settings). Only ever the signed-in account: nothing in
+ * the body can name anyone else.
  * PATCH { displayName, pronouns } — what the table calls you.
+ * PATCH { portrait } — your woodcut (a data URL made in the browser), or null.
+ * PATCH { prefs } — your defaults for reading, dice and sound (src/lib/prefs.ts).
  * POST { current, password } — change your password. Every session ends,
  *   this one included; the page signs in again with the new password.
  */
@@ -16,6 +19,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const body = bodyOf(req);
   try {
     if (req.method === "PATCH") {
+      if ("prefs" in body) return res.status(200).json({ prefs: await accounts.setPrefs(viewer.id, body.prefs) });
+      if ("portrait" in body) {
+        const u = await accounts.setPortrait(viewer.id, body.portrait);
+        return res.status(200).json({ portrait: u.portrait });
+      }
       const u = await accounts.updateProfile(viewer.id, body);
       return res.status(200).json({ displayName: u.displayName, pronouns: u.pronouns });
     }

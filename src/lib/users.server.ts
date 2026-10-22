@@ -8,6 +8,7 @@ import {
   inviteSchema,
   isAdmin,
   passwordSchema,
+  portraitSchema,
   profileSchema,
   signUpSchema,
   usernameKey,
@@ -16,6 +17,7 @@ import {
   type Viewer,
 } from "./accounts";
 import { hashPassword, verifyPassword } from "./password.server";
+import { prefsSchema, type Prefs } from "./prefs";
 import { db } from "./prisma";
 import { LIMITS, loginIpKey, loginUserKey, rateLimiter, tokenIpKey, type RateLimiter } from "./rateLimit.server";
 
@@ -328,6 +330,21 @@ export class Accounts {
     const parsed = profileSchema.safeParse(input);
     if (!parsed.success) throw new AccountError(parsed.error.issues[0].message, 400, String(parsed.error.issues[0].path[0]));
     return this.client().user.update({ where: { id: userId }, data: { displayName: parsed.data.displayName, pronouns: parsed.data.pronouns ?? null } });
+  }
+
+  /** Your woodcut, or none (null). */
+  async setPortrait(userId: string, input: unknown): Promise<User> {
+    const parsed = portraitSchema.safeParse(input);
+    if (!parsed.success) throw new AccountError(parsed.error.issues[0].message, 400, "portrait");
+    return this.client().user.update({ where: { id: userId }, data: { portrait: parsed.data } });
+  }
+
+  /** Your defaults for reading, dice and sound, as a whole set. */
+  async setPrefs(userId: string, input: unknown): Promise<Prefs> {
+    const parsed = prefsSchema.safeParse(input);
+    if (!parsed.success) throw new AccountError("Those settings don't parse", 400, "prefs");
+    await this.client().user.update({ where: { id: userId }, data: { prefs: parsed.data } });
+    return parsed.data;
   }
 
   // ---- The people page ----

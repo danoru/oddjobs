@@ -2,24 +2,36 @@ import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
 import type { GetServerSideProps } from "next";
+import { ThemeProvider } from "@mui/material/styles";
 import { PASSWORD_MIN, canMakeInvites, fieldErrors, passwordSchema, profileSchema, type Viewer } from "@/lib/accounts";
 import { pageViewer } from "@/lib/auth";
+import { db } from "@/lib/prisma";
+import { usePrefs } from "@/lib/storage";
+import { READING_LABELS, READING_MODES } from "@/lib/reading";
+import type { Prefs } from "@/lib/prefs";
 import { fullLoad } from "@/lib/fullLoad";
 import { signInWithPassword } from "@/lib/signInClient";
 import { Alert, DoorPage, Field, doorStyles as d } from "@/components/door/Door";
 import { Invites } from "@/components/door/Invites";
+import { parchmentTheme } from "@/components/admin/parchmentTheme";
+import { WoodcutPicker } from "@/systems/dnd5e/components/sheet/WoodcutPicker";
 
-type Props = { viewer: Viewer };
+type Props = { viewer: Viewer; portrait: string | null };
 
-/** Your account: what the table calls you, your password and, if an admin lets you, invite links. */
+/**
+ * Your account: what the table calls you, your woodcut, your password, your
+ * defaults for reading, dice and sound, and, if an admin lets you, invite
+ * links. Safety tools come in phase 14.
+ */
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res, resolvedUrl }) => {
   const gate = await pageViewer({ req, resolvedUrl }, "member");
   if (gate.redirect) return { redirect: gate.redirect };
   res.setHeader("Cache-Control", "private, no-store");
-  return { props: { viewer: gate.viewer } };
+  const row = await db().user.findUnique({ where: { id: gate.viewer.id }, select: { portrait: true } });
+  return { props: { viewer: gate.viewer, portrait: row?.portrait ?? null } };
 };
 
-export default function SettingsPage({ viewer }: Props) {
+export default function SettingsPage({ viewer, portrait: initialPortrait }: Props) {
   const [profile, setProfile] = useState({ displayName: viewer.displayName, pronouns: viewer.pronouns ?? "" });
   const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
   const [profileMsg, setProfileMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -27,6 +39,25 @@ export default function SettingsPage({ viewer }: Props) {
   const [pwErrors, setPwErrors] = useState<Record<string, string>>({});
   const [pwMsg, setPwMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [portrait, setPortrait] = useState(initialPortrait);
+  const [portraitMsg, setPortraitMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const { prefs, setPrefs } = usePrefs();
+  const [prefsMsg, setPrefsMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  async function savePortrait(next: string | undefined) {
+    setPortraitMsg(null);
+    const r = await fetch("/api/account", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ portrait: next ?? null }) }).catch(() => null);
+    const body = (await r?.json().catch(() => ({}))) as { error?: string } | undefined;
+    if (!r?.ok) return setPortraitMsg({ ok: false, text: body?.error ?? "Couldn't keep that portrait" });
+    setPortrait(next ?? null);
+    setPortraitMsg({ ok: true, text: next ? "On your poster now." : "Taken down. Your poster shows the plain engraving." });
+  }
+
+  async function changePrefs(next: Prefs) {
+    setPrefsMsg(null);
+    const ok = await setPrefs(next);
+    setPrefsMsg(ok ? { ok: true, text: "Saved to your account, for every device you sign in on." } : { ok: false, text: "Couldn't save that to your account; it's kept on this device for now." });
+  }
 
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault();
@@ -86,7 +117,11 @@ export default function SettingsPage({ viewer }: Props) {
           <>
             Signed in as <b>{viewer.username}</b>
             {viewer.role === "admin" ? ", an admin" : ""}
-            {viewer.author ? ", with the author's quill" : ""}. <Link href="/board" className={d.link}>Back to the board</Link>
+            {viewer.author ? ", with the author's quill" : ""}.{" "}
+            <Link href={`/u/${encodeURIComponent(viewer.username)}`} prefetch={false} className={d.link}>
+              Your WANTED poster
+            </Link>{" "}
+            · <Link href="/board" className={d.link}>Back to the board</Link>
           </>
         }
       >
@@ -106,6 +141,17 @@ export default function SettingsPage({ viewer }: Props) {
           </form>
         </section>
 
+        <section className={d.section} aria-labelledby="portrait-title">
+          <h2 id="portrait-title" className={d.sectionTitle}>
+            Your portrait
+          </h2>
+          <p className={d.hint}>A photo or a sketch, carved into a woodcut in this browser for your poster. Only the woodcut is kept; the photo never leaves this device.</p>
+          <ThemeProvider theme={parchmentTheme}>
+            <WoodcutPicker value={portrait ?? undefined} onChange={(url) => void savePortrait(url)} />
+          </ThemeProvider>
+          {portraitMsg && <Alert ok={portraitMsg.ok}>{portraitMsg.text}</Alert>}
+        </section>
+
         <section className={d.section} aria-labelledby="password-title">
           <h2 id="password-title" className={d.sectionTitle}>
             Password
@@ -122,6 +168,63 @@ export default function SettingsPage({ viewer }: Props) {
               </button>
             </div>
           </form>
+        </section>
+
+        <section className={d.section} aria-labelledby="prefs-title">
+          <h2 id="prefs-title" className={d.sectionTitle}>
+            How the table reads and sounds for you
+          </h2>
+          <p className={d.hint}>Your defaults on any device you sign in on. You can still change them on a page as you play.</p>
+          <fieldset className={d.fieldset}>
+            <legend className={d.label}>Reading</legend>
+            {READING_MODES.map((m) => (
+              <label key={m} className={d.check}>
+                <input type="checkbox" checked={prefs.reading[m]} onChange={(e) => void changePrefs({ ...prefs, reading: { ...prefs.reading, [m]: e.target.checked } })} />
+                <span>
+                  {READING_LABELS[m].label}
+                  <span className={d.hint}>{READING_LABELS[m].hint}</span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
+          <fieldset className={d.fieldset}>
+            <legend className={d.label}>Dice</legend>
+            <label className={d.check}>
+              <input type="checkbox" checked={prefs.dice.shake} onChange={(e) => void changePrefs({ ...prefs, dice: { ...prefs.dice, shake: e.target.checked } })} />
+              <span>
+                Shake to roll, from the start
+                <span className={d.hint}>On phones that allow it without asking. An iPhone still asks once, from the tray.</span>
+              </span>
+            </label>
+          </fieldset>
+          <fieldset className={d.fieldset}>
+            <legend className={d.label}>Sound</legend>
+            <label className={d.field} htmlFor="volume">
+              <span>Volume: {Math.round(prefs.sound.volume * 100)}%</span>
+              <input
+                id="volume"
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={Math.round(prefs.sound.volume * 100)}
+                onChange={(e) => void changePrefs({ ...prefs, sound: { ...prefs.sound, volume: Number(e.target.value) / 100 } })}
+              />
+              <span className={d.hint}>The soundboard, the GM&apos;s bell on your phone and the candles.</span>
+            </label>
+            <label className={d.check}>
+              <input type="checkbox" checked={prefs.sound.buzz} onChange={(e) => void changePrefs({ ...prefs, sound: { ...prefs.sound, buzz: e.target.checked } })} />
+              <span>Buzz the phone with the bell and the candles</span>
+            </label>
+          </fieldset>
+          {prefsMsg && <Alert ok={prefsMsg.ok}>{prefsMsg.text}</Alert>}
+        </section>
+
+        <section className={d.section} aria-labelledby="safety-title">
+          <h2 id="safety-title" className={d.sectionTitle}>
+            Safety tools
+          </h2>
+          <p className={d.hint}>Coming soon: your lines and veils, shown to a game&apos;s GM without your name before play, and an X-card on your phone at the table.</p>
         </section>
 
         {canMakeInvites(viewer) && (

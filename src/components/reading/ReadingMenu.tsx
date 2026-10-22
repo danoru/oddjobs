@@ -4,9 +4,9 @@ import TextFieldsIcon from "@mui/icons-material/TextFields";
 import { anyReading, READING_LABELS, READING_MODES } from "@/lib/reading";
 import { useReading } from "@/lib/storage";
 
-/** The "Reading" button: large print, high contrast and dyslexia-friendly sheets, remembered on this device. */
+/** The "Reading" button: large print, high contrast and dyslexia-friendly sheets, kept on your account (a guest's on this device). */
 export function ReadingMenu() {
-  const { reading, setMode } = useReading();
+  const { reading, setMode, member } = useReading();
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const on = anyReading(reading);
 
@@ -31,7 +31,7 @@ export function ReadingMenu() {
         slotProps={{ paper: { role: "dialog", "aria-label": "Reading options", sx: { p: 2, maxWidth: 320 } } }}
       >
         <Typography variant="h6" component="h2" sx={{ fontSize: 18, mb: 1 }}>
-          How sheets read on this device
+          {member ? "How sheets read for you" : "How sheets read on this device"}
         </Typography>
         <FormGroup>
           {READING_MODES.map((m) => (
@@ -51,7 +51,7 @@ export function ReadingMenu() {
           ))}
         </FormGroup>
         <Typography variant="body2" color="text.secondary">
-          Applies to sheets, printing, cards and tents.
+          Applies to sheets, printing, cards and tents.{member ? " Kept on your account, on every device; also in your settings." : ""}
         </Typography>
       </Popover>
     </>

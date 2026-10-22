@@ -19,6 +19,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Poster } from "@/components/board/Poster";
 import { TableNote } from "@/components/board/TableNote";
 import { RunJob } from "@/components/board/RunJob";
+import { ProfileLink } from "@/components/profile/ProfileLink";
 import { YarnBoard } from "@/components/board/YarnBoard";
 import { TownBoard } from "@/components/board/TownBoard";
 import { LevelPicker } from "@/components/board/LevelPicker";
@@ -194,11 +195,29 @@ export function JobPage({ os: base, cameos }: { os: PublicAnyOneShot; cameos: Su
                 {words.party}
               </h2>
               <Typography sx={{ fontFamily: "var(--font-print)", fontSize: 16 }} aria-live="polite">
-                {claimedCast.length === 0
-                  ? "No posters torn down yet."
-                  : `${claimedCast.length} of ${os.players.max} posters torn down: ${claimedCast
-                      .map((c) => (claimedBy[c.id]?.name ? `${c.name} (${claimedBy[c.id].name})` : c.name))
-                      .join(", ")}.`}
+                {claimedCast.length === 0 ? (
+                  "No posters torn down yet."
+                ) : (
+                  <>
+                    {claimedCast.length} of {os.players.max} posters torn down:{" "}
+                    {claimedCast.map((c, i) => {
+                      const by = claimedBy[c.id];
+                      return (
+                        <span key={c.id}>
+                          {i > 0 && ", "}
+                          {c.name}
+                          {by?.name && (
+                            <>
+                              {" "}
+                              ({by.username ? <ProfileLink person={{ username: by.username, displayName: by.name }} /> : by.name})
+                            </>
+                          )}
+                        </span>
+                      );
+                    })}
+                    .
+                  </>
+                )}
               </Typography>
               {os.system === "dnd5e" && (
                 <ul className={s.roleChips} aria-label="Party roles covered">

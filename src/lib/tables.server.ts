@@ -3,21 +3,32 @@ import type { Prisma, TableEvent } from "@prisma/client";
 import type { LiveRow, NewRow, Person } from "./live";
 import type { OneShotWithCast } from "./schema";
 import { db } from "./prisma";
-import { asStatus } from "./games";
+import { asStatus, userIdOfKey } from "./games";
 import type { TableState } from "./tables";
 
 /** Include this in a game query for `stateOf`. */
-export const CLAIMS_IN_ORDER = { claims: { orderBy: { claimedAt: "asc" } } } as const;
+export const CLAIMS_IN_ORDER = { claims: { orderBy: { claimedAt: "asc" }, include: { user: { select: { username: true } } } } } as const;
 
-/** A game's seats as one player (by their key at it) sees them, or null if there's no such game. */
+/**
+ * A game's seats as one player (by their key at it) sees them, or null if
+ * there's no such game. A member asking also gets each account seat's
+ * username, to link to its holder's poster; a guest (or Foundry) doesn't.
+ */
 export async function tableState(code: string, key: string | null): Promise<TableState | null> {
   const game = await db().game.findUnique({ where: { code }, include: CLAIMS_IN_ORDER });
   return game ? stateOf(game, key) : null;
 }
 
-type StateRow = { code: string; oneshot: string; status: string; seats: number | null; claims: { characterId: string; playerName: string; playerId: string; userId: string | null; claimedAt: Date }[] };
+type StateRow = {
+  code: string;
+  oneshot: string;
+  status: string;
+  seats: number | null;
+  claims: { characterId: string; playerName: string; playerId: string; userId: string | null; claimedAt: Date; user?: { username: string } | null }[];
+};
 
 export function stateOf(game: StateRow, key: string | null): TableState {
+  const member = userIdOfKey(key) !== null;
   return {
     code: game.code,
     oneshot: game.oneshot,
@@ -28,6 +39,7 @@ export function stateOf(game: StateRow, key: string | null): TableState {
       name: c.playerName,
       mine: key !== null && c.playerId === key,
       guest: c.userId === null,
+      username: member ? (c.user?.username ?? null) : null,
       claimedAt: c.claimedAt.toISOString(),
     })),
   };

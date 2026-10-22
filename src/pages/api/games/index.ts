@@ -49,18 +49,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const [spoiled, gms, seats] = await Promise.all([
     db().spoiler.findUnique({ where: { userId_oneshot: { userId: viewer.id, oneshot: slug } } }),
-    db().spoiler.findMany({ where: { oneshot: slug, userId: { not: viewer.id } }, include: { user: { select: { displayName: true, disabledAt: true } } } }),
+    db().spoiler.findMany({ where: { oneshot: slug, userId: { not: viewer.id } }, include: { user: { select: { username: true, displayName: true, disabledAt: true } } } }),
     db().claim.findMany({
       where: { game: { oneshot: slug, status: { in: ["finished", "epilogued"] } }, userId: { not: null }, NOT: { playerId: userKey(viewer.id) } },
-      select: { user: { select: { id: true, displayName: true, disabledAt: true } } },
+      select: { user: { select: { id: true, username: true, displayName: true, disabledAt: true } } },
     }),
   ]);
   const played: JobRecord["played"] = [];
   const seen = new Set<string>();
-  const add = (u: { id: string; displayName: string; disabledAt: Date | null } | null, as: "gm" | "player") => {
+  const add = (u: { id: string; username: string; displayName: string; disabledAt: Date | null } | null, as: "gm" | "player") => {
     if (!u || u.disabledAt || seen.has(u.id)) return;
     seen.add(u.id);
-    played.push({ displayName: u.displayName, as });
+    played.push({ username: u.username, displayName: u.displayName, as });
   };
   for (const s of gms) add({ id: s.userId, ...s.user }, "gm");
   for (const c of seats) add(c.user, "player");

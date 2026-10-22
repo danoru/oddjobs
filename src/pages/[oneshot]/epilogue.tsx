@@ -4,7 +4,9 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   Container,
+  FormControlLabel,
   MenuItem,
   Stack,
   TextField,
@@ -17,7 +19,7 @@ import { useState } from "react";
 import { toPublic, type PublicAnyOneShot } from "@/lib/public";
 import { FATE_LABEL, FATES, type Fate } from "@/lib/legacy";
 import { emptyEpilogue, survivorsFrom, useSharedEpilogue } from "@/lib/epilogue";
-import { usePlayer, useTableCode } from "@/lib/storage";
+import { usePlayer, useLinkedTableCode } from "@/lib/storage";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Gazette, type EpilogueEntry } from "@/components/gazette/Gazette";
 import { publishedPaths, withPublished } from "@/lib/published";
@@ -39,7 +41,7 @@ export const getStaticProps: GetStaticProps<Props> = withPublished((os) => ({
  * content/legacy/ when it's in git.
  */
 export default function EpiloguePage({ os, sharedWorld }: Props) {
-  const code = useTableCode(os.slug);
+  const code = useLinkedTableCode(os.slug);
   const player = usePlayer();
   const { ep, setEp, canEdit, shared, saved } = useSharedEpilogue(os.slug, code, player?.id ?? null);
   const all = canEdit === "all";
@@ -165,6 +167,17 @@ export default function EpiloguePage({ os, sharedWorld }: Props) {
                         <TextField size="small" label="Title earned" disabled={!all} placeholder="Bell-thief" value={e.title ?? ""} onChange={(ev) => setEntry(c.id, { title: ev.target.value })} slotProps={{ htmlInput: { maxLength: 60 } }} sx={{ flex: 1, ...field }} />
                         <TextField size="small" label="Scar" disabled={!all} placeholder="rope-burned palms" value={e.scar ?? ""} onChange={(ev) => setEntry(c.id, { scar: ev.target.value })} slotProps={{ htmlInput: { maxLength: 140 } }} sx={{ flex: 1, ...field }} />
                       </Stack>
+                      {os.system !== "tencandles" && (
+                        <FormControlLabel
+                          disabled={!all}
+                          control={<Checkbox size="small" checked={e.revealed === true} onChange={(ev) => setEntry(c.id, { revealed: ev.target.checked || undefined })} />}
+                          label={
+                            <Typography variant="body2" color="text.secondary">
+                              Their secret came out at the table (their player&apos;s own history may then show it)
+                            </Typography>
+                          }
+                        />
+                      )}
                     </Stack>
                   </Box>
                 );

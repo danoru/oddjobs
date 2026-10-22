@@ -55,7 +55,7 @@ describe("guest passes", () => {
     const p = pass();
     for (const ok of ["/lot-thirteen", "/lot-thirteen/rook", "/lot-thirteen/play", "/lot-thirteen/tv", "/lot-thirteen/epilogue", "/api/tables/ABCDE", "/api/tables/abcde/live", "/_next/data/b1/lot-thirteen/rook.json", "/_next/data/b1/lot-thirteen.json"])
       expect(guestMayVisit(p, ok), ok).toBe(true);
-    for (const no of ["/lot-thirteen/gm", "/lot-thirteen/kit", "/lot-thirteen/box", "/the-drowned-bell", "/board", "/games", "/admin", "/api/tables/FGHJK/live", "/api/games", "/api/games/ABCDE", "/_next/data/b1/lot-thirteen/gm.json", "/chronicle"])
+    for (const no of ["/lot-thirteen/gm", "/lot-thirteen/kit", "/lot-thirteen/box", "/the-drowned-bell", "/board", "/games", "/admin", "/api/tables/FGHJK/live", "/api/games", "/api/games/ABCDE", "/_next/data/b1/lot-thirteen/gm.json", "/chronicle", "/u/rook", "/u/rook/", "/_next/data/b1/u/rook.json", "/settings", "/api/account"])
       expect(guestMayVisit(p, no), no).toBe(false);
   });
 });

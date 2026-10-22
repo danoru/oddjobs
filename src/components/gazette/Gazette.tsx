@@ -9,6 +9,8 @@ export interface EpilogueEntry {
   title?: string;
   scar?: string;
   playedBy?: string;
+  /** The GM's note that this character's secret came out at the table: it may then show in its player's own history. */
+  revealed?: boolean;
 }
 
 export interface Epilogue {

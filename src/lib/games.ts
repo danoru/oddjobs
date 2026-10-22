@@ -107,7 +107,7 @@ export interface JobRecord {
   /** The asker ran (or co-ran) it, so knows its secrets. */
   youKnow: boolean;
   /** Members who have run it or held a seat in a finished game of it. */
-  played: { displayName: string; as: "gm" | "player" }[];
+  played: { username: string; displayName: string; as: "gm" | "player" }[];
   /** The asker's games of it that aren't over. */
   games: GameSummary[];
 }

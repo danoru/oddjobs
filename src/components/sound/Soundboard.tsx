@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Slider } from "@mui/material";
 import type { Sounds } from "@/lib/schema";
 import { SoundEngine } from "@/lib/sound/synth";
+import { usePrefs } from "@/lib/storage";
 import s from "./Soundboard.module.css";
 
 /** Shown when a one-shot declares no sounds of its own. */
@@ -67,7 +68,10 @@ export function Soundboard({ title, sounds }: { title: string; sounds?: Sounds |
   const flashTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
   const [activeBed, setActiveBed] = useState<string | null>(null);
   const [flashing, setFlashing] = useState<ReadonlySet<string>>(new Set());
-  const [volume, setVolume] = useState(0.8);
+  // The viewer's default until they move the slider here.
+  const preferred = usePrefs().prefs.sound.volume;
+  const [moved, setVolume] = useState<number | null>(null);
+  const volume = moved ?? preferred;
   const [unsupported, setUnsupported] = useState(false);
 
   useWakeLock(activeBed !== null);

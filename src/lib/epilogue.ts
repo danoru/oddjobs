@@ -25,6 +25,7 @@ function parse(raw: string | null): Epilogue {
         title: typeof e.title === "string" ? e.title : undefined,
         scar: typeof e.scar === "string" ? e.scar : undefined,
         playedBy: typeof e.playedBy === "string" ? e.playedBy : undefined,
+        revealed: e.revealed === true ? true : undefined,
       };
     }
     return {

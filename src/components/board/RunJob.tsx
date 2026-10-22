@@ -5,6 +5,7 @@ import { Alert, Box, Button, Typography } from "@mui/material";
 import { STATUS_LABEL, type JobRecord } from "@/lib/games";
 import { fullLoad } from "@/lib/fullLoad";
 import s from "./Board.module.css";
+import { ProfileLink } from "@/components/profile/ProfileLink";
 
 const mono = { fontFamily: "var(--font-print)", fontSize: 16 } as const;
 const small = { fontFamily: "var(--font-label)", fontSize: 13, color: "var(--ink-soft)" } as const;
@@ -44,8 +45,15 @@ export function RunJob({ slug, runJob }: { slug: string; runJob: () => Promise<{
     } else fullLoad(`/${slug}/gm?game=${r.code}`);
   }
 
-  const gms = record.played.filter((p) => p.as === "gm").map((p) => p.displayName);
-  const players = record.played.filter((p) => p.as === "player").map((p) => p.displayName);
+  const gms = record.played.filter((p) => p.as === "gm");
+  const players = record.played.filter((p) => p.as === "player");
+  const names = (people: typeof gms) =>
+    people.map((p, i) => (
+      <span key={p.username}>
+        {i > 0 && ", "}
+        <ProfileLink person={p} />
+      </span>
+    ));
 
   return (
     <div className={`${s.note} no-print`} data-part="note" style={{ ["--tilt" as string]: "-0.3deg", marginBottom: 32 }} aria-label="Run this job">
@@ -63,10 +71,15 @@ export function RunJob({ slug, runJob }: { slug: string; runJob: () => Promise<{
       </Typography>
       {record.youKnow && <Typography sx={{ ...small, mt: 1 }}>You&apos;ve run this one before, so you know its secrets.</Typography>}
       <Typography sx={{ ...small, mt: 1 }} data-testid="played-by">
-        {record.played.length === 0
-          ? "Nobody on the board has played it yet: everyone's fresh."
-          : [gms.length ? `Run by ${gms.join(", ")}` : "", players.length ? `played by ${players.join(", ")}` : ""].filter(Boolean).join("; ") +
-            ". They know how it ends."}
+        {record.played.length === 0 ? (
+          "Nobody on the board has played it yet: everyone's fresh."
+        ) : (
+          <>
+            {gms.length > 0 && <>Run by {names(gms)}</>}
+            {gms.length > 0 && players.length > 0 && "; "}
+            {players.length > 0 && <>{gms.length ? "played" : "Played"} by {names(players)}</>}. They know how it ends.
+          </>
+        )}
       </Typography>
       {record.games.length > 0 && (
         <ul className={s.yarnList} style={{ marginTop: 8 }} aria-label="Your games of it">

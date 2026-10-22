@@ -4,6 +4,7 @@ import { currentUser } from "@/lib/auth";
 import { canAuthor, canMakeInvites } from "@/lib/accounts";
 import { db } from "@/lib/prisma";
 import { readGuestPass } from "@/lib/guestPass";
+import { parsePrefs } from "@/lib/prefs";
 
 /**
  * GET — who's signed in, for the bar across the top of every page (the
@@ -14,7 +15,8 @@ import { readGuestPass } from "@/lib/guestPass";
  * again itself.
  *
  * Also: the games the user runs or co-runs that aren't over (for the GM
- * bar), and a guest's pass (name and table). Signing in doesn't take over a
+ * bar), the account's defaults for reading, dice and sound (null if never
+ * saved: the browser keeps its own), and a guest's pass (name and table). Signing in doesn't take over a
  * guest seat by itself (a phone passed round the table would hand Sam's
  * night to whoever signs in next): that's what an invite for the seat is for.
  */
@@ -31,16 +33,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       user: null,
       running: [],
+      prefs: null,
       guest: pass ? { name: pass.name, code: pass.code, oneshot: pass.oneshot } : null,
       signedOut: !!req.headers.cookie?.includes("authjs.session-token"),
     });
   }
-  const running = await db().game.findMany({
-    where: { status: { notIn: ["finished", "epilogued"] }, OR: [{ gmId: v.id }, { coGms: { some: { userId: v.id } } }] },
-    select: { code: true, oneshot: true },
-    orderBy: { createdAt: "desc" },
-    take: 20,
-  });
+  const [running, saved] = await Promise.all([
+    db().game.findMany({
+      where: { status: { notIn: ["finished", "epilogued"] }, OR: [{ gmId: v.id }, { coGms: { some: { userId: v.id } } }] },
+      select: { code: true, oneshot: true },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+    }),
+    db().user.findUnique({ where: { id: v.id }, select: { prefs: true } }),
+  ]);
   return res.status(200).json({
     user: {
       username: v.username,
@@ -50,6 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       canInvite: canMakeInvites(v),
     },
     running,
+    prefs: saved?.prefs == null ? null : parsePrefs(saved.prefs),
     guest: null,
     signedOut: false,
   });

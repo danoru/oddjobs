@@ -4,6 +4,7 @@ import { SoundEngine } from "@/lib/sound/synth";
 import { bellsToRing, type BellData, type LiveEvent, type NoteData, type PoolRollData, type PublicPerson, type RollData, type RollMode, type RumorView } from "@/lib/live";
 import type { useLive } from "@/lib/useLive";
 import { buzz, useShake } from "@/lib/shake";
+import { usePrefs } from "@/lib/storage";
 import type { CoinMeta } from "@/systems/registry";
 import type { RollSpec } from "@/systems/dnd5e/rolls";
 import { dualityWords, type DualityData } from "@/systems/daggerheart/live";
@@ -85,6 +86,7 @@ export function rollWords(data: RollData | PoolRollData | DualityData | NodeData
  * on "Let the bell ring here" unlocks it (and keeps the screen awake).
  */
 export function PhoneBell({ live }: { live: Live }) {
+  const { sound } = usePrefs().prefs;
   const engine = useRef<SoundEngine | null>(null);
   const [unlocked, setUnlocked] = useState(false);
   const [flash, setFlash] = useState<{ id: number; label: string } | null>(null);
@@ -101,10 +103,10 @@ export function PhoneBell({ live }: { live: Live }) {
     const last = fresh.at(-1)!;
     const bell = last.data as BellData;
     engine.current?.playStinger(bell.preset as SoundStinger);
-    buzz([220, 90, 220, 90, 400]);
+    if (sound.buzz) buzz([220, 90, 220, 90, 400]);
     setRung((n) => n + fresh.length);
     setFlash({ id: last.id, label: bell.label });
-  }, [live.events, live.baseline]);
+  }, [live.events, live.baseline, sound.buzz]);
 
   // The flash clears itself after the swing, whatever the polls do meanwhile.
   useEffect(() => {
@@ -114,9 +116,9 @@ export function PhoneBell({ live }: { live: Live }) {
   }, [flash]);
 
   function unlock() {
-    engine.current ??= new SoundEngine({ volume: 0.9 });
+    engine.current ??= new SoundEngine({ volume: sound.volume });
     engine.current.playStinger("glass");
-    buzz(60);
+    if (sound.buzz) buzz(60);
     const nav = navigator as Navigator & { wakeLock?: { request: (t: "screen") => Promise<unknown> } };
     nav.wakeLock?.request("screen").catch(() => undefined);
     setUnlocked(true);

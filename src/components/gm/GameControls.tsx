@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert, Box, Button, Checkbox, FormControlLabel, MenuItem, TextField, Typography } from "@mui/material";
 import { canMove, canRepin, isOver, STATUS_LABEL, type GameDetail, type GamePatch, type GameStatus } from "@/lib/games";
 import s from "@/components/board/Board.module.css";
+import { ProfileLink } from "@/components/profile/ProfileLink";
 
 const mono = { fontFamily: "var(--font-print)", fontSize: 16 } as const;
 const small = { fontFamily: "var(--font-label)", fontSize: 13, color: "var(--ink-soft)" } as const;
@@ -77,8 +78,19 @@ export function GameControls({ code, cast }: { code: string; cast: { id: string;
       <span className={s.pin} aria-hidden="true" />
       <h2 className={s.noteTitle}>This game</h2>
       <Typography sx={mono}>
-        <b>{STATUS_LABEL[game.status]}</b> · run by {game.gm?.displayName ?? "the admins"}
-        {game.coGms.length > 0 && <> with {game.coGms.map((c) => c.displayName).join(", ")}</>}
+        <b>{STATUS_LABEL[game.status]}</b> · run by {game.gm ? <ProfileLink person={game.gm} /> : "the admins"}
+        {game.coGms.length > 0 && (
+          <>
+            {" "}
+            with{" "}
+            {game.coGms.map((c, i) => (
+              <span key={c.username}>
+                {i > 0 && ", "}
+                <ProfileLink person={c} />
+              </span>
+            ))}
+          </>
+        )}
         {game.seats !== null && <> · {game.taken} of {game.seats} seats taken</>}
       </Typography>
       {game.you === "admin" && !runs && (
@@ -154,13 +166,16 @@ export function GameControls({ code, cast }: { code: string; cast: { id: string;
             <Button size="small" variant="outlined" sx={quiet} disabled={busy || !heir} onClick={() => void patch({ op: "transfer", to: heir, stay }, () => setHeir(""))}>
               Hand it over
             </Button>
+            {heir && <PosterOf username={heir} members={game.members} />}
           </Box>
           <Typography sx={{ ...mono, fontWeight: 700, mt: 2 }}>Co-GMs</Typography>
           {game.coGms.length > 0 && (
             <ul className={s.yarnList}>
               {game.coGms.map((c) => (
                 <li key={c.username} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ flex: 1 }}>{c.displayName}</span>
+                  <span style={{ flex: 1 }}>
+                    <ProfileLink person={c} />
+                  </span>
                   <Button size="small" sx={{ color: "var(--ink-soft)" }} disabled={busy} onClick={() => void patch({ op: "removeCoGm", username: c.username })}>
                     remove
                   </Button>
@@ -179,6 +194,7 @@ export function GameControls({ code, cast }: { code: string; cast: { id: string;
             <Button size="small" variant="outlined" sx={quiet} disabled={busy || !cogm} onClick={() => void patch({ op: "addCoGm", username: cogm }, () => setCogm(""))}>
               Add co-GM
             </Button>
+            {cogm && <PosterOf username={cogm} members={game.members} />}
           </Box>
         </Box>
       )}
@@ -222,4 +238,14 @@ export function GameControls({ code, cast }: { code: string; cast: { id: string;
       )}
     </div>
   );
+}
+
+/** Who's picked in a member list, with a link to their poster, before the GM hands anything over. */
+function PosterOf({ username, members }: { username: string; members: GameDetail["members"] }) {
+  const m = members.find((x) => x.username === username);
+  return m ? (
+    <ProfileLink person={m} className={s.yarn}>
+      {m.displayName}&apos;s poster
+    </ProfileLink>
+  ) : null;
 }

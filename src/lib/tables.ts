@@ -42,6 +42,8 @@ export type TableClaim = {
   mine: boolean;
   /** Held by a guest (no account), who could keep it through an invite. */
   guest: boolean;
+  /** The holder's username, for a link to their poster: only for an account's seat, and only when a member is asking. */
+  username?: string | null;
   claimedAt: string;
 };
 

@@ -13,6 +13,8 @@ export const epilogueEntrySchema = z.object({
   title: z.string().max(60).optional(),
   scar: z.string().max(140).optional(),
   playedBy: z.string().max(60).optional(),
+  /** The secret came out at the table (the GM says so): its player's own history may show it. */
+  revealed: z.boolean().optional(),
 });
 
 export const epilogueSchema = z.object({

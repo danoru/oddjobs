@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { usePrefs } from "./storage";
 
 /**
  * Shake to roll: DeviceMotion, with iOS's permission prompt behind a button.
@@ -50,7 +51,9 @@ function motionSupport(): MotionPermission {
 
 /**
  * Calls `onShake` when the phone is shaken, while `armed`. On iOS motion
- * needs permission, asked from a tap: call `enable()` from a button.
+ * needs permission, asked from a tap: call `enable()` from a button. Where
+ * no asking is needed, it starts on if the viewer's dice default says so
+ * (src/lib/prefs.ts).
  */
 export function useShake(onShake: () => void, armed: boolean) {
   // What the browser offers (iOS asks first); the server render assumes "prompt".
@@ -58,6 +61,13 @@ export function useShake(onShake: () => void, armed: boolean) {
   const [answer, setPermission] = useState<MotionPermission | null>(null);
   const permission = answer ?? offered;
   const [on, setOn] = useState(false);
+  const wanted = usePrefs().prefs.dice.shake;
+  const started = useRef(false);
+  useEffect(() => {
+    if (started.current || !wanted || permission !== "granted") return;
+    started.current = true;
+    setOn(true);
+  }, [wanted, permission]);
   const cb = useRef(onShake);
   useEffect(() => {
     cb.current = onShake;

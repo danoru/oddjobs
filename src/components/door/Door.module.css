@@ -261,3 +261,44 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* Settings: a group of checkboxes (reading, dice, sound). */
+.fieldset {
+  display: grid;
+  gap: 10px;
+  border: 0;
+  padding: 0;
+  margin: 14px 0 0;
+}
+
+.fieldset legend {
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-family: var(--font-sheet);
+  font-size: 17px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.check input {
+  margin-top: 4px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--wax);
+  flex: none;
+}
+
+.check .hint {
+  display: block;
+}
+
+.fieldset input[type="range"] {
+  accent-color: var(--wax);
+  width: 100%;
+}

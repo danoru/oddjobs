@@ -278,6 +278,12 @@ model User {
   usernameLower String          @unique
   displayName   String
   pronouns      String?
+  /// The woodcut on their WANTED poster (/u/<username>): a small PNG data
+  /// URL engraved in the browser (src/lib/woodcut.ts). Nothing else is uploaded.
+  portrait      String?
+  /// Their defaults for reading modes, dice and sound (src/lib/prefs.ts).
+  /// Null = never saved: the browser's own, as for guests.
+  prefs         Json?
   /// argon2id.
   passwordHash  String
   /// "admin" | "member". Per-game roles (GM, co-GM, player) live on each game.

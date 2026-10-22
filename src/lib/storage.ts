@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useRouter } from "next/router";
 import { decodeTweaks, emptyTweaks, tweaksSchema, type Tweaks } from "@/systems/dnd5e/customize";
-import { parseReading, type Reading, type ReadingMode } from "./reading";
+import { parseReading, type ReadingMode } from "./reading";
+import { defaultPrefs, parsePrefs, type Prefs } from "./prefs";
+import { useWhoami } from "./useWhoami";
 import { levelsOf, pickLevel, withVariant, type HasLevels } from "@/systems/dnd5e/variants";
 import type { Character } from "@/systems/dnd5e/schema";
 import type { GameSummary, JobRecord } from "./games";
@@ -72,7 +75,9 @@ const tableKey = (slug: string) => `tearoff:table:${slug}`;
 const tweaksKey = (slug: string, id: string) => `tearoff:tweaks:${slug}/${id}`;
 const levelKey = (slug: string) => `tearoff:level:${slug}`;
 const PLAYER_KEY = "tearoff:player";
+/** Before phase 12 only the reading modes were kept, on their own. */
 const READING_KEY = "tearoff:reading";
+const PREFS_KEY = "tearoff:prefs";
 
 /** Posters torn off in this browser only — the fallback when there's no table. */
 function useLocalClaims(slug: string) {
@@ -118,7 +123,19 @@ export function useTableCode(slug: string): string | null {
   return normalizeCode(parseJson(useStored(tableKey(slug))));
 }
 
-export type ClaimInfo = { name: string | null; mine: boolean };
+/**
+ * The game a morning-after page is for: `?table=<code>` in the address (a
+ * link from your games or a profile names one game), else the table this
+ * browser joined. Following a link doesn't change which table that is.
+ */
+export function useLinkedTableCode(slug: string): string | null {
+  const stored = useTableCode(slug);
+  const linked = normalizeCode(useRouter().query.table);
+  return linked ?? stored;
+}
+
+/** Who tore a poster: their name, whether it's the asker, and (for a member looking at an account's seat) the username of their poster. */
+export type ClaimInfo = { name: string | null; mine: boolean; username?: string | null };
 
 type Reply = { ok: boolean; status: number; json: { error?: string; state?: TableState } & Partial<TableState> };
 
@@ -214,7 +231,7 @@ export function useClaims(slug: string, fixed?: string | null) {
 
   const claimedBy = useMemo<Record<string, ClaimInfo>>(() => {
     if (!code) return Object.fromEntries(local.claims.map((id) => [id, { name: null, mine: true }]));
-    return Object.fromEntries((live?.claims ?? []).map((c) => [c.characterId, { name: c.name, mine: c.mine }]));
+    return Object.fromEntries((live?.claims ?? []).map((c) => [c.characterId, { name: c.name, mine: c.mine, username: c.username ?? null }]));
   }, [code, live, local.claims]);
 
   /** Send a claim change, showing it straight away and correcting from the reply. */
@@ -389,13 +406,59 @@ function hasLevels(os: object): os is Leveled {
   return "level" in os && typeof os.level === "number" && "variants" in os && Array.isArray(os.variants);
 }
 
+/** Once per page load: the account's defaults over this browser's copy (or this browser's moved up to the account). */
+let synced = false;
+
+/**
+ * This viewer's defaults for reading, dice and sound (src/lib/prefs.ts). A
+ * member's are kept on their account and this browser holds a copy, so a
+ * sheet renders with them before the account answers; a guest's stay in
+ * the browser. The first time a member's account has none, this browser's
+ * are moved up to it.
+ */
+export function usePrefs() {
+  const who = useWhoami();
+  const raw = useStored(PREFS_KEY);
+  const legacy = useStored(READING_KEY);
+  const prefs = useMemo<Prefs>(() => {
+    const v = parseJson(raw);
+    return v ? parsePrefs(v) : { ...defaultPrefs(), reading: parseReading(parseJson(legacy)) };
+  }, [raw, legacy]);
+  const member = Boolean(who?.user);
+
+  const save = useCallback(
+    (next: Prefs): Promise<boolean> =>
+      fetch("/api/account", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prefs: next }) }).then(
+        (r) => r.ok,
+        () => false,
+      ),
+    [],
+  );
+
+  useEffect(() => {
+    if (synced || !who?.user) return;
+    synced = true;
+    if (who.prefs) write(PREFS_KEY, who.prefs);
+    else if (readRaw(PREFS_KEY) !== null || readRaw(READING_KEY) !== null) void save(prefs);
+  }, [who, prefs, save]);
+
+  /** Kept in this browser at once; a member's also go to the account (true once they're there). */
+  const setPrefs = useCallback(
+    (next: Prefs): Promise<boolean> => {
+      write(PREFS_KEY, next);
+      return member ? save(next) : Promise.resolve(true);
+    },
+    [member, save],
+  );
+  return { prefs, setPrefs, member };
+}
+
 /** This viewer's reading modes (large print, high contrast, dyslexia-friendly), for every sheet and printable. */
 export function useReading() {
-  const raw = useStored(READING_KEY);
-  const reading = useMemo(() => parseReading(parseJson(raw)), [raw]);
+  const { prefs, setPrefs, member } = usePrefs();
   const setMode = useCallback(
-    (mode: ReadingMode, on: boolean) => write(READING_KEY, { ...reading, [mode]: on } satisfies Reading),
-    [reading],
+    (mode: ReadingMode, on: boolean) => void setPrefs({ ...prefs, reading: { ...prefs.reading, [mode]: on } }),
+    [prefs, setPrefs],
   );
-  return { reading, setMode };
+  return { reading: prefs.reading, setMode, member };
 }

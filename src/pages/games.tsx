@@ -7,6 +7,7 @@ import { isAdmin } from "@/lib/accounts";
 import { isOver, STATUS_LABEL, type GameSummary } from "@/lib/games";
 import { listGames } from "@/lib/games.server";
 import { SiteHeader } from "@/components/SiteHeader";
+import { ProfileLink } from "@/components/profile/ProfileLink";
 import s from "@/components/board/Board.module.css";
 
 type Props = { games: GameSummary[]; all: boolean; admin: boolean };
@@ -37,7 +38,24 @@ function Row({ g }: { g: GameSummary }) {
       <span className={s.yarn}>{g.title}</span> <span style={small}>· {g.code}</span>
       <span style={{ display: "block", ...small }}>
         {STATUS_LABEL[g.status]} · {g.you ? ROLE[g.you] : ""}
-        {g.gm && g.you !== "gm" && <> · run by {g.gm.displayName}</>}
+        {g.gm && g.you !== "gm" && (
+          <>
+            {" "}
+            · run by <ProfileLink person={g.gm} />
+          </>
+        )}
+        {g.coGms.length > 0 && (
+          <>
+            {" "}
+            · with{" "}
+            {g.coGms.map((c, i) => (
+              <span key={c.username}>
+                {i > 0 && ", "}
+                <ProfileLink person={c} />
+              </span>
+            ))}
+          </>
+        )}
         {g.scheduledAt && <> · {new Date(g.scheduledAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</>}
         {g.finishedAt && isOver(g.status) && <> · {new Date(g.finishedAt).toLocaleDateString(undefined, { dateStyle: "medium" })}</>}
         {" · "}

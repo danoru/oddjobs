@@ -37,6 +37,11 @@ import gamesRoute from "@/pages/api/games/index";
 import gameRoute from "@/pages/api/games/[code]";
 import guestRoute from "@/pages/api/guest";
 import { handler as joinRoute } from "@/pages/api/join";
+import accountRoute from "@/pages/api/account";
+import { getServerSideProps as profilePage } from "@/pages/u/[username]";
+import { adoptGuest } from "@/lib/games.server";
+import { profileFor } from "@/lib/profile.server";
+import { defaultPrefs } from "@/lib/prefs";
 
 /**
  * The database store, against the local Postgres in .env (`pnpm db:dev`) in a
@@ -1051,5 +1056,139 @@ describe.skipIf(!up)("games", () => {
     const state = await db().gameState.findFirstOrThrow({ where: { game: { code } } });
     expect(JSON.stringify(state.state)).toContain(`u-${other.id}`);
     expect(JSON.stringify((await hit(stateRoute, stranger, { method: "GET", query: { ...q, as: "player" } })).body)).not.toContain(other.id);
+  });
+});
+
+describe.skipIf(!up)("profiles and settings", () => {
+  const PARANOIA = "open-in-case-of-future";
+  const KEY = "0123456789abcdef0123456789abcdef";
+  let gm: Viewer, co: Viewer, ollie: Viewer, stranger: Viewer;
+  const sam = (code: string): { guest: GuestPass } => ({ guest: { code, oneshot: PARANOIA, key: KEY, name: "Sam", exp: Math.floor(Date.now() / 1000) + 3600 } });
+  const WOODCUT = "data:image/png;base64,iVBORw0KGgo=";
+
+  beforeEach(async () => {
+    vi.stubEnv("TEAROFF_STORE", "db");
+    gm = toViewer(await person("Mags"));
+    co = toViewer(await person("Cobb"));
+    ollie = toViewer(await person("Ollie"));
+    stranger = toViewer(await person("Stray"));
+    installTestUsers([gm, co, ollie, stranger]);
+    const store = new DbStore();
+    await store.import(PARANOIA, await gitDoc(PARANOIA));
+    await store.publish(PARANOIA);
+  });
+
+  /** A finished, epilogued night: Mags runs it with Cobb, Ollie plays Gloria (whose secret came out) and Agnes, Sam the guest plays Penny. */
+  async function night() {
+    const code = (await createGame(gm, PARANOIA))!.code;
+    const q = { code };
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "addCoGm", username: "Cobb" } })).statusCode).toBe(200);
+    expect((await hit(claimsRoute, ollie, { method: "POST", query: q, body: { characterId: "gloria-pop" } })).statusCode).toBe(201);
+    expect((await hit(claimsRoute, ollie, { method: "POST", query: q, body: { characterId: "agnes-fil" } })).statusCode).toBe(201);
+    expect((await hit(claimsRoute, sam(code), { method: "POST", query: q, body: { characterId: "penny-buy" } })).statusCode).toBe(201);
+    await hit(flashbacksRoute, ollie, { method: "POST", query: q, body: { characterId: "gloria-pop", answer: "A private flashback, for the GM." } });
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: q, body: { op: "status", status: "finished" } })).statusCode).toBe(200);
+    const entries = {
+      "gloria-pop": { fate: "survived", title: "Loyal Citizen", scar: "a singed eyebrow", line: "I saw nothing.", revealed: true },
+      "agnes-fil": { fate: "fell", line: "Tell my clone I said hi." },
+      "penny-buy": { fate: "changed", title: "Sprinkle Baron", revealed: true },
+    };
+    const put = await hit(epilogueRoute, gm, { method: "PUT", query: q, body: { epilogue: { date: "2026-10-20", headline: "TREASON AT THE FACTORY", subhead: "", lead: "", entries } } });
+    expect(put.body).toMatchObject({ status: "epilogued" });
+    const game = await db().game.findUniqueOrThrow({ where: { code } });
+    const os = await gameOneShot(game);
+    const society = (id: string) => (os.cast.find((c) => c.id === id) as unknown as { naughty: { society: string } }).naughty.society;
+    return { code, game, gloria: society("gloria-pop"), agnes: society("agnes-fil"), penny: society("penny-buy") };
+  }
+
+  it("keeps each night on the poster of everyone who saw it through, by role, and a guest's only once it's claimed", async () => {
+    const { code, game } = await night();
+    const roles = async (v: Viewer) => (await profileFor(v.username, v))!.history.map((e) => [e.code, e.role, e.character?.id ?? null]);
+    expect(await roles(gm)).toEqual([[code, "gm", null]]);
+    expect(await roles(co)).toEqual([[code, "cogm", null]]);
+    expect((await roles(ollie)).sort()).toEqual([
+      [code, "player", "agnes-fil"],
+      [code, "player", "gloria-pop"],
+    ]);
+    expect(await roles(stranger)).toEqual([]);
+    const o = (await profileFor("ollie", stranger))!;
+    expect(o.summary).toMatchObject({ bounty: 1, played: 2, ran: 0, aliases: [{ title: "Loyal Citizen" }], scars: [{ scar: "a singed eyebrow" }] });
+    expect(o.history.find((e) => e.character?.id === "gloria-pop")).toMatchObject({ date: "2026-10-20", inPaper: true, character: { fate: "survived", line: "I saw nothing." } });
+    // Sam's seat was a guest's: nobody's history, until an invite hands it to an account.
+    await adoptGuest(game.id, KEY, { id: stranger.id, displayName: stranger.displayName });
+    expect(await roles(stranger)).toEqual([[code, "player", "penny-buy"]]);
+    expect((await profileFor("stray", stranger))!.summary.bounty).toBe(1);
+  });
+
+  it("never puts a secret on a poster, except your own once it came out at the table, and no one's private data", async () => {
+    const { gloria, agnes, penny } = await night();
+    // Ollie reads their own: Gloria's came out, Agnes's didn't.
+    const own = (await profileFor("Ollie", ollie))!;
+    expect(own.own).toBe(true);
+    expect(own.history.find((e) => e.character?.id === "gloria-pop")!.character!.secret).toContain(gloria);
+    expect("secret" in own.history.find((e) => e.character?.id === "agnes-fil")!.character!).toBe(false);
+    const ownText = JSON.stringify(own);
+    expect(ownText).not.toContain(agnes);
+    expect(ownText).not.toContain(penny);
+    // Anyone else reading Ollie's, or the GM's, sees no secret at all, revealed or not.
+    const reads: [Viewer, string][] = [[stranger, "ollie"], [gm, "ollie"], [ollie, "mags"], [stranger, "mags"]];
+    for (const [who, whose] of reads) {
+      const text = JSON.stringify(await profileFor(whose, who));
+      for (const secret of [gloria, agnes, penny]) expect(text.includes(secret), `${who.username} reading ${whose}`).toBe(false);
+      expect(text).not.toContain("private flashback");
+      expect(text).not.toContain(ollie.id);
+    }
+  });
+
+  it("shows profiles to signed-in members only: guests and strangers go to the door", async () => {
+    const { code } = await night();
+    const visit = async (who: Who, username: string) => {
+      const cookies: Record<string, string> =
+        who && "guest" in who ? { [GUEST_COOKIE]: encodeURIComponent(await signGuestPass(who.guest, process.env.AUTH_SECRET!)) } : await sessionCookies(who);
+      const req = { headers: {}, cookies };
+      const res = { setHeader: () => undefined };
+      return profilePage({ req, res, resolvedUrl: `/u/${username}`, params: { username }, query: { username } } as unknown as Parameters<typeof profilePage>[0]);
+    };
+    expect(await visit(null, "ollie")).toEqual({ redirect: { destination: "/login?next=%2Fu%2Follie", permanent: false } });
+    expect(await visit(sam(code), "ollie")).toMatchObject({ redirect: { destination: expect.stringMatching(/^\/login\?/) } });
+    expect(await visit(stranger, "OLLIE")).toMatchObject({ props: { profile: { username: "Ollie", own: false } } });
+    expect(await visit(stranger, "nobody-here")).toEqual({ notFound: true });
+    // A closed account has no poster.
+    await db().user.update({ where: { id: ollie.id }, data: { disabledAt: new Date() } });
+    expect(await visit(stranger, "ollie")).toEqual({ notFound: true });
+  });
+
+  it("changes only the signed-in account's own settings, and only for a member", async () => {
+    const prefs = { ...defaultPrefs(), reading: { large: true, contrast: false, dyslexia: true }, sound: { volume: 0.4, buzz: false } };
+    for (const body of [{ prefs }, { portrait: WOODCUT }, { displayName: "X", pronouns: "" }]) {
+      expect((await hit(accountRoute, null, { method: "PATCH", body })).statusCode).toBe(401);
+      expect((await hit(accountRoute, sam("ABCDE"), { method: "PATCH", body })).statusCode).toBe(401);
+    }
+    expect((await hit(accountRoute, null, { method: "POST", body: { current: PW, password: "another long password" } })).statusCode).toBe(401);
+    expect((await hit(accountRoute, ollie, { method: "PUT", body: {} })).statusCode).toBe(405);
+
+    // Naming someone else in the body changes nothing of theirs.
+    const r = await hit(accountRoute, ollie, { method: "PATCH", body: { prefs, userId: stranger.id, username: "Stray" } });
+    expect(r).toMatchObject({ statusCode: 200, body: { prefs } });
+    expect((await hit(accountRoute, ollie, { method: "PATCH", body: { portrait: WOODCUT, id: stranger.id } })).statusCode).toBe(200);
+    const o = await db().user.findUniqueOrThrow({ where: { id: ollie.id } });
+    const st = await db().user.findUniqueOrThrow({ where: { id: stranger.id } });
+    expect([o.prefs, o.portrait]).toEqual([prefs, WOODCUT]);
+    expect([st.prefs, st.portrait]).toEqual([null, null]);
+    expect((await profileFor("ollie", stranger))!.portrait).toBe(WOODCUT);
+
+    // Only a woodcut, within reason; null takes it down.
+    for (const portrait of ["https://example.com/me.png", "data:text/html;base64,PHNjcmlwdD4=", `data:image/png;base64,${"A".repeat(260_000)}`, 42]) {
+      expect((await hit(accountRoute, ollie, { method: "PATCH", body: { portrait } })).statusCode, String(portrait).slice(0, 30)).toBe(400);
+    }
+    expect((await hit(accountRoute, ollie, { method: "PATCH", body: { portrait: null } })).body).toEqual({ portrait: null });
+    expect((await hit(accountRoute, ollie, { method: "PATCH", body: { prefs: { sound: { volume: 3 } } } })).statusCode).toBe(400);
+    // Missing parts take their defaults.
+    expect((await hit(accountRoute, ollie, { method: "PATCH", body: { prefs: { dice: { shake: true } } } })).body).toEqual({ prefs: { ...defaultPrefs(), dice: { shake: true } } });
+
+    // The rest of the settings, still: a name, and a password that needs the old one.
+    expect((await hit(accountRoute, ollie, { method: "PATCH", body: { displayName: "Ollie Two", pronouns: "they/them" } })).body).toEqual({ displayName: "Ollie Two", pronouns: "they/them" });
+    expect((await hit(accountRoute, ollie, { method: "POST", body: { current: "wrong password!", password: "another long password" } })).statusCode).toBe(400);
+    expect((await hit(accountRoute, ollie, { method: "POST", body: { current: PW, password: "another long password" } })).statusCode).toBe(200);
   });
 });
