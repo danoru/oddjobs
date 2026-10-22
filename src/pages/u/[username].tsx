@@ -4,7 +4,8 @@ import { Container } from "@mui/material";
 import { pageViewer } from "@/lib/auth";
 import { profileFor, type Profile } from "@/lib/profile.server";
 import { SiteHeader } from "@/components/SiteHeader";
-import { Cabinet, JobRecord, WantedPoster } from "@/components/profile/WantedPoster";
+import { JobRecord, WantedPoster } from "@/components/profile/WantedPoster";
+import { Cabinet } from "@/components/keepsake/Cabinet";
 import b from "@/components/board/Board.module.css";
 import s from "@/components/profile/Profile.module.css";
 
@@ -13,7 +14,7 @@ type Props = { profile: Profile };
 /**
  * A member's WANTED poster: their woodcut, name and pronouns, the titles and
  * scars the paper gave their characters, the bounty (jobs survived) and the
- * record of every game they saw to the end. Members only: a guest or a
+ * record of every game they saw to the end, and the cabinet of keepsakes. Members only: a guest or a
  * stranger goes to the door (the proxy sends them there too). Secrets stay
  * off it, except your own once they came out at the table.
  */
@@ -41,7 +42,7 @@ export default function ProfilePage({ profile }: Props) {
               <WantedPoster profile={profile} />
               <JobRecord profile={profile} />
             </div>
-            <Cabinet entries={profile.history} />
+            <Cabinet items={profile.cabinet} own={profile.own} />
           </div>
         </main>
       </Container>

@@ -211,5 +211,9 @@
     "sources": ["PHB 2014", "Xanathar's Guide to Everything", "Monster Manual 2014"],
     "warnings": ["faked death and grief", "fraud and impersonation", "an NPC bound and gagged (offscreen)", "cartoonish violence"]
   },
-  "skin": "dossier"
+  "skin": "dossier",
+  "keepsakes": {
+    "player": { "name": "Paddle No. 13", "note": "A bidder's paddle, split down the handle. You raised it for the lot nobody should have won.", "art": "paddle" },
+    "gm": { "name": "The master auctioneer's gavel", "note": "Going once, going twice, gone. The block still has a dent in it.", "art": "gavel" }
+  }
 }

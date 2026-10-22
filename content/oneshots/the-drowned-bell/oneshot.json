@@ -205,5 +205,9 @@
     }
   ],
   "content": { "sources": ["PHB 2024"], "warnings": ["undead", "drowning"] },
-  "variants": [{ "level": 3, "note": "Greener hands: a year or two before they were any good at this." }]
+  "variants": [{ "level": 3, "note": "Greener hands: a year or two before they were any good at this." }],
+  "keepsakes": {
+    "player": { "name": "A shard of the storm-bell", "note": "Bronze gone green with the sea. It hums, very faintly, before a storm.", "art": "bell" },
+    "gm": { "name": "The keeper's lantern", "note": "Hung in the bell-tower window while the worst storm in a generation came in.", "art": "lantern" }
+  }
 }

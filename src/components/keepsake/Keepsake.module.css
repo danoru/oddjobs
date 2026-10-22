@@ -1,0 +1,207 @@
+/* Keepsakes (phase 13): the cabinet on a WANTED poster, and the morning
+   after's "what everyone takes home" strip. Ink on parchment: the shelves
+   are inked planks with a hatched shadow, the objects woodcuts. */
+
+/* Worn with the board's .note. */
+.cabinet {
+  margin-top: clamp(20px, 3vw, 40px);
+}
+
+.under {
+  font-family: var(--font-print);
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 15px;
+  margin: -4px 0 12px;
+}
+
+.empty {
+  font-family: var(--font-print);
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 15px;
+  margin: 0;
+}
+
+/* The cabinet: side posts and a top rail, a plank under every row of 112px. */
+.shelf {
+  list-style: none;
+  margin: 0;
+  padding: 10px 4px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  grid-auto-rows: 112px;
+  border: 5px solid var(--ink);
+  border-bottom: 0;
+  border-radius: 3px 3px 0 0;
+  background-image:
+    repeating-linear-gradient(to bottom, transparent 0 96px, var(--ink) 96px 102px, transparent 102px 112px),
+    repeating-linear-gradient(to bottom, transparent 0 102px, rgba(43, 29, 14, 0.22) 102px 109px, transparent 109px 112px),
+    repeating-linear-gradient(135deg, rgba(43, 29, 14, 0.06) 0 1px, transparent 1px 5px);
+  background-position: 0 10px, 0 10px, 0 0;
+  min-height: 112px;
+}
+
+.slot {
+  position: relative;
+  height: 112px;
+  padding-bottom: 16px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.object {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  margin: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: transform 120ms ease;
+}
+
+.object:hover,
+.slot[data-open] .object {
+  transform: translateY(-3px) rotate(-3deg);
+}
+
+.object:focus-visible {
+  outline: 2px dashed var(--wax);
+  outline-offset: 2px;
+}
+
+.count {
+  position: absolute;
+  right: -6px;
+  bottom: 0;
+  font-family: var(--font-label);
+  font-size: 13px;
+  line-height: 1;
+  padding: 3px 5px;
+  color: var(--parchment);
+  background: var(--ink);
+  border-radius: 3px;
+}
+
+/* The card: above the object, nudged sideways (--shift) to stay on a phone's screen. */
+.card {
+  display: none;
+  position: absolute;
+  z-index: 6;
+  bottom: calc(100% - 10px);
+  left: 50%;
+  width: min(280px, calc(100vw - 32px));
+  transform: translateX(calc(-50% + var(--shift, 0px)));
+  padding: 10px 12px;
+  text-align: left;
+  color: var(--ink);
+  background: var(--parchment);
+  border: 2px solid var(--ink);
+  box-shadow:
+    3px 3px 0 rgba(43, 29, 14, 0.35),
+    0 10px 20px rgba(0, 0, 0, 0.3);
+  font-family: var(--font-print);
+  font-size: 14.5px;
+  line-height: 1.3;
+}
+
+.slot:hover .card,
+.object:focus-visible + .card,
+.slot[data-open] .card {
+  display: block;
+}
+
+/* One card at a time: one opened or focused wins over one merely under the mouse. */
+.shelf:has(.object:focus-visible, .slot[data-open]) .slot:not([data-open]):not(:has(.object:focus-visible)) .card,
+.shelf[data-quiet] .card {
+  display: none;
+}
+
+.cardName {
+  display: block;
+  font-size: 17px;
+}
+
+.cardNote {
+  display: block;
+  margin: 2px 0 6px;
+  color: var(--ink-soft);
+}
+
+.cardJob {
+  display: block;
+  font-family: var(--font-label);
+  letter-spacing: 0.06em;
+  font-size: 13px;
+  border-top: 1px solid rgba(43, 29, 14, 0.35);
+  padding-top: 5px;
+}
+
+.runs {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  font-size: 14px;
+}
+
+.cardMeta {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+/* The morning after: what everyone takes home. Quiet, no buttons. */
+.strip {
+  margin-top: 28px;
+  padding: 14px 16px 10px;
+  border-top: 4px double currentColor;
+}
+
+.stripTitle {
+  font-family: var(--font-label);
+  letter-spacing: 0.1em;
+  font-size: 15px;
+  margin: 0 0 10px;
+}
+
+.stripList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr));
+  gap: 10px 18px;
+}
+
+.stripItem {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  line-height: 1.25;
+}
+
+.stripWho {
+  display: block;
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.stripName {
+  display: block;
+  font-weight: 600;
+}
+
+.stripNote {
+  display: block;
+  font-size: 13px;
+  font-style: italic;
+  opacity: 0.75;
+}

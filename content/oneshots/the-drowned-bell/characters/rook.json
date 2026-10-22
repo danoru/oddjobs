@@ -346,5 +346,10 @@
       "The Act 2 break-in set piece; replace with a rescue of Rook.",
       "The coin-on-the-rope choice in Act 4, unless the coin holder wants to make it."
     ]
+  },
+  "keepsake": {
+    "name": "A sea-worn token",
+    "note": "Rowed home in a closed fist, and never spent.",
+    "art": "coin"
   }
 }

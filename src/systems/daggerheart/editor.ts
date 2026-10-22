@@ -1,4 +1,4 @@
-import { coreFlashback, coreGm, coreHints, corePoster, corePosting, coreSkin, coreTablePlay, coreUnclaimed, freshId } from "@/lib/editor/core";
+import { coreCharacterKeepsake, coreFlashback, coreGm, coreHints, coreKeepsakes, corePoster, corePosting, coreSkin, coreTablePlay, coreUnclaimed, freshId } from "@/lib/editor/core";
 import type { SystemEditor } from "@/lib/editor/types";
 import { getAt } from "@/lib/store/doc";
 import { ANCESTRIES, COMMUNITIES, DOMAIN_CARDS } from "./srd";
@@ -22,6 +22,7 @@ export const editor: SystemEditor = {
       help: "GM-only stat blocks for tonight's foes, in your own words. The GM page rolls their attacks (a d20 plus the modifier) behind the screen.",
       fields: ["adversaries"],
     },
+    coreKeepsakes,
     coreGm,
   ],
   characterSections: [
@@ -46,6 +47,7 @@ export const editor: SystemEditor = {
       ],
     },
     coreFlashback,
+    coreCharacterKeepsake,
     coreUnclaimed,
     {
       id: "mech",

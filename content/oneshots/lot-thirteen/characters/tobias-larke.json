@@ -150,5 +150,10 @@
       "Old Marigold's recovery thread; the lute simply sits in Biscuit's gut as treasure.",
       "The Merry Perils bail-and-cheese gags with Nettle."
     ]
+  },
+  "keepsake": {
+    "name": "The ring he kept",
+    "note": "Bought for an altar, carried to an auction, and still in his pocket.",
+    "art": "ring"
   }
 }

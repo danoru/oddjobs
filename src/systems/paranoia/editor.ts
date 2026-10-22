@@ -1,4 +1,4 @@
-import { coreFlashback, coreGm, coreHints, corePoster, corePosting, coreSkin, coreTablePlay, coreUnclaimed, freshId } from "@/lib/editor/core";
+import { coreCharacterKeepsake, coreFlashback, coreGm, coreHints, coreKeepsakes, corePoster, corePosting, coreSkin, coreTablePlay, coreUnclaimed, freshId } from "@/lib/editor/core";
 import type { SystemEditor } from "@/lib/editor/types";
 import { BONUS_DUTIES, MUTANT_POWERS, SERVICE_GROUPS, SOCIETIES } from "./rules";
 
@@ -27,6 +27,7 @@ export const editor: SystemEditor = {
       fields: ["houseRules"],
     },
     coreTablePlay,
+    coreKeepsakes,
     coreGm,
   ],
   characterSections: [
@@ -51,6 +52,7 @@ export const editor: SystemEditor = {
       ],
     },
     coreFlashback,
+    coreCharacterKeepsake,
     coreUnclaimed,
     {
       id: "mech",

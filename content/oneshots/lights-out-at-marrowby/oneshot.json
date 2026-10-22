@@ -233,5 +233,9 @@
     "The footprints at the crossing have moved a little nearer to the light.",
     "The stationmaster's wife has laid a third place at her table.",
     "The candle in the tunnel refuge is still burning."
-  ]
+  ],
+  "keepsakes": {
+    "player": { "name": "A candle stub", "note": "One of ten. It burned as long as it could.", "art": "candle" },
+    "gm": { "name": "The signal lamp", "note": "Kept lit on the Marrowby post for nineteen days, because somebody had to.", "art": "lantern" }
+  }
 }

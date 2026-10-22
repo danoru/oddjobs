@@ -29,5 +29,10 @@
       },
       { "to": "owen-pask", "text": "He reminds her of her son, and she's furious with herself for it.", "public": "keeps giving him the last of the tea" }
     ]
+  },
+  "keepsake": {
+    "name": "Ida's pocket watch",
+    "note": "Thirty years of trains, kept to the minute.",
+    "art": "pocketwatch"
   }
 }

@@ -29,5 +29,10 @@
         "public": "met her at the crossing"
       }
     ]
+  },
+  "keepsake": {
+    "name": "A set of house keys",
+    "note": "His mum's. He walked eleven miles meaning to give them back.",
+    "art": "key"
   }
 }

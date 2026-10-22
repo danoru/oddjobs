@@ -1120,6 +1120,41 @@ describe.skipIf(!up)("profiles and settings", () => {
     expect((await profileFor("stray", stranger))!.summary.bounty).toBe(1);
   });
 
+  it("fills each cabinet from the night: by role, a character's own, the fallen, stacks, a guest's once claimed", async () => {
+    const { game } = await night();
+    const shelf = async (v: Viewer, as: Viewer = stranger) =>
+      (await profileFor(v.username, as))!.cabinet.map((i) => [i.keepsake.name, i.count, i.fallen, i.runs.map((r) => r.character?.name ?? r.role)]);
+    // Paranoia's seeds: a souvenir capsule for players, a commendation for the GM, Agnes's own replica key.
+    expect(await shelf(gm)).toEqual([["A Commendation for Posterity", 1, false, ["gm"]]]);
+    expect(await shelf(co)).toEqual([["A Commendation for Posterity", 1, false, ["cogm"]]]);
+    expect((await shelf(ollie)).sort()).toEqual([
+      ["A MEMENTO-4 souvenir capsule", 1, false, ["Gloria"]],
+      ["A replica Sealing Key", 1, true, ["Agnes"]],
+    ]);
+    expect(await shelf(stranger)).toEqual([]);
+    await adoptGuest(game.id, KEY, { id: stranger.id, displayName: stranger.displayName });
+    expect(await shelf(stranger)).toEqual([["A MEMENTO-4 souvenir capsule", 1, false, ["Penny"]]]);
+
+    // Running it again stacks.
+    const again = (await createGame(gm, PARANOIA))!.code;
+    expect((await hit(gameRoute, gm, { method: "PATCH", query: { code: again }, body: { op: "status", status: "finished" } })).statusCode).toBe(200);
+    expect(await shelf(gm)).toEqual([["A Commendation for Posterity", 2, false, ["gm", "gm"]]]);
+
+    // A keepsake mended in the builder reaches nights already played (whatever copy they pinned).
+    const store = new DbStore();
+    const doc = (await store.get(PARANOIA))!.published!;
+    const mended = { ...doc.oneshot.keepsakes as object, gm: { name: "A gold star", note: "For the future.", art: "badge" } };
+    await store.saveDraft(PARANOIA, { ...doc, oneshot: { ...doc.oneshot, keepsakes: mended } });
+    await store.publish(PARANOIA);
+    const later = Date.now() + 60_000;
+    const now = vi.spyOn(Date, "now").mockReturnValue(later);
+    try {
+      expect(await shelf(gm)).toEqual([["A gold star", 2, false, ["gm", "gm"]]]);
+    } finally {
+      now.mockRestore();
+    }
+  });
+
   it("never puts a secret on a poster, except your own once it came out at the table, and no one's private data", async () => {
     const { gloria, agnes, penny } = await night();
     // Ollie reads their own: Gloria's came out, Agnes's didn't.

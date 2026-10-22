@@ -235,5 +235,9 @@
       "betrayal between players is expected; agree at the start how much backstabbing your table enjoys"
     ]
   },
-  "skin": "dossier"
+  "skin": "dossier",
+  "keepsakes": {
+    "player": { "name": "A MEMENTO-4 souvenir capsule", "note": "Commemorates the sealing of the time capsule. Please be happy about it.", "art": "capsule" },
+    "gm": { "name": "A Commendation for Posterity", "note": "Awarded by Friend Computer for services to the future. Wearing it is mandatory.", "art": "badge" }
+  }
 }

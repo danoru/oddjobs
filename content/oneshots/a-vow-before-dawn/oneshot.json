@@ -331,5 +331,9 @@
         }
       ]
     }
-  ]
+  ],
+  "keepsakes": {
+    "player": { "name": "A sprig of the Vow-Oak", "note": "Picked on the walk home at sunrise, and pressed in a book ever since.", "art": "sprig" },
+    "gm": { "name": "A thorn from the Hush", "note": "It glowed like an ember in a sleeping man's palm. Now it only glows at midnight.", "art": "thorn" }
+  }
 }

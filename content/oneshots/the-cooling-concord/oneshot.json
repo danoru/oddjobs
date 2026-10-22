@@ -225,5 +225,9 @@
       "bathhouse setting (nudity implied, none depicted)"
     ]
   },
-  "skin": "playbill"
+  "skin": "playbill",
+  "keepsakes": {
+    "player": { "name": "A cinder from the furnace", "note": "Carried up from under the Thermae on Jubilee Night. It has never quite gone cold.", "art": "ember" },
+    "gm": { "name": "The Concord seal", "note": "Fifty years of peace pressed into red wax, and one night to decide what it was worth.", "art": "seal" }
+  }
 }

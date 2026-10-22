@@ -152,5 +152,10 @@
       "Corwen's sea-order silence and the Witness's casting-vote tension (Torvak takes the casting vote).",
       "The Corwen and Selenor letter-writers' scene."
     ]
+  },
+  "keepsake": {
+    "name": "A tide-reader's shell",
+    "note": "Hold it to your ear and it tells you the hour of the next high water.",
+    "art": "shell"
   }
 }

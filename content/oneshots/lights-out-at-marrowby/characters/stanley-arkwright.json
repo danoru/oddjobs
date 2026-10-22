@@ -25,5 +25,10 @@
       { "to": "ida-kell", "text": "She watches him like he's a signal she can't read. He'd like to tell her the truth, if he knew what it was.", "public": "Ida doesn't trust him" },
       { "to": "marguerite-loy", "text": "He's seen his own name on an envelope in her sack. He hasn't asked. He's afraid of what the address will be.", "public": "won't ask about the letter" }
     ]
+  },
+  "keepsake": {
+    "name": "A ticket to Saltcoats",
+    "note": "Unpunched.",
+    "art": "ticket"
   }
 }

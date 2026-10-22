@@ -99,5 +99,10 @@
       "The cookbook as a secret objective (it is only an object in the barrel now).",
       "Agnes's evidence on Penny's posterity payments."
     ]
+  },
+  "keepsake": {
+    "name": "A replica Sealing Key",
+    "note": "Opens nothing, holds nothing, and is filed in triplicate anyway.",
+    "art": "key"
   }
 }

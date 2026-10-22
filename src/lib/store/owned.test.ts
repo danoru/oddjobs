@@ -163,6 +163,45 @@ describe("the builder API and ownership", () => {
     expect((await store.get("quills-night"))!.draft!.oneshot.title).toBe("Quill's Long Night");
   });
 
+  it("lets authors and admins edit keepsakes only where they may edit at all, and checks them on publish", async () => {
+    const store = tempStore();
+    await call(listRoute, store, { role: "author", method: "POST", body: { action: "create", system: "tencandles", title: "Quill's Night" } });
+    const paddle = { name: "Paddle No. 13", note: "Raised once.", art: "paddle" };
+    const gavel = { name: "The gavel", note: "Gone.", art: "gavel" };
+    const withKeepsakes = (d: OneShotDoc): OneShotDoc => ({ ...d, oneshot: { ...d.oneshot, keepsakes: { player: paddle, gm: gavel } } });
+
+    // The author, on their own.
+    const mine = (await store.get("quills-night"))!.draft!;
+    expect((await call(oneRoute, store, { role: "author", method: "PUT", query: { slug: "quills-night" }, body: { doc: withKeepsakes(mine) } })).statusCode).toBe(200);
+    expect((await store.get("quills-night"))!.draft!.oneshot.keepsakes).toEqual({ player: paddle, gm: gavel });
+
+    // Someone else's, and the admins' unowned one: refused, nothing written.
+    for (const [who, slug, status] of [["author2", "quills-night", 403], ["author", LEGACY, 403], ["table", LEGACY, 403], [null, LEGACY, 401]] as const) {
+      const before = await store.get(slug);
+      const r = await call(oneRoute, store, { role: who, method: "PUT", query: { slug }, body: { doc: withKeepsakes((before!.draft ?? before!.published)!) } });
+      expect(r.statusCode, `${who} on ${slug}`).toBe(status);
+      expect(await store.get(slug), `${who} on ${slug}`).toEqual(before);
+    }
+
+    // An admin, on the unowned one: the shared keepsakes and a character's own, published.
+    const legacy = (await store.get(LEGACY))!.published!;
+    const ida = legacy.cast.findIndex((c) => c.id === "ida-kell");
+    const watch = { name: "A watch", note: "Kept to the minute.", art: "pocketwatch" };
+    const edited = withKeepsakes({ ...legacy, cast: legacy.cast.map((c, i) => (i === ida ? { ...c, keepsake: watch } : c)) });
+    expect((await call(oneRoute, store, { role: "gm", method: "PUT", query: { slug: LEGACY }, body: { doc: edited } })).statusCode).toBe(200);
+    expect((await call(actionRoute, store, { role: "gm", method: "POST", query: { slug: LEGACY, action: "publish" } })).statusCode).toBe(200);
+    const published = (await store.get(LEGACY))!.published!;
+    expect(published.oneshot.keepsakes).toEqual({ player: paddle, gm: gavel });
+    expect(published.cast.find((c) => c.id === "ida-kell")!.keepsake).toEqual(watch);
+
+    // A keepsake the checks refuse doesn't publish.
+    const bad = { ...edited, oneshot: { ...edited.oneshot, keepsakes: { player: { ...paddle, art: "trophy" }, gm: gavel } } };
+    await call(oneRoute, store, { role: "gm", method: "PUT", query: { slug: LEGACY }, body: { doc: bad } });
+    const refusedPublish = await call(actionRoute, store, { role: "gm", method: "POST", query: { slug: LEGACY, action: "publish" } });
+    expect(refusedPublish.statusCode).toBeGreaterThanOrEqual(400);
+    expect((await store.get(LEGACY))!.published!.oneshot.keepsakes).toEqual({ player: paddle, gm: gavel });
+  });
+
   it("keeps members without the badge out of the builder entirely", async () => {
     const store = tempStore();
     for (const [route, req] of [

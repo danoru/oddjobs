@@ -1,8 +1,10 @@
 import { usernameKey, type Viewer } from "./accounts";
 import { gameOneShot } from "./games.server";
 import { deriveHistory, summarizeHistory, type HistoryCast, type HistoryEntry, type HistorySummary } from "./history";
+import { shelve, type CabinetItem, type KeepsakeSource } from "./keepsakes";
 import { db } from "./prisma";
 import type { OneShotWithCast } from "./schema";
+import { tableOneShot } from "./source";
 
 /**
  * A member's WANTED poster (/u/<username>, phase 12): who they are, and
@@ -25,6 +27,8 @@ export interface Profile {
   own: boolean;
   history: HistoryEntry[];
   summary: HistorySummary;
+  /** The keepsakes: one object per job and role (./keepsakes.ts). */
+  cabinet: CabinetItem[];
 }
 
 /** What someone's character hides, as their own history would show it once it's out. Ten Candles has none. */
@@ -77,13 +81,28 @@ export async function gamesOf(userId: string) {
 
 /** Someone's history: the games, the content each played (its pinned copy), and the rules in ./history.ts. */
 export async function historyOf(userId: string, own: boolean): Promise<HistoryEntry[]> {
+  return (await recordOf(userId, own)).history;
+}
+
+/**
+ * Someone's history and their cabinet. Keepsakes come from the one-shot as
+ * it's published now, so one added or mended later reaches every run of it;
+ * a one-shot that's gone falls back to the copy its game played.
+ */
+export async function recordOf(userId: string, own: boolean): Promise<{ history: HistoryEntry[]; cabinet: CabinetItem[] }> {
   const games = await gamesOf(userId);
   const casts = new Map<string, HistoryCast | null>();
+  const played = new Map<string, OneShotWithCast>();
   for (const g of games) {
     const os = await gameOneShot(g).catch(() => null);
     casts.set(g.id, os ? castOf(os, own) : null);
+    if (os && !played.has(g.oneshot)) played.set(g.oneshot, os);
   }
-  return deriveHistory(userId, games, (g) => casts.get(g.id) ?? null, own);
+  const history = deriveHistory(userId, games, (g) => casts.get(g.id) ?? null, own);
+  const sources = new Map<string, KeepsakeSource | null>();
+  for (const slug of new Set(history.map((e) => e.oneshot)))
+    sources.set(slug, await tableOneShot(slug).catch(() => played.get(slug) ?? null));
+  return { history, cabinet: shelve(history, (slug) => sources.get(slug) ?? null) };
 }
 
 /** The poster for `/u/<username>`, as `viewer` (a signed-in member) may see it, or null if there's no such member. */
@@ -95,7 +114,7 @@ export async function profileFor(username: string, viewer: Viewer): Promise<Prof
   });
   if (!u || u.disabledAt) return null;
   const own = u.id === viewer.id;
-  const history = await historyOf(u.id, own);
+  const { history, cabinet } = await recordOf(u.id, own);
   return {
     username: u.username,
     displayName: u.displayName,
@@ -104,5 +123,6 @@ export async function profileFor(username: string, viewer: Viewer): Promise<Prof
     own,
     history,
     summary: summarizeHistory(history),
+    cabinet,
   };
 }

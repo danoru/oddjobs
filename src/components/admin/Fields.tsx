@@ -23,6 +23,8 @@ import { hintFor, humanize, maxLength, minItems, objectKeys, schemaAt, scopeOf, 
 import type { DocPath } from "@/lib/oneShotCheck";
 import type { FieldHint } from "@/lib/editor/types";
 import { PosterIcon, type IconKey } from "@/components/PosterIcon";
+import { KeepsakeArt } from "@/components/keepsake/KeepsakeArt";
+import type { KeepsakeArt as KeepsakeKey } from "@/lib/schema";
 import { SoundEngine } from "@/lib/sound/synth";
 import type { SoundBed, SoundStinger } from "@/lib/sound/synth";
 import { useEditor } from "./EditorContext";
@@ -58,7 +60,7 @@ function labelFor(hint: FieldHint, node: SchemaNode, path: DocPath): string {
 
 /** Short inputs share a row; long text and lists take the whole width. */
 function isWide(kind: Kind, hint: FieldHint): boolean {
-  if (hint.widget === "castRefs" || hint.widget === "icon" || hint.widget === "tags") return true;
+  if (hint.widget === "castRefs" || hint.widget === "icon" || hint.widget === "keepsake" || hint.widget === "tags") return true;
   if (kind === "string")
     return !["text", "castRef", "actRef", "readonly", "suggest", "sound", "spell"].includes(hint.widget ?? "");
   return kind === "object" || kind === "array" || kind === "union" || kind === "record" || kind === "other";
@@ -138,6 +140,9 @@ export function Field({ path, label, wide }: { path: DocPath; label?: string; wi
       break;
     case "icon":
       input = <IconPicker path={path} label={text} />;
+      break;
+    case "keepsake":
+      input = <IconPicker path={path} label={text} keepsake />;
       break;
     case "sound":
       input = <SoundPicker path={path} label={text} node={node} />;
@@ -876,11 +881,12 @@ function CastRefs({ path, label, help }: { path: DocPath; label: string; help?: 
   );
 }
 
-function IconPicker({ path, label }: { path: DocPath; label: string }) {
+/** The poster icons, or (`keepsake`) the keepsake drawings. */
+function IconPicker({ path, label, keepsake = false }: { path: DocPath; label: string; keepsake?: boolean }) {
   const ctx = useEditor();
   const value = getAt(ctx.doc, path);
   const node = schemaAt(ctx.system, path, ctx.doc);
-  const icons = node && node.schema instanceof z.ZodEnum ? (node.schema.options as IconKey[]) : [];
+  const icons = node && node.schema instanceof z.ZodEnum ? (node.schema.options as string[]) : [];
   return (
     <div className={s.group}>
       <span className={s.legend} id={`lbl-${pathKey(path)}`}>
@@ -900,7 +906,7 @@ function IconPicker({ path, label }: { path: DocPath; label: string }) {
             className={value === icon ? s.iconOn : s.iconButton}
             onClick={() => ctx.set(path, icon)}
           >
-            <PosterIcon icon={icon} size={28} />
+            {keepsake ? <KeepsakeArt art={icon as KeepsakeKey} size={34} /> : <PosterIcon icon={icon as IconKey} size={28} />}
           </button>
         ))}
       </div>

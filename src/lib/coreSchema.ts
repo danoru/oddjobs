@@ -158,6 +158,41 @@ export const ifUnclaimedSchema = z.object({
   cuts: z.array(z.string()).default([]).describe("What gets cut"),
 });
 
+/** Keepsake drawings; drawn by src/components/keepsake/KeepsakeArt.tsx. */
+export const KEEPSAKE_ARTS = [
+  "ticket",
+  "paddle",
+  "gavel",
+  "coin",
+  "bell",
+  "key",
+  "candle",
+  "lantern",
+  "ring",
+  "sprig",
+  "letter",
+  "mask",
+  "book",
+  "ember",
+  "seal",
+  "shell",
+  "capsule",
+  "badge",
+  "thorn",
+  "pocketwatch",
+] as const;
+
+/**
+ * What someone takes home from a job (phase 13): a small object on their
+ * profile's cabinet. Everyone who reads a profile sees it, played the job or
+ * not, so it's never a secret.
+ */
+export const keepsakeSchema = z.object({
+  name: z.string().min(1).max(60, "keep a keepsake's name short").describe("Name"),
+  note: z.string().min(1).max(140, "keep the note to a line").describe("Note: one line, in-world"),
+  art: z.enum(KEEPSAKE_ARTS).describe("Drawing"),
+});
+
 /** Dress for a one-shot's job page and posters. */
 export const SKINS = ["noticeboard", "dossier", "playbill", "tarot"] as const;
 
@@ -174,6 +209,8 @@ export const coreCharacterFields = {
   /** Session-zero question the player answers in a sentence before play. */
   flashback: z.string().optional().describe("Session-zero flashback question"),
   ifUnclaimed: ifUnclaimedSchema.optional().describe("If nobody claims them"),
+  /** Their own keepsake, instead of the one-shot's shared player keepsake. */
+  keepsake: keepsakeSchema.optional().describe("Their own keepsake"),
 };
 
 /** Every one-shot, in any system, has these. Systems add `system` and their own fields. */
@@ -228,6 +265,14 @@ export const coreOneShotFields = {
     .describe("Content notes"),
   /** How the job page and its posters are dressed. The home board is always the notice board. */
   skin: z.enum(SKINS).default("noticeboard").describe("Skin"),
+  /** What players and the GM take home. Without it, everyone gets a ticket stub (src/lib/keepsakes.ts). */
+  keepsakes: z
+    .object({
+      player: keepsakeSchema.describe("Every player's (unless their character has their own)"),
+      gm: keepsakeSchema.describe("The GM's"),
+    })
+    .optional()
+    .describe("Keepsakes"),
 };
 
 export type Poster = z.infer<typeof posterSchema>;
@@ -241,6 +286,8 @@ export type NoticeKind = (typeof NOTICE_KINDS)[number];
 export type IfUnclaimed = z.infer<typeof ifUnclaimedSchema>;
 export type Sounds = z.infer<typeof soundsSchema>;
 export type Skin = (typeof SKINS)[number];
+export type Keepsake = z.infer<typeof keepsakeSchema>;
+export type KeepsakeArt = (typeof KEEPSAKE_ARTS)[number];
 
 /** The parts of a character that shared code (posters, yarn, letters, tonight) may read. */
 export type CoreCharacter = {
@@ -251,5 +298,6 @@ export type CoreCharacter = {
   portrait?: string;
   flashback?: string;
   ifUnclaimed?: IfUnclaimed;
+  keepsake?: Keepsake;
   story: { ties: Tie[] };
 };

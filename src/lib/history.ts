@@ -14,7 +14,8 @@ import type { Fate } from "./legacy";
  * - A secret shows only in its player's own history, and only if the GM
  *   marked it as having come out at the table (the morning after's `revealed`).
  *
- * Phase 13's keepsakes are one per entry: (oneshot, role, character).
+ * Phase 13's keepsakes (./keepsakes.ts) are read from these entries: one per
+ * entry, stacked by the object they resolve to.
  */
 
 export type HistoryRole = "gm" | "cogm" | "player";

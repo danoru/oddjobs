@@ -41,6 +41,8 @@ export type Widget =
   | "actRef"
   /** The poster icon grid. */
   | "icon"
+  /** The keepsake drawings grid. */
+  | "keepsake"
   /** A sound preset with a play button. */
   | "sound"
   /** Free text with suggestions (`options`). */

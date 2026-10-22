@@ -1,4 +1,4 @@
-import { coreFlashback, coreGm, coreHints, corePoster, corePosting, coreSkin, coreTablePlay, coreUnclaimed } from "@/lib/editor/core";
+import { coreCharacterKeepsake, coreFlashback, coreGm, coreHints, coreKeepsakes, corePoster, corePosting, coreSkin, coreTablePlay, coreUnclaimed } from "@/lib/editor/core";
 import type { SystemEditor } from "@/lib/editor/types";
 import { getAt } from "@/lib/store/doc";
 import { ABILITIES } from "./schema";
@@ -19,6 +19,7 @@ export const editor: SystemEditor = {
       panel: "levels5e",
     },
     { ...coreTablePlay, fields: [...coreTablePlay.fields!, "coins"] },
+    coreKeepsakes,
     coreGm,
   ],
   characterSections: [
@@ -44,6 +45,7 @@ export const editor: SystemEditor = {
       ],
     },
     coreFlashback,
+    coreCharacterKeepsake,
     coreUnclaimed,
     {
       id: "mech",

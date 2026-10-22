@@ -381,6 +381,8 @@
   background: var(--ink);
   color: var(--parchment);
   border-color: var(--ink);
+  /* A keepsake drawing's gouges show the button behind them. */
+  --keepsake-paper: var(--ink);
 }
 
 /* ---- Navigation ---------------------------------------------------------------------- */

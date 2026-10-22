@@ -1,6 +1,6 @@
 import type { OneShotDoc } from "@/lib/oneShotCheck";
 import type { EditorSection, FieldHint } from "./types";
-import { publicTieWarning } from "./warnings";
+import { mysteryKeepsakeWarning, publicTieWarning } from "./warnings";
 
 /**
  * The builder sections every system shares. A system's editor
@@ -49,6 +49,22 @@ export const coreGm: EditorSection = {
   scope: "oneshot",
   help: "Only the GM page shows the notes.",
   fields: ["gmNotes", "coreRoles", "content.warnings", "content.sources"],
+};
+
+export const coreKeepsakes: EditorSection = {
+  id: "keepsakes",
+  title: "Keepsakes",
+  scope: "oneshot",
+  help: "What players and the GM take home: a small object on their profile once the game is finished. Anyone who reads a profile sees it, so keep it free of spoilers. Without keepsakes, everyone gets a ticket stub; a character can have their own on their Keepsake tab.",
+  fields: ["keepsakes"],
+};
+
+export const coreCharacterKeepsake: EditorSection = {
+  id: "keepsake",
+  title: "Keepsake",
+  scope: "character",
+  help: "Optional: what this character's player takes home instead of the one-shot's shared player keepsake. If they fall, it comes home cracked or scorched.",
+  fields: ["keepsake"],
 };
 
 export const corePoster: EditorSection = {
@@ -154,6 +170,20 @@ export const coreHints: Record<string, FieldHint> = {
   "oneshot:gazette.town": { widget: "text" },
   "oneshot:gazette.price": { widget: "text" },
   "oneshot:content.sources": { itemLabel: "source" },
+
+  "oneshot:keepsakes": { fields: ["player", "gm"], newItem: () => ({ player: { art: "ticket" }, gm: { art: "gavel" } }) },
+  "oneshot:keepsakes.player": { fields: ["name", "note", "art"] },
+  "oneshot:keepsakes.gm": { fields: ["name", "note", "art"] },
+  "oneshot:keepsakes.player.name": { widget: "text", placeholder: "Paddle No. 13" },
+  "oneshot:keepsakes.gm.name": { widget: "text", placeholder: "The auctioneer's gavel" },
+  "oneshot:keepsakes.player.note": { widget: "text" },
+  "oneshot:keepsakes.gm.note": { widget: "text" },
+  "oneshot:keepsakes.player.art": { widget: "keepsake" },
+  "oneshot:keepsakes.gm.art": { widget: "keepsake" },
+  "character:keepsake": { fields: ["name", "note", "art"], newItem: () => ({ art: "coin" }), warn: mysteryKeepsakeWarning },
+  "character:keepsake.name": { widget: "text", placeholder: "The drowned woman's coin" },
+  "character:keepsake.note": { widget: "text" },
+  "character:keepsake.art": { widget: "keepsake" },
 
   "character:name": { widget: "text" },
   "character:id": { widget: "text", help: "Lowercase-kebab; it's the sheet's address. Renaming updates ties, letters and heirs." },

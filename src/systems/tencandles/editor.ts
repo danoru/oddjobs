@@ -1,4 +1,4 @@
-import { coreFlashback, coreGm, coreHints, corePoster, corePosting, coreSkin, coreTablePlay, coreUnclaimed, freshId } from "@/lib/editor/core";
+import { coreCharacterKeepsake, coreFlashback, coreGm, coreHints, coreKeepsakes, corePoster, corePosting, coreSkin, coreTablePlay, coreUnclaimed, freshId } from "@/lib/editor/core";
 import type { SystemEditor } from "@/lib/editor/types";
 
 /**
@@ -29,6 +29,7 @@ export const editor: SystemEditor = {
       fields: ["suggestedTruths"],
     },
     coreTablePlay,
+    coreKeepsakes,
     { ...coreGm, help: "Ten Candles characters are made at the table, so leave core roles empty." },
   ],
   characterSections: [
@@ -40,6 +41,7 @@ export const editor: SystemEditor = {
       fields: ["story.pronouns", "story.concept", "story.look", "story.stake", "story.namePrompts", "story.carrying", "story.ties"],
     },
     coreFlashback,
+    coreCharacterKeepsake,
     coreUnclaimed,
   ],
   hints: {

@@ -129,5 +129,10 @@
       "The Tumbletoe burrow-hold mortgage stakes.",
       "Nettle's gentle kindness toward Odalys."
     ]
+  },
+  "keepsake": {
+    "name": "A harlequin's half-mask",
+    "note": "Nimble, charming, and still not answering questions.",
+    "art": "mask"
   }
 }

@@ -182,5 +182,10 @@
       "Pell's confession at the Briar Gate about running.",
       "The thornling contact, Burr, and the shortcut through the hedges in Act 3."
     ]
+  },
+  "keepsake": {
+    "name": "The wedding rings",
+    "note": "Kept safe by the best man until sunrise. Both of them, somehow.",
+    "art": "ring"
   }
 }

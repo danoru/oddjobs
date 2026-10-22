@@ -22,6 +22,7 @@ import { emptyEpilogue, survivorsFrom, useSharedEpilogue } from "@/lib/epilogue"
 import { usePlayer, useLinkedTableCode } from "@/lib/storage";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Gazette, type EpilogueEntry } from "@/components/gazette/Gazette";
+import { TakeHomeStrip } from "@/components/keepsake/TakeHome";
 import { publishedPaths, withPublished } from "@/lib/published";
 import { storeKind, type StoreKind } from "@/lib/store/kind";
 
@@ -223,6 +224,7 @@ export default function EpiloguePage({ os, sharedWorld }: Props) {
           </Box>
           <Gazette os={os} ep={ep} />
         </Box>
+        <TakeHomeStrip os={os} ep={ep} />
       </Container>
     </>
   );

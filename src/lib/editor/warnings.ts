@@ -40,3 +40,25 @@ export function publicTieWarning(value: unknown, doc: OneShotDoc, path: DocPath)
     ? `Might reveal the secret: it shares ${shared.map((w) => `“${w}”`).join(", ")} with it. Everyone sees this line on the board.`
     : null;
 }
+
+/**
+ * For a character's own keepsake, which anyone reading a profile sees: warns
+ * when it echoes their secret, or when they hide behind an alias on the board.
+ */
+export function mysteryKeepsakeWarning(value: unknown, doc: OneShotDoc, path: DocPath): string | null {
+  if (!value || typeof value !== "object") return null;
+  const k = value as { name?: unknown; note?: unknown };
+  const words = [k.name, k.note].filter((x): x is string => typeof x === "string").join(" ");
+  // path: ["cast", i, "keepsake"]. The secret: `story.secret`, or a Troubleshooter's naughty side.
+  const at = path.slice(0, 2);
+  const naughty = getAt(doc, [...at, "naughty"]) as { society?: unknown; secret?: unknown; mutantPower?: { name?: unknown } } | undefined;
+  const secret = [getAt(doc, [...at, "story", "secret"]), naughty?.society, naughty?.secret, naughty?.mutantPower?.name]
+    .filter((x): x is string => typeof x === "string")
+    .join(" ");
+  const shared = secret && words ? sharedWithSecret(words, secret) : [];
+  if (shared.length) return `Might reveal the secret: it shares ${shared.map((w) => `“${w}”`).join(", ")} with it. Profiles show keepsakes to everyone.`;
+  const alias = getAt(doc, [...path.slice(0, 2), "poster", "alias"]);
+  if (typeof alias === "string" && alias.trim())
+    return `The board calls them “${alias}”, but profiles show keepsakes to everyone: make sure this one doesn't give away who they are.`;
+  return null;
+}

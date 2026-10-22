@@ -149,13 +149,3 @@ export function JobRecord({ profile: p }: { profile: Profile }) {
     </section>
   );
 }
-
-/**
- * The cabinet: phase 13's keepsakes, one small object per job per role,
- * drawn from these same history entries (oneshot, role, character, fate).
- * Nothing to show until then, so it isn't drawn.
- */
-export function Cabinet({ entries }: { entries: HistoryEntry[] }) {
-  void entries;
-  return null;
-}
